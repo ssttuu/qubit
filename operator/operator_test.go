@@ -15,4 +15,3 @@ func TestGetOperatorFromJson(t *testing.T) {
 
 	assert.Equal(t, op.Name, "read1")
 }
-
