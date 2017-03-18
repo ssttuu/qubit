@@ -1,0 +1,19 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "kMBZlFW4Y+4Wcm1OFc+MAatwBWw=",
+			"path": "github.com/bitly/go-nsq",
+			"revision": "b9762cdcb6d5cc5ac5287ca076354143d332cc97",
+			"revisionTime": "2017-02-15T00:13:23Z"
+		},
+		{
+			"checksumSHA1": "p/8vSviYF91gFflhrt5vkyksroo=",
+			"path": "github.com/golang/snappy",
+			"revision": "553a641470496b2327abcac10b36396bd98e45c9",
+			"revisionTime": "2017-02-15T23:32:05Z"
+		}
+	],
+	"rootPath": "github.com/stupschwartz/qubit/compute"
+}

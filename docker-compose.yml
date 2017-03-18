@@ -5,9 +5,35 @@ services:
     build: ./server
     ports:
       - 8443:8443
+    command: sleep 5 && go run main.go
+    depends_on:
+      - cassandra-migrate-up
+      - nsqd
+      - postgres
+
+  compute:
+    image: stupschwartz/qubit-compute
+    build: ./compute
     command: go run main.go
     depends_on:
+      - nsqlookupd
+
+  compute-worker:
+    image: stupschwartz/qubit-compute-worker
+    build: ./compute-worker
+    depends_on:
+      - nsqlookupd
+
+  cassandra-migrate-up:
+    image: atijust/migrate
+    volumes:
+      - ./migrations/cassandra:/migrations
+    entrypoint: sh /utils/waitforit.sh cassandra:9042 --
+    command: migrate -url cassandra://cassandra:9042/qubit -path ./ up
+    depends_on:
       - cassandra
+    volumes_from:
+      - utils
 
   cassandra:
     image: cassandra
@@ -17,21 +43,42 @@ services:
       - 7199:7199
       - 9042:9042
       - 9160:9160
+    volumes:
+      - ./cassandra:/var/lib/cassandra
+
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_DB=qubit
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
 
   nsqlookupd:
     image: nsqio/nsq
     command: /nsqlookupd
     ports:
-      - 4160
-      - 4161
+      - 4160:4160
+      - 4161:4161
   nsqd:
     image: nsqio/nsq
     command: /nsqd --lookupd-tcp-address=nsqlookupd:4160
     ports:
-      - 4150
-      - 4151
+      - 4150:4150
+      - 4151:4151
+    depends_on:
+      - nsqlookupd
   nsqadmin:
     image: nsqio/nsq
     command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
     ports:
-      - 4171
+      - 4171:4171
+    depends_on:
+      - nsqlookupd
+
+  utils:
+    image: ubuntu
+    volumes:
+      - ./utils:/utils
+

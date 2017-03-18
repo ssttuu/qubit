@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"github.com/gocql/gocql"
 	"encoding/base64"
+	"github.com/stupschwartz/qubit/server/api/render"
 )
 
 type CqlNodeRow struct {
@@ -37,6 +38,25 @@ var createNodeQuery string = `
 		node_digest
 	) VALUES (?, ?, ?, ?);
 `
+
+//func nodeChanged(env *env.Env, n node.Node, nodeDigest string) {
+//	message := struct {
+//		Node   node.Node `json:"node"`
+//		Digest string `json:"digest"`
+//	}{
+//		Node: n,
+//		Digest: nodeDigest,
+//	}
+//
+//	jsonData, _ := json.Marshal(&message)
+//
+//	err := env.NsqProducer.Publish("node_changed", jsonData)
+//	if err != nil {
+//		log.Panic("Could not connect")
+//	}
+//
+//	go render.RenderNodeAndDependents(n)
+//}
 
 func GetAllHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	var (
@@ -132,6 +152,10 @@ func PostHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 		log.Fatal(err)
 	}
 
+	//nodeChanged(env, n, nodeDigest)
+	go render.RenderNodeAndDependents(nodeUuid)
+
+
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
 
@@ -178,6 +202,9 @@ func PutHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	if err := query.Exec(); err != nil {
 		log.Fatal(err)
 	}
+
+	//nodeChanged(env, n, nodeDigest)
+	//go render.RenderNodeAndDependents(whereNodeId)
 
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")

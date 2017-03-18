@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "kMBZlFW4Y+4Wcm1OFc+MAatwBWw=",
+			"path": "github.com/bitly/go-nsq",
+			"revision": "b9762cdcb6d5cc5ac5287ca076354143d332cc97",
+			"revisionTime": "2017-02-15T00:13:23Z"
+		},
+		{
 			"checksumSHA1": "7BEKq0xoRvV1whMiWU0aV3WubXE=",
 			"path": "github.com/gocql/gocql",
 			"revision": "1f874493e9e5aebe46b312593cbd9cb5d3946eda",
@@ -45,6 +51,18 @@
 			"revisionTime": "2016-01-25T11:53:50Z"
 		},
 		{
+			"checksumSHA1": "FZem1OXCd+ogu1yeG11GMlGiGVA=",
+			"path": "github.com/lib/pq",
+			"revision": "699d6b1bd83a497693f0863c142dd8759b35eb80",
+			"revisionTime": "2017-03-05T04:07:35Z"
+		},
+		{
+			"checksumSHA1": "Gk3jTNQ5uGDUE0WMJFWcYz9PMps=",
+			"path": "github.com/lib/pq/oid",
+			"revision": "699d6b1bd83a497693f0863c142dd8759b35eb80",
+			"revisionTime": "2017-03-05T04:07:35Z"
+		},
+		{
 			"checksumSHA1": "Se195FlZ160eaEk/uVx4KdTPSxU=",
 			"path": "github.com/pborman/uuid",
 			"revision": "1b00554d822231195d1babd97ff4a781231955c9",
@@ -53,14 +71,14 @@
 		{
 			"checksumSHA1": "6sCgXQNuh6J2/Phu6mTuuf+WBgY=",
 			"path": "github.com/stupschwartz/qubit/node",
-			"revision": "d809acd36edf08dfec702b8f0b39fd41f7184f07",
-			"revisionTime": "2017-02-26T22:58:26Z"
+			"revision": "398073e17b555da41980909c470fb4107c97ea0e",
+			"revisionTime": "2017-03-01T01:46:51Z"
 		},
 		{
 			"checksumSHA1": "OvBPZX/V2rvbvIwKE45TXORP13I=",
 			"path": "github.com/stupschwartz/qubit/operator",
-			"revision": "d809acd36edf08dfec702b8f0b39fd41f7184f07",
-			"revisionTime": "2017-02-26T22:58:26Z"
+			"revision": "398073e17b555da41980909c470fb4107c97ea0e",
+			"revisionTime": "2017-03-01T01:46:51Z"
 		},
 		{
 			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",
