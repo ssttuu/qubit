@@ -10,79 +10,35 @@ import (
 	"github.com/stupschwartz/qubit/server/handler"
 	"log"
 	"net/http"
-	"github.com/gocql/gocql"
+	"github.com/satori/go.uuid"
 	"encoding/base64"
 	"github.com/stupschwartz/qubit/server/api/render"
+	"cloud.google.com/go/datastore"
+	"strings"
 )
 
-type CqlNodeRow struct {
-	NodeId      gocql.UUID `json:"node_id"`
-	NodeVersion int `json:"node_version"`
-	NodeData    node.Node `json:"node_data"`
-	NodeDigest  string `json:"node_digest"`
+func GetDigestFromNode(n *node.Node) string {
+	digestHasher := sha256.New()
+	digestHasher.Write([]byte(n.Type))
+	digestHasher.Write([]byte(strings.Join(n.Inputs, ",")))
+
+	//paramsAsJson, _ := json.Marshal(&n.Params)
+	//digestHasher.Write([]byte(paramsAsJson))
+	return base64.URLEncoding.EncodeToString(digestHasher.Sum(nil))
 }
 
-var allNodesQuery string = `
-	SELECT node_id, node_version, node_data, node_digest FROM qubit.nodes;
-`
-
-var selectNodeQuery string = `
-	SELECT node_id, node_version, node_data, node_digest FROM qubit.nodes WHERE node_id=?;
-`
-
-var createNodeQuery string = `
-	INSERT INTO qubit.nodes (
-		node_id,
-		node_version,
-		node_data,
-		node_digest
-	) VALUES (?, ?, ?, ?);
-`
-
-//func nodeChanged(env *env.Env, n node.Node, nodeDigest string) {
-//	message := struct {
-//		Node   node.Node `json:"node"`
-//		Digest string `json:"digest"`
-//	}{
-//		Node: n,
-//		Digest: nodeDigest,
-//	}
-//
-//	jsonData, _ := json.Marshal(&message)
-//
-//	err := env.NsqProducer.Publish("node_changed", jsonData)
-//	if err != nil {
-//		log.Panic("Could not connect")
-//	}
-//
-//	go render.RenderNodeAndDependents(n)
-//}
 
 func GetAllHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
-	var (
-		nodeId gocql.UUID
-		nodeVersion int
-		nodeData string
-		nodeDigest string
-	)
-
-	iter := env.CqlSession.Query(allNodesQuery).Iter()
-
-	cqlNodes := []CqlNodeRow{}
-
-	for iter.Scan(&nodeId, &nodeVersion, &nodeData, &nodeDigest) {
-		n := node.Node{}
-		if err := json.Unmarshal([]byte(nodeData), &n); err != nil {
-			log.Fatal(err)
-		}
-		cqlNodes = append(cqlNodes, CqlNodeRow{NodeId: nodeId, NodeVersion: nodeVersion, NodeData: n, NodeDigest: nodeDigest})
+	var nodes []*node.Node
+	_, err := env.DatastoreClient.GetAll(env.Context, datastore.NewQuery("Node"), &nodes)
+	if err != nil {
+		return err
 	}
-
-	jsonData, _ := json.Marshal(&cqlNodes)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
+	jsonData, _ := json.Marshal(&nodes)
 	fmt.Fprint(w, string(jsonData))
 
 	return nil
@@ -92,74 +48,78 @@ func GetHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	whereNodeId := vars["id"]
 
-	var (
-		nodeId gocql.UUID
-		nodeVersion int
-		nodeData string
-		nodeDigest string
-	)
+	nodeKey := datastore.NameKey("Node", whereNodeId, nil)
 
-	err := env.CqlSession.Query(selectNodeQuery, whereNodeId).Consistency(gocql.One).Scan(&nodeId, &nodeVersion, &nodeData, &nodeDigest)
-
-	if err != nil {
-		log.Fatal(err)
+	var existingNode node.Node
+	if err := env.DatastoreClient.Get(env.Context, nodeKey, &existingNode); err != nil {
+		return err
 	}
-
-	n := node.Node{}
-	if err := json.Unmarshal([]byte(nodeData), &n); err != nil {
-		log.Fatal(err)
-	}
-	cqlNodeRow := CqlNodeRow{NodeId: nodeId, NodeVersion: nodeVersion, NodeData: n, NodeDigest: nodeDigest}
-
-	jsonData, _ := json.Marshal(&cqlNodeRow)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
-	fmt.Fprint(w, string(jsonData))
+	nodeAsJson, err := json.Marshal(&existingNode)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Fprintf(w, string(nodeAsJson))
 
 	return nil
 }
 
 func PostHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
-	nodeUuid, err := gocql.RandomUUID()
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Println("Posting")
+
+	nodeUuid := uuid.NewV4()
+	log.Println("UUID: " + nodeUuid.String())
 
 	decoder := json.NewDecoder(r.Body)
 
-	n := node.Node{}
+	newNode := node.Node{}
+	log.Println("new Node")
 
-	if err := decoder.Decode(&n); err != nil {
+	if err := decoder.Decode(&newNode); err != nil {
 		log.Fatal(err)
 	}
 
 	defer r.Body.Close()
 
-	nodeAsJson, err := json.Marshal(n)
-	if err != nil {
-		log.Fatal(err)
+	newNode.Id = nodeUuid.String()
+	newNode.Digest = GetDigestFromNode(&newNode)
+	newNode.Version = 0
+
+	log.Println("set values")
+
+	newNodeKey := datastore.NameKey("Node", newNode.Id, nil)
+
+	log.Println("newNodeKey")
+
+	if _, err := env.DatastoreClient.Put(env.Context, newNodeKey, &newNode); err != nil {
+		log.Fatalf("Failed to save node: %v", err)
 	}
 
-	digestHasher := sha256.New()
-	digestHasher.Write([]byte(nodeAsJson))
-	nodeDigest := base64.URLEncoding.EncodeToString(digestHasher.Sum(nil))
-
-	query := env.CqlSession.Query(createNodeQuery, nodeUuid, 0, nodeAsJson, nodeDigest)
-
-	if err := query.Exec(); err != nil {
-		log.Fatal(err)
-	}
+	log.Println("Put item")
 
 	//nodeChanged(env, n, nodeDigest)
-	go render.RenderNodeAndDependents(nodeUuid)
+	go render.RenderNodeAndDependents(newNode.Id)
 
+	log.Println("rendered dependents")
 
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
 
+	nodeAsJson, err := json.Marshal(&newNode)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("json data")
+	log.Println(string(nodeAsJson))
+
 	fmt.Fprintf(w, string(nodeAsJson))
+
+	log.Println("made it")
 
 	return nil
 }
@@ -167,47 +127,42 @@ func PostHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 func PutHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	whereNodeId := vars["id"]
-
-	selectNodeQuery := `
-		SELECT node_version FROM qubit.nodes WHERE node_id=?;
-	`
-
-	var nodeVersion int
-
-	if err := env.CqlSession.Query(selectNodeQuery, whereNodeId).Consistency(gocql.One).Scan(&nodeVersion); err != nil {
-		log.Fatal(err)
-	}
+	nodeKey := datastore.NameKey("Node", whereNodeId, nil)
 
 	decoder := json.NewDecoder(r.Body)
 
-	n := node.Node{}
+	newNode := node.Node{}
 
-	if err := decoder.Decode(&n); err != nil {
+	if err := decoder.Decode(&newNode); err != nil {
 		log.Fatal(err)
 	}
 
-	defer r.Body.Close()
+	_, err := env.DatastoreClient.RunInTransaction(env.Context, func(tx *datastore.Transaction) error {
+		var existingNode node.Node
+		if err := tx.Get(nodeKey, &existingNode); err != nil {
+			return err
+		}
+		existingNode.Version += 1
+		existingNode.Name = newNode.Name
+		//existingNode.Params = newNode.Params
+		existingNode.Inputs = newNode.Inputs
+		existingNode.Digest = GetDigestFromNode(&existingNode)
 
-	nodeAsJson, err := json.Marshal(n)
+		_, err := tx.Put(nodeKey, &existingNode)
+		return err
+	})
+
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to update node, %v", err)
 	}
-
-	digestHasher := sha256.New()
-	digestHasher.Write([]byte(nodeAsJson))
-	nodeDigest := base64.URLEncoding.EncodeToString(digestHasher.Sum(nil))
-
-	query := env.CqlSession.Query(createNodeQuery, whereNodeId, nodeVersion + 1, nodeAsJson, nodeDigest)
-
-	if err := query.Exec(); err != nil {
-		log.Fatal(err)
-	}
-
-	//nodeChanged(env, n, nodeDigest)
-	//go render.RenderNodeAndDependents(whereNodeId)
 
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
+
+	nodeAsJson, err := json.Marshal(&newNode)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Fprintf(w, string(nodeAsJson))
 

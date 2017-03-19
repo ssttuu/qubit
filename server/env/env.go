@@ -1,13 +1,11 @@
 package env
 
 import (
-	"github.com/gocql/gocql"
-	"github.com/bitly/go-nsq"
-	"database/sql"
+	"cloud.google.com/go/datastore"
+	"golang.org/x/net/context"
 )
 
 type Env struct {
-	CqlSession *gocql.Session
-	NsqProducer *nsq.Producer
-	Postgres *sql.DB
+	DatastoreClient *datastore.Client
+	Context context.Context
 }

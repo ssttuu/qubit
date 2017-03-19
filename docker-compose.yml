@@ -3,82 +3,109 @@ services:
   server:
     image: stupschwartz/qubit-server
     build: ./server
+    environment:
+      - DATASTORE_PROJECT_ID=qubit-161916
+      - DATASTORE_DATASET=qubit
+      - DATASTORE_EMULATOR_HOST=datastore:8380
+      - DATASTORE_HOST=datastore:8380
+      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
     ports:
       - 8443:8443
-    command: sleep 5 && go run main.go
+    command: go run main.go
+    volumes:
+      - ./credentials:/opt/etc/credentials
     depends_on:
-      - cassandra-migrate-up
-      - nsqd
-      - postgres
+      - datastore
+      - pubsub
 
   compute:
     image: stupschwartz/qubit-compute
     build: ./compute
+    environment:
+      - DATASTORE_PROJECT_ID=qubit-161916
     command: go run main.go
     depends_on:
-      - nsqlookupd
+      - datastore
 
   compute-worker:
     image: stupschwartz/qubit-compute-worker
     build: ./compute-worker
     depends_on:
-      - nsqlookupd
+      - datastore
 
-  cassandra-migrate-up:
-    image: atijust/migrate
-    volumes:
-      - ./migrations/cassandra:/migrations
-    entrypoint: sh /utils/waitforit.sh cassandra:9042 --
-    command: migrate -url cassandra://cassandra:9042/qubit -path ./ up
-    depends_on:
-      - cassandra
-    volumes_from:
-      - utils
-
-  cassandra:
-    image: cassandra
-    ports:
-      - 7000:7000
-      - 7001:7001
-      - 7199:7199
-      - 9042:9042
-      - 9160:9160
-    volumes:
-      - ./cassandra:/var/lib/cassandra
-
-  postgres:
-    image: postgres
+  datastore:
+    image: google/cloud-sdk
     environment:
-      - POSTGRES_DB=qubit
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - CLOUDSDK_CORE_PROJECT=compositor
+    command: gcloud beta emulators datastore start --no-legacy --host-port 0.0.0.0:8380
     ports:
-      - 5432:5432
+      - 8380:8380
 
-  nsqlookupd:
-    image: nsqio/nsq
-    command: /nsqlookupd
+  pubsub:
+    image: google/cloud-sdk
+    environment:
+      - CLOUDSDK_CORE_PROJECT=compositor
+    command: gcloud beta emulators pubsub start --host-port 0.0.0.0:8538
     ports:
-      - 4160:4160
-      - 4161:4161
-  nsqd:
-    image: nsqio/nsq
-    command: /nsqd --lookupd-tcp-address=nsqlookupd:4160
-    ports:
-      - 4150:4150
-      - 4151:4151
-    depends_on:
-      - nsqlookupd
-  nsqadmin:
-    image: nsqio/nsq
-    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
-    ports:
-      - 4171:4171
-    depends_on:
-      - nsqlookupd
+      - 8538:8538
 
-  utils:
-    image: ubuntu
-    volumes:
-      - ./utils:/utils
+
+
+#  cassandra-migrate-up:
+#    image: atijust/migrate
+#    volumes:
+#      - ./migrations/cassandra:/migrations
+#    entrypoint: sh /utils/waitforit.sh cassandra:9042 --
+#    command: migrate -url cassandra://cassandra:9042/qubit -path ./ up
+#    depends_on:
+#      - cassandra
+#    volumes_from:
+#      - utils
+#
+#  cassandra:
+#    image: cassandra
+#    ports:
+#      - 7000:7000
+#      - 7001:7001
+#      - 7199:7199
+#      - 9042:9042
+#      - 9160:9160
+#    volumes:
+#      - ./cassandra:/var/lib/cassandra
+#
+#  postgres:
+#    image: postgres
+#    environment:
+#      - POSTGRES_DB=qubit
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=postgres
+#    ports:
+#      - 5432:5432
+#
+#  nsqlookupd:
+#    image: nsqio/nsq
+#    command: /nsqlookupd
+#    ports:
+#      - 4160:4160
+#      - 4161:4161
+#  nsqd:
+#    image: nsqio/nsq
+#    command: /nsqd --lookupd-tcp-address=nsqlookupd:4160
+#    ports:
+#      - 4150:4150
+#      - 4151:4151
+#    depends_on:
+#      - nsqlookupd
+#  nsqadmin:
+#    image: nsqio/nsq
+#    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+#    ports:
+#      - 4171:4171
+#    depends_on:
+#      - nsqlookupd
+#
+#  utils:
+#    image: ubuntu
+#    volumes:
+#      - ./utils:/utils
 
