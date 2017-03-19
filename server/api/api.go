@@ -17,8 +17,5 @@ func Handlers(environ *env.Env) *mux.Router {
 	nodes.Register(apiRouter, environ)
 	render.Register(apiRouter, environ)
 
-	//apiRouter.HandleFunc("/render", NodeHandler).Methods("POST")
-	//apiRouter.HandleFunc("/render", RenderHandler).Methods("POST")
-
 	return router
 }

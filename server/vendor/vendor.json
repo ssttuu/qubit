@@ -153,16 +153,16 @@
 			"revisionTime": "2016-09-27T10:08:44Z"
 		},
 		{
-			"checksumSHA1": "xyNIgZYU+RviqT6LfsOYPGryzyM=",
+			"checksumSHA1": "ZjBMw9+u45p5PsmWCuNmek7oThI=",
 			"path": "github.com/stupschwartz/qubit/node",
-			"revision": "bf1a043c7e14bc807f05c099a48dae3ba256bfbc",
-			"revisionTime": "2017-03-19T19:44:09Z"
+			"revision": "e14847cb951d255bdcb596124bbb6d6efd7b17c6",
+			"revisionTime": "2017-03-19T23:08:02Z"
 		},
 		{
 			"checksumSHA1": "OvBPZX/V2rvbvIwKE45TXORP13I=",
 			"path": "github.com/stupschwartz/qubit/operator",
-			"revision": "bf1a043c7e14bc807f05c099a48dae3ba256bfbc",
-			"revisionTime": "2017-03-19T19:44:09Z"
+			"revision": "e14847cb951d255bdcb596124bbb6d6efd7b17c6",
+			"revisionTime": "2017-03-19T23:08:02Z"
 		},
 		{
 			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",

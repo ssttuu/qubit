@@ -173,6 +173,72 @@ func DeleteHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+type ConnectionData struct {
+	From string `json:"from"`
+	To string `json:"to"`
+}
+
+func stringInSlice(a string, list []string) bool {
+    for _, b := range list {
+        if b == a {
+            return true
+        }
+    }
+    return false
+}
+
+func ConnectHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
+	decoder := json.NewDecoder(r.Body)
+
+	connection := ConnectionData{}
+
+	if err := decoder.Decode(&connection); err != nil {
+		log.Fatal(err)
+	}
+
+	_, err := env.DatastoreClient.RunInTransaction(env.Context, func(tx *datastore.Transaction) error {
+		fromNodeKey := datastore.NameKey("Node", connection.From, nil)
+		toNodeKey := datastore.NameKey("Node", connection.To, nil)
+
+		var fromNode node.Node
+		if err := tx.Get(fromNodeKey, &fromNode); err != nil {
+			return err
+		}
+
+		var toNode node.Node
+		if err := tx.Get(toNodeKey, &toNode); err != nil {
+			return err
+		}
+
+		if !stringInSlice(connection.To, fromNode.Outputs) {
+			fromNode.Outputs = append(fromNode.Outputs, connection.To)
+
+			_, err := tx.Put(fromNodeKey, &fromNode)
+			if err != nil {
+				log.Fatalf("Failed to put FromNode: %v", err)
+			}
+		}
+
+		if !stringInSlice(connection.From, toNode.Inputs) {
+			toNode.Inputs = append(toNode.Inputs, connection.From)
+			toNode.Digest = GetDigestFromNode(&toNode)
+
+			_, err := tx.Put(toNodeKey, &toNode)
+			if err != nil {
+				log.Fatalf("Failed to put ToNode: %v", err)
+			}
+		}
+
+		return nil
+	})
+
+	return err
+}
+
+func DisconnectHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
 func Register(router *mux.Router, environ *env.Env) {
 	s := router.PathPrefix("/nodes").Subrouter()
 
@@ -182,4 +248,7 @@ func Register(router *mux.Router, environ *env.Env) {
 	s.Handle("/", handler.Handler{environ, PostHandler}).Methods("POST")
 	s.Handle("/{id}", handler.Handler{environ, PutHandler}).Methods("PUT")
 	s.Handle("/{id}", handler.Handler{environ, DeleteHandler}).Methods("DELETE")
+
+	s.Handle("/connect/", handler.Handler{environ, ConnectHandler}).Methods("PUT")
+	s.Handle("/disconnect/", handler.Handler{environ, DisconnectHandler}).Methods("PUT")
 }
