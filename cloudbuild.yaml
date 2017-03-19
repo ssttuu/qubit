@@ -1,27 +1,27 @@
 steps:
   # Server
   - name: "gcr.io/cloud-builders/go"
-    env: ["PROJECT_ROOT=server"]
-    args: ["install", "."]
-    id: "server-go-install"
+#    env: ["PROJECT_ROOT=server"]
+    args: ["install", "./server"]
+    id: "server-test"
     waitFor: ["-"]
 
   - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "gcr.io/${PROJECT_ID}/qubit-server:${COMMIT_SHA}", "."]
+    args: ["build", "-t", "gcr.io/${PROJECT_ID}/qubit-server:${COMMIT_SHA}", "./server"]
     id: "server-docker-build"
-    waitFor: ["server-go-install"]
+    waitFor: ["server-test"]
 
   # Compute
   - name: "gcr.io/cloud-builders/go"
-    env: ["PROJECT_ROOT=compute"]
-    args: ["install", "."]
-    id: "compute-go-install"
+#    env: ["PROJECT_ROOT=compute"]
+    args: ["install", "./compute"]
+    id: "compute-test"
     waitFor: ["-"]
 
   - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "gcr.io/${PROJECT_ID}/qubit-compute:${COMMIT_SHA}", "."]
+    args: ["build", "-t", "gcr.io/${PROJECT_ID}/qubit-compute:${COMMIT_SHA}", "./compute"]
     id: "compute-docker-build"
-    waitFor: ["compute-go-install"]
+    waitFor: ["compute-test"]
 
 
 images: [

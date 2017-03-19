@@ -13,20 +13,6 @@ import (
 )
 
 func main() {
-	mainCluster := gocql.NewCluster("cassandra")
-	mainCluster.Consistency = gocql.Quorum
-	mainCluster.Keyspace = "system"
-	mainSession, err := mainCluster.CreateSession()
-	for err != nil {
-		time.Sleep(100 * time.Millisecond)
-		mainSession, err = mainCluster.CreateSession()
-	}
-
-	err = mainSession.Query("CREATE KEYSPACE IF NOT EXISTS qubit WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1}")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	cluster := gocql.NewCluster("cassandra")
 	cluster.Keyspace = "qubit"
 	cluster.Consistency = gocql.Quorum
