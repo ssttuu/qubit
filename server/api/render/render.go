@@ -5,24 +5,15 @@ import (
 	"github.com/stupschwartz/qubit/server/env"
 	"github.com/stupschwartz/qubit/server/handler"
 	"net/http"
-	"github.com/stupschwartz/qubit/node"
-	"log"
-	"cloud.google.com/go/datastore"
 )
 
 func PostHandler(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	whereNodeId := vars["id"]
-	nodeKey := datastore.NameKey("Node", whereNodeId, nil)
 
-	var existingNode node.Node
-	if err := e.DatastoreClient.Get(e.Context, nodeKey, &existingNode); err != nil {
-		return err
-	}
+	go RenderNodeAndDependents(e, whereNodeId)
 
-	log.Printf("Rendering Task %v", existingNode)
-
-	w.WriteHeader(http.StatusProcessing)
+	w.WriteHeader(http.StatusAccepted)
 
 	return nil
 }

@@ -17,16 +17,52 @@ import (
 	"strings"
 )
 
-func GetDigestFromNode(n *node.Node) string {
+// TODO: in memory caching of Nodes (or even just the digests)
+// TODO: use the input digest to lookup the content digest and use that.
+// TODO: add params back to digest value
+func GetDigestFromNode(n *node.Node, e *env.Env) string {
 	digestHasher := sha256.New()
 	digestHasher.Write([]byte(n.Type))
-	digestHasher.Write([]byte(strings.Join(n.Inputs, ",")))
+
+	var inputDigests []string
+	for _, inputId := range n.Inputs {
+		log.Printf("inputId: %v", inputId)
+		inputNodeKey := datastore.NameKey("Node", inputId, nil)
+		var inputNode node.Node
+		if err := e.DatastoreClient.Get(e.Context, inputNodeKey, &inputNode); err != nil {
+			log.Fatalf("Failed to get input node, %v", err)
+		}
+
+		inputDigests = append(inputDigests, inputNode.Digest)
+	}
+
+	digestHasher.Write([]byte(strings.Join(inputDigests, ",")))
 
 	//paramsAsJson, _ := json.Marshal(&n.Params)
 	//digestHasher.Write([]byte(paramsAsJson))
 	return base64.URLEncoding.EncodeToString(digestHasher.Sum(nil))
 }
 
+// TODO: do this concurrently
+// TODO: use transaction
+func PutNodeAndUpdateDigests(n *node.Node, e *env.Env) {
+	n.Digest = GetDigestFromNode(n, e)
+
+	nodeKey := datastore.NameKey("Node", n.Id, nil)
+	if _, err := e.DatastoreClient.Put(e.Context, nodeKey, n); err != nil {
+		log.Fatalf("Failed to put node with digest, %v", err)
+	}
+
+	for _, outputId := range n.Outputs {
+		outputNodeKey := datastore.NameKey("Node", outputId, nil)
+		var outputNode node.Node
+		if err := e.DatastoreClient.Get(e.Context, outputNodeKey, &outputNode); err != nil {
+			log.Fatalf("Failed to get output node, %v", err)
+		}
+
+		PutNodeAndUpdateDigests(&outputNode, e)
+	}
+}
 
 func GetAllHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	var nodes []*node.Node
@@ -86,23 +122,11 @@ func PostHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	defer r.Body.Close()
 
 	newNode.Id = nodeUuid.String()
-	newNode.Digest = GetDigestFromNode(&newNode)
 	newNode.Version = 0
-
-	log.Println("set values")
-
-	newNodeKey := datastore.NameKey("Node", newNode.Id, nil)
-
-	log.Println("newNodeKey")
-
-	if _, err := env.DatastoreClient.Put(env.Context, newNodeKey, &newNode); err != nil {
-		log.Fatalf("Failed to save node: %v", err)
-	}
-
-	log.Println("Put item")
+	PutNodeAndUpdateDigests(&newNode, env)
 
 	//nodeChanged(env, n, nodeDigest)
-	go render.RenderNodeAndDependents(newNode.Id)
+	go render.RenderNodeAndDependents(env, newNode.Id)
 
 	log.Println("rendered dependents")
 
@@ -146,7 +170,7 @@ func PutHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 		existingNode.Name = newNode.Name
 		//existingNode.Params = newNode.Params
 		existingNode.Inputs = newNode.Inputs
-		existingNode.Digest = GetDigestFromNode(&existingNode)
+		PutNodeAndUpdateDigests(&existingNode, env)
 
 		_, err := tx.Put(nodeKey, &existingNode)
 		return err
@@ -175,16 +199,16 @@ func DeleteHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 
 type ConnectionData struct {
 	From string `json:"from"`
-	To string `json:"to"`
+	To   string `json:"to"`
 }
 
 func stringInSlice(a string, list []string) bool {
-    for _, b := range list {
-        if b == a {
-            return true
-        }
-    }
-    return false
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }
 
 func ConnectHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
@@ -221,12 +245,7 @@ func ConnectHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error 
 
 		if !stringInSlice(connection.From, toNode.Inputs) {
 			toNode.Inputs = append(toNode.Inputs, connection.From)
-			toNode.Digest = GetDigestFromNode(&toNode)
-
-			_, err := tx.Put(toNodeKey, &toNode)
-			if err != nil {
-				log.Fatalf("Failed to put ToNode: %v", err)
-			}
+			PutNodeAndUpdateDigests(&toNode, env)
 		}
 
 		return nil
