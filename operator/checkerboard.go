@@ -8,7 +8,6 @@ import (
 
 func CheckerBoardOperation(inputs []image.Plane, p params.Parameters, width int, height int) image.Plane {
 	sizeParam := params.GetByName(p, "Size")
-
 	sizeValue := int(sizeParam.GetValue())
 
 	var totalPixels int = width * height
@@ -33,13 +32,9 @@ func CheckerBoardOperation(inputs []image.Plane, p params.Parameters, width int,
 		bluePixels[index] = value
 	}
 
-	redMatrix := mat64.NewDense(height, width, redPixels)
-	greenMatrix := mat64.NewDense(height, width, greenPixels)
-	blueMatrix := mat64.NewDense(height, width, bluePixels)
-
-	redComponent := image.Component{Dense: redMatrix, Label: "Red"}
-	greenComponent := image.Component{Dense: greenMatrix, Label: "Green"}
-	blueComponent := image.Component{Dense: blueMatrix, Label: "Blue"}
+	redComponent := image.Component{Dense: mat64.NewDense(height, width, redPixels), Label: "Red"}
+	greenComponent := image.Component{Dense: mat64.NewDense(height, width, greenPixels), Label: "Green"}
+	blueComponent := image.Component{Dense: mat64.NewDense(height, width, bluePixels), Label: "Blue"}
 
 	components := make([]image.Component, 3)
 	components[0] = redComponent
