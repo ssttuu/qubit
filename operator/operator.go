@@ -1,7 +1,8 @@
 package operator
 
 import (
-	"encoding/json"
+	"github.com/stupschwartz/qubit/params"
+	"github.com/stupschwartz/qubit/image"
 )
 
 type Operator struct {
@@ -11,23 +12,20 @@ type Operator struct {
 	Inputs []string               `json:"inputs"`
 }
 
-type Operation func(op Operator) string
+type Operation func(inputs []image.Plane, p params.Parameters, width int, height int) image.Plane
 
 var Operators = make(map[string]Operation)
+var Parameters = make(map[string]params.Parameters)
 
-func RegisterOperation(opType string, operation Operation) {
+func RegisterOperation(opType string, operation Operation, parameters params.Parameters) {
 	Operators[opType] = operation
+	Parameters[opType] = parameters
 }
 
 func GetOperation(opType string) Operation {
 	return Operators[opType]
 }
 
-func GetOperatorFromJson(jsonBytes []byte) *Operator {
-	op := new(Operator)
-	if err := json.Unmarshal(jsonBytes, op); err != nil {
-
-	}
-
-	return op
+func GetParameters(opType string) params.Parameters {
+	return Parameters[opType]
 }

@@ -5,7 +5,7 @@ import (
 	"log"
 	"cloud.google.com/go/datastore"
 	"github.com/stupschwartz/qubit/server/env"
-	//"github.com/satori/go.uuid"
+	"context"
 )
 
 type RenderTask struct {
@@ -17,7 +17,7 @@ func RenderNodeAndDependents(e *env.Env, nodeUuid string) {
 	nodeKey := datastore.NameKey("Node", nodeUuid, nil)
 
 	var existingNode node.Node
-	if err := e.DatastoreClient.Get(e.Context, nodeKey, &existingNode); err != nil {
+	if err := e.DatastoreClient.Get(context.Background(), nodeKey, &existingNode); err != nil {
 		log.Fatalf("Failed to get node to be rendered, %v", err)
 	}
 

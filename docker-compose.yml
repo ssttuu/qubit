@@ -8,6 +8,7 @@ services:
       - DATASTORE_DATASET=qubit
       - DATASTORE_EMULATOR_HOST=datastore:8380
       - DATASTORE_HOST=datastore:8380
+      - STORAGE_BUCKET=qubit-dev-161916
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
     ports:
       - 8443:8443

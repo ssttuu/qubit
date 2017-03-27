@@ -2,10 +2,10 @@ package env
 
 import (
 	"cloud.google.com/go/datastore"
-	"golang.org/x/net/context"
+	"cloud.google.com/go/storage"
 )
 
 type Env struct {
 	DatastoreClient *datastore.Client
-	Context context.Context
+	StorageClient *storage.Client
 }

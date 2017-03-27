@@ -33,8 +33,20 @@
 			"revisionTime": "2017-03-17T20:35:08Z"
 		},
 		{
+			"checksumSHA1": "W2xJ0+fvugRhRi1PMi64bYofBbU=",
+			"path": "cloud.google.com/go/internal/optional",
+			"revision": "d3ab0ba5bd871165fd59d6779773139bf99c220d",
+			"revisionTime": "2017-03-17T20:35:08Z"
+		},
+		{
 			"checksumSHA1": "1TvufkYTMOYnB/ehKjekN5XTb+E=",
 			"path": "cloud.google.com/go/internal/version",
+			"revision": "d3ab0ba5bd871165fd59d6779773139bf99c220d",
+			"revisionTime": "2017-03-17T20:35:08Z"
+		},
+		{
+			"checksumSHA1": "Zigw3m/OQZy82BO6RgZjTqOWEE0=",
+			"path": "cloud.google.com/go/storage",
 			"revision": "d3ab0ba5bd871165fd59d6779773139bf99c220d",
 			"revisionTime": "2017-03-17T20:35:08Z"
 		},
@@ -105,6 +117,78 @@
 			"revisionTime": "2017-02-15T23:32:05Z"
 		},
 		{
+			"checksumSHA1": "tJLFSeWyXG8RWcdQ3oNtI7meD3c=",
+			"path": "github.com/gonum/blas",
+			"revision": "f6d28c18e71668e63984d0eec21fe11804c6fa30",
+			"revisionTime": "2017-02-21T03:08:21Z"
+		},
+		{
+			"checksumSHA1": "Hc4+U8HpN0345fLzyzrxlqYBBMs=",
+			"path": "github.com/gonum/blas/blas64",
+			"revision": "f6d28c18e71668e63984d0eec21fe11804c6fa30",
+			"revisionTime": "2017-02-21T03:08:21Z"
+		},
+		{
+			"checksumSHA1": "aOMVBeGiUPMVPx5pvj8D/ChC3Xg=",
+			"path": "github.com/gonum/blas/native",
+			"revision": "f6d28c18e71668e63984d0eec21fe11804c6fa30",
+			"revisionTime": "2017-02-21T03:08:21Z"
+		},
+		{
+			"checksumSHA1": "4URlS0sh4+VMLN6iDIYdt0JfpFg=",
+			"path": "github.com/gonum/blas/native/internal/math32",
+			"revision": "f6d28c18e71668e63984d0eec21fe11804c6fa30",
+			"revisionTime": "2017-02-21T03:08:21Z"
+		},
+		{
+			"checksumSHA1": "EhncFKKOt0T5oORInPdxj6rHXr0=",
+			"path": "github.com/gonum/floats",
+			"revision": "a2cbc5c70616cd18491ef2843231f6ce28b2cb02",
+			"revisionTime": "2017-02-05T03:04:20Z"
+		},
+		{
+			"checksumSHA1": "Uq4+T6tQvYIpWHb716BLJiloNmI=",
+			"path": "github.com/gonum/internal/asm/f32",
+			"revision": "aa14b654e75da6e47f3c563fbda889112fe5ac94",
+			"revisionTime": "2017-01-23T01:58:25Z"
+		},
+		{
+			"checksumSHA1": "CD+GPms4vKOhYGuqI4aVYVvE2RI=",
+			"path": "github.com/gonum/internal/asm/f64",
+			"revision": "aa14b654e75da6e47f3c563fbda889112fe5ac94",
+			"revisionTime": "2017-01-23T01:58:25Z"
+		},
+		{
+			"checksumSHA1": "djinfQio4KyhHiNGVSsqXOqt2Zk=",
+			"path": "github.com/gonum/lapack",
+			"revision": "eb5191820e3fef2174b4d0658a6dd42413bd61ba",
+			"revisionTime": "2017-02-25T06:48:49Z"
+		},
+		{
+			"checksumSHA1": "duOxKDxW5hl5pFfXzuaw2wiO+eA=",
+			"path": "github.com/gonum/lapack/lapack64",
+			"revision": "eb5191820e3fef2174b4d0658a6dd42413bd61ba",
+			"revisionTime": "2017-02-25T06:48:49Z"
+		},
+		{
+			"checksumSHA1": "hMTco+W7SYhW4On2qpsxSIi1ocs=",
+			"path": "github.com/gonum/lapack/native",
+			"revision": "eb5191820e3fef2174b4d0658a6dd42413bd61ba",
+			"revisionTime": "2017-02-25T06:48:49Z"
+		},
+		{
+			"checksumSHA1": "FzIGevy+kpiirIj6a6+l3CHFnoY=",
+			"path": "github.com/gonum/matrix",
+			"revision": "96a2f64ca6c006823bbfe5f92981534fd0a991b9",
+			"revisionTime": "2017-02-18T23:14:54Z"
+		},
+		{
+			"checksumSHA1": "nRaEkJFSUvAHWLh1nbtzgMCE8Sk=",
+			"path": "github.com/gonum/matrix/mat64",
+			"revision": "96a2f64ca6c006823bbfe5f92981534fd0a991b9",
+			"revisionTime": "2017-02-18T23:14:54Z"
+		},
+		{
 			"checksumSHA1": "WQ0nd5KXenaxGjgMpARaWa15PP4=",
 			"path": "github.com/googleapis/gax-go",
 			"revision": "8c5154c0fe5bf18cf649634d4c6df50897a32751",
@@ -153,16 +237,28 @@
 			"revisionTime": "2016-09-27T10:08:44Z"
 		},
 		{
-			"checksumSHA1": "ZjBMw9+u45p5PsmWCuNmek7oThI=",
-			"path": "github.com/stupschwartz/qubit/node",
-			"revision": "e14847cb951d255bdcb596124bbb6d6efd7b17c6",
-			"revisionTime": "2017-03-19T23:08:02Z"
+			"checksumSHA1": "HdS1mNqux9L3znyAY11a+xz2hdk=",
+			"path": "github.com/stupschwartz/qubit/image",
+			"revision": "b78074aaf98d92885708fc5926b4f0e3a42242c3",
+			"revisionTime": "2017-03-20T00:50:03Z"
 		},
 		{
-			"checksumSHA1": "OvBPZX/V2rvbvIwKE45TXORP13I=",
+			"checksumSHA1": "8uOvbCp3JP3n9BcbKB+AL1ImaIM=",
+			"path": "github.com/stupschwartz/qubit/node",
+			"revision": "b78074aaf98d92885708fc5926b4f0e3a42242c3",
+			"revisionTime": "2017-03-20T00:50:03Z"
+		},
+		{
+			"checksumSHA1": "dV3cwWxAG4vkOH1eIUZZ9bJ5/V8=",
 			"path": "github.com/stupschwartz/qubit/operator",
-			"revision": "e14847cb951d255bdcb596124bbb6d6efd7b17c6",
-			"revisionTime": "2017-03-19T23:08:02Z"
+			"revision": "b78074aaf98d92885708fc5926b4f0e3a42242c3",
+			"revisionTime": "2017-03-20T00:50:03Z"
+		},
+		{
+			"checksumSHA1": "fe9JPaxcNc9fXYsQs/txGmnuFvM=",
+			"path": "github.com/stupschwartz/qubit/params",
+			"revision": "b78074aaf98d92885708fc5926b4f0e3a42242c3",
+			"revisionTime": "2017-03-20T00:50:03Z"
 		},
 		{
 			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",
@@ -243,6 +339,24 @@
 			"revisionTime": "2017-02-13T18:53:58Z"
 		},
 		{
+			"checksumSHA1": "C7k1pbU/WU4CBoBwA4EBUnV/iek=",
+			"path": "google.golang.org/api/gensupport",
+			"revision": "cbeb0ff89adddeef6a3287fa481dcca2b596ed36",
+			"revisionTime": "2017-03-16T20:56:44Z"
+		},
+		{
+			"checksumSHA1": "BWKmb7kGYbfbvXO6E7tCpTh9zKE=",
+			"path": "google.golang.org/api/googleapi",
+			"revision": "cbeb0ff89adddeef6a3287fa481dcca2b596ed36",
+			"revisionTime": "2017-03-16T20:56:44Z"
+		},
+		{
+			"checksumSHA1": "1K0JxrUfDqAB3MyRiU1LKjfHyf4=",
+			"path": "google.golang.org/api/googleapi/internal/uritemplates",
+			"revision": "cbeb0ff89adddeef6a3287fa481dcca2b596ed36",
+			"revisionTime": "2017-03-16T20:56:44Z"
+		},
+		{
 			"checksumSHA1": "Mr2fXhMRzlQCgANFm91s536pG7E=",
 			"path": "google.golang.org/api/googleapi/transport",
 			"revision": "cbeb0ff89adddeef6a3287fa481dcca2b596ed36",
@@ -263,6 +377,12 @@
 		{
 			"checksumSHA1": "hZ9zds+/FPwSGEiti5lGaZL3e6w=",
 			"path": "google.golang.org/api/option",
+			"revision": "cbeb0ff89adddeef6a3287fa481dcca2b596ed36",
+			"revisionTime": "2017-03-16T20:56:44Z"
+		},
+		{
+			"checksumSHA1": "AJ0D3BoIFVy+jpVdc3jSMdEiHqQ=",
+			"path": "google.golang.org/api/storage/v1",
 			"revision": "cbeb0ff89adddeef6a3287fa481dcca2b596ed36",
 			"revisionTime": "2017-03-16T20:56:44Z"
 		},

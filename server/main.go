@@ -9,6 +9,7 @@ import (
 	"github.com/stupschwartz/qubit/server/env"
 
 	"cloud.google.com/go/datastore"
+	"cloud.google.com/go/storage"
 	"google.golang.org/api/option"
 
 	"golang.org/x/net/context"
@@ -31,16 +32,26 @@ func main() {
 	}
 
 	ctx := context.Background()
-	client, err := datastore.NewClient(ctx, projID, option.WithServiceAccountFile(os.Getenv("DATASTORE")))
+
+	serviceCredentials := option.WithServiceAccountFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+
+	datastoreClient, err := datastore.NewClient(ctx, projID, serviceCredentials)
 	for err != nil {
 		log.Printf("Could not create datastore client: %v\n", err)
 		time.Sleep(100 * time.Millisecond)
-		client, err = datastore.NewClient(ctx, projID)
+		datastoreClient, err = datastore.NewClient(ctx, projID, serviceCredentials)
+	}
+
+	storageClient, err := storage.NewClient(ctx, serviceCredentials)
+	for err != nil {
+		log.Printf("Could not create storage client: %v\n", err)
+		time.Sleep(100 * time.Millisecond)
+		storageClient, err = storage.NewClient(ctx, serviceCredentials)
 	}
 
 	environ := &env.Env{
-		DatastoreClient: client,
-		Context: ctx,
+		DatastoreClient: datastoreClient,
+		StorageClient: storageClient,
 	}
 
 

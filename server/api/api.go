@@ -4,7 +4,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/stupschwartz/qubit/server/api/nodes"
 	"github.com/stupschwartz/qubit/server/env"
-	//"github.com/stupschwartz/qubit/server/api/render"
 	_ "github.com/lib/pq"
 	"github.com/stupschwartz/qubit/server/api/render"
 )

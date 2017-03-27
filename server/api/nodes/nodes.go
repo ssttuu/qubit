@@ -1,7 +1,6 @@
 package nodes
 
 import (
-	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -11,62 +10,82 @@ import (
 	"log"
 	"net/http"
 	"github.com/satori/go.uuid"
-	"encoding/base64"
-	"github.com/stupschwartz/qubit/server/api/render"
 	"cloud.google.com/go/datastore"
-	"strings"
+	"context"
+	"cloud.google.com/go/storage"
+	"os"
+	"github.com/stupschwartz/qubit/params"
 )
 
 // TODO: in memory caching of Nodes (or even just the digests)
 // TODO: use the input digest to lookup the content digest and use that.
 // TODO: add params back to digest value
-func GetDigestFromNode(n *node.Node, e *env.Env) string {
-	digestHasher := sha256.New()
-	digestHasher.Write([]byte(n.Type))
-
-	var inputDigests []string
-	for _, inputId := range n.Inputs {
-		log.Printf("inputId: %v", inputId)
-		inputNodeKey := datastore.NameKey("Node", inputId, nil)
-		var inputNode node.Node
-		if err := e.DatastoreClient.Get(e.Context, inputNodeKey, &inputNode); err != nil {
-			log.Fatalf("Failed to get input node, %v", err)
-		}
-
-		inputDigests = append(inputDigests, inputNode.Digest)
-	}
-
-	digestHasher.Write([]byte(strings.Join(inputDigests, ",")))
-
-	//paramsAsJson, _ := json.Marshal(&n.Params)
-	//digestHasher.Write([]byte(paramsAsJson))
-	return base64.URLEncoding.EncodeToString(digestHasher.Sum(nil))
-}
+//func GetDigestFromNode(n *node.Node, e *env.Env) string {
+//	digestHasher := sha256.New()
+//	digestHasher.Write([]byte(n.Type))
+//
+//	var inputDigests []string
+//	for _, inputId := range n.Inputs {
+//		log.Printf("inputId: %v", inputId)
+//		inputNodeKey := datastore.NameKey("Node", inputId, nil)
+//		var inputNode node.Node
+//		if err := e.DatastoreClient.Get(e.Context, inputNodeKey, &inputNode); err != nil {
+//			log.Fatalf("Failed to get input node, %v", err)
+//		}
+//
+//		inputDigests = append(inputDigests, inputNode.Digest)
+//	}
+//
+//	digestHasher.Write([]byte(strings.Join(inputDigests, ",")))
+//
+//	//paramsAsJson, _ := json.Marshal(&n.Params)
+//	//digestHasher.Write([]byte(paramsAsJson))
+//	return base64.URLEncoding.EncodeToString(digestHasher.Sum(nil))
+//}
 
 // TODO: do this concurrently
 // TODO: use transaction
-func PutNodeAndUpdateDigests(n *node.Node, e *env.Env) {
-	n.Digest = GetDigestFromNode(n, e)
-
+func PutNode(n *node.Node, e *env.Env) {
 	nodeKey := datastore.NameKey("Node", n.Id, nil)
-	if _, err := e.DatastoreClient.Put(e.Context, nodeKey, n); err != nil {
+	if _, err := e.DatastoreClient.Put(context.Background(), nodeKey, n); err != nil {
 		log.Fatalf("Failed to put node with digest, %v", err)
 	}
+}
 
-	for _, outputId := range n.Outputs {
-		outputNodeKey := datastore.NameKey("Node", outputId, nil)
-		var outputNode node.Node
-		if err := e.DatastoreClient.Get(e.Context, outputNodeKey, &outputNode); err != nil {
-			log.Fatalf("Failed to get output node, %v", err)
-		}
+func PutParams(id string, p *params.Parameters, e *env.Env) {
+	bucket := e.StorageClient.Bucket(os.Getenv("STORAGE_BUCKET"))
 
-		PutNodeAndUpdateDigests(&outputNode, e)
+	paramsObj := bucket.Object("params/" + id)
+
+	ctx := context.Background()
+	w := paramsObj.NewWriter(ctx)
+
+	jsonBytes, err := json.Marshal(p)
+	if err != nil {
+		log.Fatal("Error encoding JSON")
 	}
+
+	if _, err := fmt.Fprint(w, string(jsonBytes)); err != nil {
+		log.Fatal("Failed to write to Storage")
+	}
+
+	if err := w.Close(); err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = paramsObj.Update(ctx, storage.ObjectAttrsToUpdate{
+		ContentType: "application/json",
+	})
+	if err != nil {
+		log.Fatalf("Failed to update attributes: %v", err)
+	}
+
 }
 
 func GetAllHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	var nodes []*node.Node
-	_, err := env.DatastoreClient.GetAll(env.Context, datastore.NewQuery("Node"), &nodes)
+	ctx := context.Background()
+	_, err := env.DatastoreClient.GetAll(ctx, datastore.NewQuery("Node"), &nodes)
 	if err != nil {
 		return err
 	}
@@ -87,7 +106,8 @@ func GetHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	nodeKey := datastore.NameKey("Node", whereNodeId, nil)
 
 	var existingNode node.Node
-	if err := env.DatastoreClient.Get(env.Context, nodeKey, &existingNode); err != nil {
+	ctx := context.Background()
+	if err := env.DatastoreClient.Get(ctx, nodeKey, &existingNode); err != nil {
 		return err
 	}
 
@@ -104,46 +124,44 @@ func GetHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+type RequestBody struct {
+	Node   *node.Node `json:"node"`
+	Params params.Parameters `json:"params"`
+}
+
 func PostHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	log.Println("Posting")
 
 	nodeUuid := uuid.NewV4()
 	log.Println("UUID: " + nodeUuid.String())
 
+	requestBody := RequestBody{}
+
 	decoder := json.NewDecoder(r.Body)
-
-	newNode := node.Node{}
-	log.Println("new Node")
-
-	if err := decoder.Decode(&newNode); err != nil {
+	if err := decoder.Decode(&requestBody); err != nil {
 		log.Fatal(err)
 	}
+
+	newNode := requestBody.Node
+	newParams := requestBody.Params
 
 	defer r.Body.Close()
 
 	newNode.Id = nodeUuid.String()
 	newNode.Version = 0
-	PutNodeAndUpdateDigests(&newNode, env)
-
-	//nodeChanged(env, n, nodeDigest)
-	go render.RenderNodeAndDependents(env, newNode.Id)
-
-	log.Println("rendered dependents")
+	PutNode(newNode, env)
+	PutParams(newNode.Id, &newParams, env)
 
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
 
-	nodeAsJson, err := json.Marshal(&newNode)
+	nodeAsJson, err := json.Marshal(newNode)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("json data")
 	log.Println(string(nodeAsJson))
-
 	fmt.Fprintf(w, string(nodeAsJson))
-
-	log.Println("made it")
 
 	return nil
 }
@@ -155,22 +173,24 @@ func PutHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 
 	decoder := json.NewDecoder(r.Body)
 
-	newNode := node.Node{}
+	requestBody := RequestBody{}
 
-	if err := decoder.Decode(&newNode); err != nil {
+	if err := decoder.Decode(&requestBody); err != nil {
 		log.Fatal(err)
 	}
 
-	_, err := env.DatastoreClient.RunInTransaction(env.Context, func(tx *datastore.Transaction) error {
+	newNode := requestBody.Node
+
+	ctx := context.Background()
+	_, err := env.DatastoreClient.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		var existingNode node.Node
 		if err := tx.Get(nodeKey, &existingNode); err != nil {
 			return err
 		}
 		existingNode.Version += 1
 		existingNode.Name = newNode.Name
-		//existingNode.Params = newNode.Params
 		existingNode.Inputs = newNode.Inputs
-		PutNodeAndUpdateDigests(&existingNode, env)
+		PutNode(&existingNode, env)
 
 		_, err := tx.Put(nodeKey, &existingNode)
 		return err
@@ -220,7 +240,8 @@ func ConnectHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error 
 		log.Fatal(err)
 	}
 
-	_, err := env.DatastoreClient.RunInTransaction(env.Context, func(tx *datastore.Transaction) error {
+	ctx := context.Background()
+	_, err := env.DatastoreClient.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		fromNodeKey := datastore.NameKey("Node", connection.From, nil)
 		toNodeKey := datastore.NameKey("Node", connection.To, nil)
 
@@ -245,7 +266,7 @@ func ConnectHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error 
 
 		if !stringInSlice(connection.From, toNode.Inputs) {
 			toNode.Inputs = append(toNode.Inputs, connection.From)
-			PutNodeAndUpdateDigests(&toNode, env)
+			PutNode(&toNode, env)
 		}
 
 		return nil
