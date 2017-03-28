@@ -7,8 +7,8 @@ import (
 )
 
 func CheckerBoardOperation(inputs []image.Plane, p params.Parameters, width int, height int) image.Plane {
-	sizeParam := params.GetByName(p, "Size")
-	sizeValue := int(sizeParam.GetValue())
+	sizeParam := p.GetByName("Size")
+	sizeValue := int(sizeParam.GetValue(0))
 
 	var totalPixels int = width * height
 	redPixels := make([]float64, totalPixels)

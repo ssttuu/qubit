@@ -7,7 +7,7 @@ import (
 )
 
 func ConstantOperation(inputs []image.Plane, p params.Parameters, width int, height int) image.Plane {
-	colorParam := params.GetByName(p, "Color")
+	colorParam := p.GetByName("Color")
 
 	redValue := colorParam.GetComponentValueByLabel("Red")
 	greenValue := colorParam.GetComponentValueByLabel("Green")
