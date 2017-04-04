@@ -19,9 +19,10 @@ func PostHandler(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	queryParams := r.URL.Query()
 
+
 	nodeUuid := vars["id"]
-	width, err := strconv.ParseInt(queryParams["width"][0], 10, 64)
-	height, err := strconv.ParseInt(queryParams["height"][0], 10, 64)
+	width, err := strconv.ParseInt(queryParams.Get("width"), 10, 64)
+	height, err := strconv.ParseInt(queryParams.Get("height"), 10, 64)
 
 	renderBounds := &pb.BoundingBox{StartX: 0, StartY: 0, EndX: width, EndY: height}
 
