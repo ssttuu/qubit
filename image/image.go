@@ -6,6 +6,7 @@ import (
 	"image"
 	"image/color"
 	"log"
+	pb "github.com/stupschwartz/qubit/protos"
 )
 
 type Component struct {
@@ -17,9 +18,33 @@ func (c Component) String() string {
 	return fmt.Sprintf("%v: %v", c.Label, mat64.Formatted(c, mat64.Prefix(" "), mat64.Squeeze()))
 }
 
+func (c Component) ToProto() *pb.ImageComponent {
+	matrix := c.RawMatrix()
+	return &pb.ImageComponent{Label: c.Label, Width: int32(matrix.Cols), Height: int32(matrix.Rows), Data: matrix.Data}
+}
+
+func NewComponentFromProto(cp *pb.ImageComponent) Component {
+	return Component{Label: cp.GetLabel(), Dense: mat64.NewDense(int(cp.GetHeight()), int(cp.GetWidth()), cp.GetData())}
+}
+
+func NewComponentsFromProtos(cps []*pb.ImageComponent) []Component {
+	components := make([]Component, len(cps))
+
+	for index, cp := range cps {
+		components[index] = NewComponentFromProto(cp)
+	}
+
+	return components
+}
+
 type Plane struct {
-	Components      []Component
-	Label string
+	Components []Component
+	Label      string
+}
+
+func NewPlaneFromProto(imagePlaneProto *pb.ImagePlane) Plane {
+	p := Plane{Label: imagePlaneProto.GetLabel(), Components: NewComponentsFromProtos(imagePlaneProto.GetComponents())}
+	return p
 }
 
 func (p Plane) ToNRGBA() *image.NRGBA {
@@ -41,6 +66,16 @@ func (p Plane) ToNRGBA() *image.NRGBA {
 	return img
 }
 
+func (p Plane) ToProto() *pb.ImagePlane {
+	cps := make([]*pb.ImageComponent, len(p.Components))
+
+	for index, component := range p.Components {
+		cps[index] = component.ToProto()
+	}
+
+	return &pb.ImagePlane{Label: p.Label, Components: cps}
+}
+
 type Frame struct {
-	Planes      []Plane
+	Planes []Plane
 }

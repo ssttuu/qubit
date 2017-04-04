@@ -1,5 +1,7 @@
 package params
 
+import pb "github.com/stupschwartz/qubit/protos"
+
 type Component struct {
 	Label string `json:"label"`
 	Value float64 `json:"value"`
@@ -11,6 +13,10 @@ func (c *Component) GetValue() float64 {
 
 func (c *Component) SetValue(value float64) {
 	c.Value = value
+}
+
+func (c *Component) ToProto() *pb.Component {
+	return &pb.Component{Label: c.Label, Value: c.Value}
 }
 
 type Parameter struct {
@@ -58,6 +64,16 @@ func (p *Parameter) SetValueByName(name string, value float64) {
 	p.GetComponentByName(name).SetValue(value)
 }
 
+func (p *Parameter) ToProto() *pb.Parameter {
+	cps := make([]*pb.Component, len(p.Components))
+
+	for index, component := range p.Components {
+		cps[index] = component.ToProto()
+	}
+
+	return &pb.Parameter{Name: p.Name, Components: cps}
+}
+
 func NewFloatParameter(name string) Parameter {
 	p := Parameter{Name: name}
 	floatComponent := Component{Label: "float", Value: 0.0}
@@ -89,4 +105,14 @@ func (p Parameters) GetByName(name string) *Parameter {
 
 func (p Parameters) SetByName(name string, component string, value float64) {
 	p.GetByName(name).SetValueByName(component, value)
+}
+
+func (p Parameters) ToProto() []*pb.Parameter {
+	pps := make([]*pb.Parameter, len(p))
+
+	for index, param := range p {
+		pps[index] = param.ToProto()
+	}
+
+	return pps
 }

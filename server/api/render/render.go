@@ -5,53 +5,34 @@ import (
 	"github.com/stupschwartz/qubit/server/env"
 	"github.com/stupschwartz/qubit/server/handler"
 	"net/http"
-	"github.com/stupschwartz/qubit/node"
-	"cloud.google.com/go/datastore"
+
 	"context"
 	"log"
-	"github.com/stupschwartz/qubit/operator"
-	"github.com/stupschwartz/qubit/params"
 	"github.com/stupschwartz/qubit/image"
-	"encoding/json"
 	"image/png"
-	"os"
+	"google.golang.org/grpc/grpclog"
+	pb "github.com/stupschwartz/qubit/protos"
+	"strconv"
 )
-
-func Render(n *node.Node, p params.Parameters, e *env.Env) image.Plane {
-	op := operator.GetOperation(n.Type)
-
-	return op([]image.Plane{}, p, 1920, 1080)
-}
 
 func PostHandler(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
+	queryParams := r.URL.Query()
+
 	nodeUuid := vars["id"]
+	width, err := strconv.ParseInt(queryParams["width"][0], 10, 64)
+	height, err := strconv.ParseInt(queryParams["height"][0], 10, 64)
 
-	nodeKey := datastore.NameKey("Node", nodeUuid, nil)
+	renderBounds := &pb.BoundingBox{StartX: 0, StartY: 0, EndX: width, EndY: height}
 
-	var existingNode node.Node
-	if err := e.DatastoreClient.Get(context.Background(), nodeKey, &existingNode); err != nil {
-		log.Fatalf("Failed to get node to be rendered, %v", err)
-	}
+	renderRequest := &pb.RenderRequest{Node: &pb.Node{Id: nodeUuid}, BoundingBox: renderBounds}
 
-	var p params.Parameters
-	bucket := e.StorageClient.Bucket(os.Getenv("STORAGE_BUCKET"))
-	paramsObj := bucket.Object("params/" + existingNode.Id)
-
-	ctx := context.Background()
-	reader, err := paramsObj.NewReader(ctx)
+	renderResponse, err := e.ComputeClient.Render(context.Background(), renderRequest)
 	if err != nil {
-		log.Fatalf("Failed to create Reader, %v", err)
+		grpclog.Fatal("failed to render")
 	}
 
-	decoder := json.NewDecoder(reader)
-	if err := decoder.Decode(&p); err != nil {
-		log.Fatal(err)
-	}
-
-	defer reader.Close()
-
-	imagePlane := Render(&existingNode, p, e)
+	imagePlane := image.NewPlaneFromProto(renderResponse.GetImagePlane())
 
 	w.Header().Set("Content-Type", "image/png")
 

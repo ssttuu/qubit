@@ -14,6 +14,10 @@ import (
 
 	"golang.org/x/net/context"
 	"os"
+	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc"
+
+	pb "github.com/stupschwartz/qubit/protos"
 )
 
 type Credentials struct {
@@ -49,9 +53,20 @@ func main() {
 		storageClient, err = storage.NewClient(ctx, serviceCredentials)
 	}
 
+	var opts []grpc.DialOption
+	opts = append(opts, grpc.WithInsecure())
+
+	conn, err := grpc.Dial("compute:10000", opts...)
+	if err != nil {
+		grpclog.Fatalf("fail to dial: %v", err)
+	}
+	defer conn.Close()
+	computeClient := pb.NewComputeClient(conn)
+
 	environ := &env.Env{
 		DatastoreClient: datastoreClient,
 		StorageClient: storageClient,
+		ComputeClient: computeClient,
 	}
 
 

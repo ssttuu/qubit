@@ -213,7 +213,30 @@ func PutHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func DeleteHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
+func DeleteAllHandler(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	var nodes interface{}
+	ctx := context.Background()
+	nodeIds, err := e.DatastoreClient.GetAll(ctx, datastore.NewQuery("Node").KeysOnly(), nodes)
+	log.Println(nodeIds)
+	log.Println(err)
+	log.Println("Here ish")
+	if err != nil {
+		return err
+	}
+
+	log.Println("Here ish 2")
+	err = e.DatastoreClient.DeleteMulti(ctx, nodeIds)
+	log.Println(err)
+	log.Println("Here ish 3")
+	if err != nil {
+		return err
+	}
+	log.Println("Here ish 4")
+
+	return nil
+}
+
+func DeleteHandler(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
@@ -287,6 +310,7 @@ func Register(router *mux.Router, environ *env.Env) {
 
 	s.Handle("/", handler.Handler{environ, PostHandler}).Methods("POST")
 	s.Handle("/{id}", handler.Handler{environ, PutHandler}).Methods("PUT")
+	s.Handle("/DELETE", handler.Handler{environ, DeleteAllHandler}).Methods("DELETE")
 	s.Handle("/{id}", handler.Handler{environ, DeleteHandler}).Methods("DELETE")
 
 	s.Handle("/connect/", handler.Handler{environ, ConnectHandler}).Methods("PUT")

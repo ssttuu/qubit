@@ -24,9 +24,17 @@ services:
     build: ./compute
     environment:
       - DATASTORE_PROJECT_ID=qubit-161916
+      - DATASTORE_DATASET=qubit
+      - DATASTORE_EMULATOR_HOST=datastore:8380
+      - DATASTORE_HOST=datastore:8380
+      - STORAGE_BUCKET=qubit-dev-161916
+      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
     command: go run main.go
+    volumes:
+      - ./credentials:/opt/etc/credentials
     depends_on:
       - datastore
+      - pubsub
 
   compute-worker:
     image: stupschwartz/qubit-compute-worker
