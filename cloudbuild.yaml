@@ -1,14 +1,14 @@
 steps:
   # Server
   - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "gcr.io/${PROJECT_ID}/qubit-server:${COMMIT_SHA}", "-t", "latest", "."]
+    args: ["build", "-t", "gcr.io/${PROJECT_ID}/qubit-server:${COMMIT_SHA}", "-t", "gcr.io/${PROJECT_ID}/qubit-server:latest", "."]
     id: "server-docker-build"
     dir: "server"
     waitFor: ["-"]
 
   # Compute
   - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "gcr.io/${PROJECT_ID}/qubit-compute:${COMMIT_SHA}", "-t", "latest", "."]
+    args: ["build", "-t", "gcr.io/${PROJECT_ID}/qubit-compute:${COMMIT_SHA}", "-t", "gcr.io/${PROJECT_ID}/qubit-compute:latest", "."]
     id: "compute-docker-build"
     dir: "compute"
     waitFor: ["-"]

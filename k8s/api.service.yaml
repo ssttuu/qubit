@@ -4,7 +4,7 @@ metadata:
   name: api
 spec:
   selector:
-    app: MyApp
+    app: api
   ports:
     - protocol: TCP
-      port: 80
+      port: 8443

@@ -1,0 +1,16 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: compute-deployment
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: compute
+    spec:
+      containers:
+      - name: compute
+        image: qubit-compute:latest
+        ports:
+        - containerPort: 10000

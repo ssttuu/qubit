@@ -13,4 +13,4 @@ spec:
       - name: api
         image: qubit-server:latest
         ports:
-        - containerPort: 80
+        - containerPort: 8443
