@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package protos;
+
+service Compute {
+    rpc Render (RenderRequest) returns (RenderResponse) {}
+}
+
+message RenderRequest {
+    Node node = 1;
+    BoundingBox boundingBox = 2;
+//    repeated Parameter parameters = 2;
+}
+
+message RenderResponse {
+    ImagePlane imagePlane = 1;
+}
+
+// Image
+
+message ImageComponent {
+    string label = 1;
+    int32 width = 2;
+    int32 height = 3;
+    repeated double data = 4;
+}
+
+
+message ImagePlane {
+    string label = 1;
+    repeated ImageComponent components = 2;
+}
+
+message ImageFrame {
+    repeated ImagePlane imagePlanes = 1;
+}
+
+// Node
+
+message Node {
+    string id = 1;
+//    string type = 2;
+}
+
+// Parameter
+
+message Component {
+    string label = 1;
+    double value = 2;
+}
+
+message Parameter {
+    string name = 1;
+    repeated Component components = 2;
+}
+
+// BoundingBox
+message BoundingBox {
+    int64 start_x = 1;
+    int64 start_y = 2;
+    int64 end_x = 3;
+    int64 end_y = 4;
+}

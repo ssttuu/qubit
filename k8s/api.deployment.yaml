@@ -14,3 +14,19 @@ spec:
         image: gcr.io/qubit-161916/qubit-server:latest
         ports:
         - containerPort: 8443
+        env:
+        - name: DATASTORE_PROJECT_ID
+          value: qubit-161916
+        - name: DATASTORE_DATASET
+          value: qubit
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /opt/etc/credentials/service-account-key-file.json
+        - name: STORAGE_BUCKET
+          value: qubit-dev-161916
+        volumeMounts:
+        - name: google-credentials
+          mountPath: /opt/etc/credentials
+      volumes:
+      - name: google-credentials
+        secret:
+          secretName: google-service-account

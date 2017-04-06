@@ -17,6 +17,8 @@ spec:
         env:
         - name: DATASTORE_PROJECT_ID
           value: qubit-161916
+        - name: DATASTORE_DATASET
+          value: qubit
         - name: GOOGLE_APPLICATION_CREDENTIALS
           value: /opt/etc/credentials/service-account-key-file.json
         volumeMounts:
