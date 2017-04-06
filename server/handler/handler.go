@@ -4,6 +4,9 @@ import (
 	"github.com/stupschwartz/qubit/server/env"
 	"log"
 	"net/http"
+	//"github.com/pkg/errors"
+	//"fmt"
+	"fmt"
 )
 
 type Error interface {
@@ -32,6 +35,7 @@ type Handler struct {
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := h.H(h.Env, w, r)
 	if err != nil {
+		http.Error(w, fmt.Sprintf("%s", err), http.StatusInternalServerError)
 		switch e := err.(type) {
 		case Error:
 			// We can retrieve the status here and write out a specific

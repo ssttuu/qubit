@@ -231,6 +231,12 @@
 			"revisionTime": "2017-01-12T15:04:04Z"
 		},
 		{
+			"checksumSHA1": "ynJSWoF6v+3zMnh9R0QmmG6iGV8=",
+			"path": "github.com/pkg/errors",
+			"revision": "ff09b135c25aae272398c51a07235b90a75aa4f0",
+			"revisionTime": "2017-03-16T20:15:38Z"
+		},
+		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
 			"path": "github.com/satori/go.uuid",
 			"revision": "b061729afc07e77a8aa4fad0a2fd840958f1942a",
@@ -239,32 +245,32 @@
 		{
 			"checksumSHA1": "GtMSCsP06VZ0+VdlBMpfw3g24ts=",
 			"path": "github.com/stupschwartz/qubit/image",
-			"revision": "4ae40d9fba87d57192e1e5453432e763ec92c0b1",
-			"revisionTime": "2017-04-06T01:24:55Z"
+			"revision": "b7057a807f548d63f6c85d75ff53dd0aa90d2418",
+			"revisionTime": "2017-04-06T09:37:15Z"
 		},
 		{
 			"checksumSHA1": "dMhpY5OajLhwKt8v7eQ2kMD3IUo=",
 			"path": "github.com/stupschwartz/qubit/node",
-			"revision": "4ae40d9fba87d57192e1e5453432e763ec92c0b1",
-			"revisionTime": "2017-04-06T01:24:55Z"
+			"revision": "b7057a807f548d63f6c85d75ff53dd0aa90d2418",
+			"revisionTime": "2017-04-06T09:37:15Z"
 		},
 		{
 			"checksumSHA1": "cxRcgAQsamWbT11oxmKYMgCLo6E=",
 			"path": "github.com/stupschwartz/qubit/operator",
-			"revision": "4ae40d9fba87d57192e1e5453432e763ec92c0b1",
-			"revisionTime": "2017-04-06T01:24:55Z"
+			"revision": "b7057a807f548d63f6c85d75ff53dd0aa90d2418",
+			"revisionTime": "2017-04-06T09:37:15Z"
 		},
 		{
 			"checksumSHA1": "RUiRuQpAKLE4e8BT3RtRAgyzrgQ=",
 			"path": "github.com/stupschwartz/qubit/params",
-			"revision": "4ae40d9fba87d57192e1e5453432e763ec92c0b1",
-			"revisionTime": "2017-04-06T01:24:55Z"
+			"revision": "b7057a807f548d63f6c85d75ff53dd0aa90d2418",
+			"revisionTime": "2017-04-06T09:37:15Z"
 		},
 		{
 			"checksumSHA1": "9yamyTm+/gmWqV5jxsbeQYJah+M=",
 			"path": "github.com/stupschwartz/qubit/protos",
-			"revision": "4ae40d9fba87d57192e1e5453432e763ec92c0b1",
-			"revisionTime": "2017-04-06T01:24:55Z"
+			"revision": "b7057a807f548d63f6c85d75ff53dd0aa90d2418",
+			"revisionTime": "2017-04-06T09:37:15Z"
 		},
 		{
 			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",
