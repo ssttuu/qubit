@@ -159,34 +159,40 @@
 			"revisionTime": "2017-03-05T23:04:05Z"
 		},
 		{
+			"checksumSHA1": "91VCDy64xbxaJ6926tA43lwpdls=",
+			"path": "github.com/stupschwartz/qubit/compute",
+			"revision": "111837767d0e42b295a6bec3f9cda1be75392cc6",
+			"revisionTime": "2017-04-06T00:53:39Z"
+		},
+		{
 			"checksumSHA1": "GtMSCsP06VZ0+VdlBMpfw3g24ts=",
 			"path": "github.com/stupschwartz/qubit/image",
-			"revision": "af17574aebb68ba1628031f88f5c3b8701e27f3a",
-			"revisionTime": "2017-04-04T01:12:53Z"
+			"revision": "111837767d0e42b295a6bec3f9cda1be75392cc6",
+			"revisionTime": "2017-04-06T00:53:39Z"
 		},
 		{
 			"checksumSHA1": "dMhpY5OajLhwKt8v7eQ2kMD3IUo=",
 			"path": "github.com/stupschwartz/qubit/node",
-			"revision": "af17574aebb68ba1628031f88f5c3b8701e27f3a",
-			"revisionTime": "2017-04-04T01:12:53Z"
+			"revision": "111837767d0e42b295a6bec3f9cda1be75392cc6",
+			"revisionTime": "2017-04-06T00:53:39Z"
 		},
 		{
-			"checksumSHA1": "gM/DZYvqzMkg4c1yTeRGsGcqgh8=",
+			"checksumSHA1": "cxRcgAQsamWbT11oxmKYMgCLo6E=",
 			"path": "github.com/stupschwartz/qubit/operator",
-			"revision": "af17574aebb68ba1628031f88f5c3b8701e27f3a",
-			"revisionTime": "2017-04-04T01:12:53Z"
+			"revision": "111837767d0e42b295a6bec3f9cda1be75392cc6",
+			"revisionTime": "2017-04-06T00:53:39Z"
 		},
 		{
 			"checksumSHA1": "RUiRuQpAKLE4e8BT3RtRAgyzrgQ=",
 			"path": "github.com/stupschwartz/qubit/params",
-			"revision": "af17574aebb68ba1628031f88f5c3b8701e27f3a",
-			"revisionTime": "2017-04-04T01:12:53Z"
+			"revision": "111837767d0e42b295a6bec3f9cda1be75392cc6",
+			"revisionTime": "2017-04-06T00:53:39Z"
 		},
 		{
 			"checksumSHA1": "9yamyTm+/gmWqV5jxsbeQYJah+M=",
 			"path": "github.com/stupschwartz/qubit/protos",
-			"revision": "af17574aebb68ba1628031f88f5c3b8701e27f3a",
-			"revisionTime": "2017-04-04T01:12:53Z"
+			"revision": "111837767d0e42b295a6bec3f9cda1be75392cc6",
+			"revisionTime": "2017-04-06T00:53:39Z"
 		},
 		{
 			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",

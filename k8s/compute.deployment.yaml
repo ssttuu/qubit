@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: compute-deployment
@@ -11,6 +11,18 @@ spec:
     spec:
       containers:
       - name: compute
-        image: qubit-compute:latest
+        image: gcr.io/qubit-161916/qubit-compute:latest
         ports:
         - containerPort: 10000
+        env:
+        - name: DATASTORE_PROJECT_ID
+          value: qubit-161916
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /opt/etc/credentials/service-account-key-file.json
+        volumeMounts:
+        - name: google-credentials
+          mountPath: /opt/etc/credentials
+      volumes:
+      - name: google-credentials
+        secret:
+          secretName: google-service-account

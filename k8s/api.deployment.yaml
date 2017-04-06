@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: api-deployment
@@ -11,6 +11,6 @@ spec:
     spec:
       containers:
       - name: api
-        image: qubit-server:latest
+        image: gcr.io/qubit-161916/qubit-server:latest
         ports:
         - containerPort: 8443

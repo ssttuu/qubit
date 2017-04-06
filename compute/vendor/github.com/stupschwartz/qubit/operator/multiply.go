@@ -13,7 +13,6 @@ func MultiplyOperation(inputs []image.Plane, p params.Parameters, width int, hei
 
 	inputImage := inputs[0]
 
-
 	for componentIndex := range inputImage.Components {
 		inputComponent := inputImage.Components[componentIndex]
 		newMatrixData := make([]float64, width * height)

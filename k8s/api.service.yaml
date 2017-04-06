@@ -5,6 +5,8 @@ metadata:
 spec:
   selector:
     app: api
+  type: LoadBalancer
   ports:
     - protocol: TCP
       port: 8443
+      targetPort: 8443
