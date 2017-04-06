@@ -4,7 +4,8 @@ metadata:
   name: compute
 spec:
   selector:
-    app: api
+    app: compute
   ports:
     - protocol: TCP
       port: 10000
+      targetPort: 10000
