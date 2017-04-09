@@ -3,7 +3,7 @@ package operator
 import (
 	"testing"
 	"github.com/stretchr/testify/assert"
-	"github.com/stupschwartz/qubit/image"
+	"github.com/stupschwartz/qubit/core/image"
 	"github.com/gonum/matrix/mat64"
 )
 

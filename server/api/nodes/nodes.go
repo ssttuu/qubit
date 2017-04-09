@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/stupschwartz/qubit/node"
+	"github.com/stupschwartz/qubit/core/node"
+	"github.com/stupschwartz/qubit/core/params"
 	"github.com/stupschwartz/qubit/server/env"
 	"github.com/stupschwartz/qubit/server/handler"
 	"net/http"
@@ -13,7 +14,6 @@ import (
 	"golang.org/x/net/context"
 	"cloud.google.com/go/storage"
 	"os"
-	"github.com/stupschwartz/qubit/params"
 	"github.com/pkg/errors"
 	"cloud.google.com/go/trace"
 )
@@ -44,13 +44,11 @@ import (
 //	return base64.URLEncoding.EncodeToString(digestHasher.Sum(nil))
 //}
 
-// TODO: do this concurrently
-// TODO: use transaction
-func PutNode(ctx context.Context, n *node.Node, e *env.Env) error {
+func PutNode(ctx context.Context, sceneKey *datastore.Key, n *node.Node, e *env.Env) error {
 	span := trace.FromContext(ctx).NewChild("PutNode")
 	defer span.Finish()
 
-	nodeKey := datastore.NameKey("Node", n.Id, nil)
+	nodeKey := datastore.NameKey("Node", n.Id, sceneKey)
 	if _, err := e.DatastoreClient.Put(ctx, nodeKey, n); err != nil {
 		return errors.Wrapf(err, "Failed to put node with digest %v", n.Id)
 	}
@@ -95,8 +93,13 @@ func GetAllHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *
 	span := trace.FromContext(ctx).NewChild("GetAllHandler")
 	defer span.Finish()
 
+	vars := mux.Vars(r)
+
+	sceneId := vars["scene_id"]
+	sceneKey := datastore.NameKey("Scene", sceneId, nil)
+
 	var nodes []*node.Node
-	_, err := env.DatastoreClient.GetAll(ctx, datastore.NewQuery("Node"), &nodes)
+	_, err := env.DatastoreClient.GetAll(ctx, datastore.NewQuery("Node").Ancestor(sceneKey), &nodes)
 	if err != nil {
 		return errors.Wrap(err, "Could not get all")
 	}
@@ -115,9 +118,12 @@ func GetHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *htt
 	defer span.Finish()
 
 	vars := mux.Vars(r)
-	whereNodeId := vars["id"]
 
-	nodeKey := datastore.NameKey("Node", whereNodeId, nil)
+	sceneId := vars["scene_id"]
+	nodeId := vars["node_id"]
+
+	sceneKey := datastore.NameKey("Scene", sceneId, nil)
+	nodeKey := datastore.NameKey("Node", nodeId, sceneKey)
 
 	var existingNode node.Node
 	if err := env.DatastoreClient.Get(ctx, nodeKey, &existingNode); err != nil {
@@ -146,7 +152,12 @@ func PostHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *ht
 	span := trace.FromContext(ctx).NewChild("PostHandler")
 	defer span.Finish()
 
+	vars := mux.Vars(r)
+
+	sceneId := vars["scene_id"]
 	nodeUuid := uuid.NewV4()
+
+	sceneKey := datastore.NameKey("Scene", sceneId, nil)
 
 	requestBody := RequestBody{}
 
@@ -162,7 +173,7 @@ func PostHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *ht
 
 	newNode.Id = nodeUuid.String()
 	newNode.Version = 0
-	PutNode(ctx, newNode, env)
+	PutNode(ctx, sceneKey, newNode, env)
 	PutParams(ctx, newNode.Id, &newParams, env)
 
 	w.WriteHeader(http.StatusCreated)
@@ -183,8 +194,11 @@ func PutHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *htt
 	defer span.Finish()
 
 	vars := mux.Vars(r)
-	whereNodeId := vars["id"]
-	nodeKey := datastore.NameKey("Node", whereNodeId, nil)
+	sceneId := vars["scene_id"]
+	nodeId := vars["node_id"]
+
+	sceneKey := datastore.NameKey("Scene", sceneId, nil)
+	nodeKey := datastore.NameKey("Node", nodeId, sceneKey)
 
 	decoder := json.NewDecoder(r.Body)
 
@@ -204,7 +218,7 @@ func PutHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *htt
 		existingNode.Version += 1
 		existingNode.Name = newNode.Name
 		existingNode.Inputs = newNode.Inputs
-		PutNode(ctx, &existingNode, env)
+		PutNode(ctx, sceneKey, &existingNode, env)
 
 		_, err := tx.Put(nodeKey, &existingNode)
 		if err != nil {
@@ -234,8 +248,13 @@ func DeleteAllHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r 
 	span := trace.FromContext(ctx).NewChild("DeleteAllHandler")
 	defer span.Finish()
 
+	vars := mux.Vars(r)
+	sceneId := vars["scene_id"]
+
+	sceneKey := datastore.NameKey("Scene", sceneId, nil)
+
 	var nodes interface{}
-	nodeIds, err := e.DatastoreClient.GetAll(ctx, datastore.NewQuery("Node").KeysOnly(), nodes)
+	nodeIds, err := e.DatastoreClient.GetAll(ctx, datastore.NewQuery("Node").Ancestor(sceneKey).KeysOnly(), nodes)
 	if err != nil {
 		return errors.Wrap(err, "Failed to get all keys only")
 	}
@@ -281,9 +300,14 @@ func ConnectHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r 
 		return errors.Wrap(err, "Failed to decode connection data")
 	}
 
+	vars := mux.Vars(r)
+	sceneId := vars["scene_id"]
+
+	sceneKey := datastore.NameKey("Scene", sceneId, nil)
+
 	_, err := env.DatastoreClient.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
-		fromNodeKey := datastore.NameKey("Node", connection.From, nil)
-		toNodeKey := datastore.NameKey("Node", connection.To, nil)
+		fromNodeKey := datastore.NameKey("Node", connection.From, sceneKey)
+		toNodeKey := datastore.NameKey("Node", connection.To, sceneKey)
 
 		var fromNode node.Node
 		if err := tx.Get(fromNodeKey, &fromNode); err != nil {
@@ -307,7 +331,7 @@ func ConnectHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r 
 		if !stringInSlice(connection.From, toNode.Inputs) {
 			toNode.Inputs = append(toNode.Inputs, connection.From)
 
-			if err := PutNode(ctx, &toNode, env); err != nil {
+			if err := PutNode(ctx, sceneKey, &toNode, env); err != nil {
 				return errors.Wrap(err, "Failed to put toNode")
 			}
 		}
@@ -326,15 +350,15 @@ func DisconnectHandler(ctx context.Context, env *env.Env, w http.ResponseWriter,
 }
 
 func Register(router *mux.Router, environ *env.Env) {
-	s := router.PathPrefix("/nodes").Subrouter()
+	s := router.PathPrefix("/scenes/{scene_id}/nodes").Subrouter()
 
 	s.Handle("/", handler.Handler{environ, GetAllHandler}).Methods("GET")
-	s.Handle("/{id}/", handler.Handler{environ, GetHandler}).Methods("GET")
+	s.Handle("/{node_id}/", handler.Handler{environ, GetHandler}).Methods("GET")
 
 	s.Handle("/", handler.Handler{environ, PostHandler}).Methods("POST")
-	s.Handle("/{id}", handler.Handler{environ, PutHandler}).Methods("PUT")
-	s.Handle("/DELETE", handler.Handler{environ, DeleteAllHandler}).Methods("DELETE")
-	s.Handle("/{id}", handler.Handler{environ, DeleteHandler}).Methods("DELETE")
+	s.Handle("/{node_id}/", handler.Handler{environ, PutHandler}).Methods("PUT")
+	s.Handle("/DELETE/", handler.Handler{environ, DeleteAllHandler}).Methods("DELETE")
+	s.Handle("/{node_id}/", handler.Handler{environ, DeleteHandler}).Methods("DELETE")
 
 	s.Handle("/connect/", handler.Handler{environ, ConnectHandler}).Methods("PUT")
 	s.Handle("/disconnect/", handler.Handler{environ, DisconnectHandler}).Methods("PUT")

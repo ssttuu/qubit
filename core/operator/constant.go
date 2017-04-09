@@ -1,8 +1,8 @@
 package operator
 
 import (
-	"github.com/stupschwartz/qubit/image"
-	"github.com/stupschwartz/qubit/params"
+	"github.com/stupschwartz/qubit/core/image"
+	"github.com/stupschwartz/qubit/core/params"
 	"github.com/gonum/matrix/mat64"
 )
 

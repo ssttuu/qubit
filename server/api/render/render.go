@@ -4,25 +4,27 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/stupschwartz/qubit/server/env"
 	"github.com/stupschwartz/qubit/server/handler"
+	"github.com/stupschwartz/qubit/core/image"
+	pb "github.com/stupschwartz/qubit/protos"
 	"net/http"
 
 	"golang.org/x/net/context"
-	"github.com/stupschwartz/qubit/image"
 	"image/png"
-	pb "github.com/stupschwartz/qubit/protos"
 	"strconv"
 	"github.com/pkg/errors"
 	"cloud.google.com/go/trace"
 )
 
+
 func PostHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	span := trace.FromContext(ctx).NewChild("PutParams")
+	span := trace.FromContext(ctx).NewChild("PostHandler")
 	defer span.Finish()
 
 	vars := mux.Vars(r)
 	queryParams := r.URL.Query()
 
-	nodeUuid := vars["id"]
+	sceneId := vars["scene_id"]
+	nodeId := vars["node_id"]
 
 	width, err := strconv.ParseInt(queryParams.Get("width"), 10, 64)
 	if err != nil {
@@ -36,16 +38,8 @@ func PostHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r *http
 
 	serializeSpan := span.NewChild("Serialize gRPC Request")
 	renderBounds := &pb.BoundingBox{StartX: 0, StartY: 0, EndX: width, EndY: height}
-	renderRequest := &pb.RenderRequest{Node: &pb.Node{Id: nodeUuid}, BoundingBox: renderBounds}
+	renderRequest := &pb.RenderRequest{Scene: &pb.Scene{Id: sceneId}, Node: &pb.Node{Id: nodeId}, BoundingBox: renderBounds}
 	serializeSpan.Finish()
-
-
-	//conn, err := grpc.DialContext("compute:10000", opts...)
-	//if err != nil {
-	//	grpclog.Fatalf("fail to dial: %v", err)
-	//}
-	//defer conn.Close()
-	//computeClient := pb.NewComputeClient(conn)
 
 	renderResponse, err := e.ComputeClient.Render(ctx, renderRequest)
 	if err != nil {
@@ -53,7 +47,8 @@ func PostHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r *http
 	}
 
 	deserializeSpan := span.NewChild("Deserialize gRPC Request")
-	imagePlane := image.NewPlaneFromProto(renderResponse.GetImagePlane())
+	imagePlaneProto := renderResponse.GetImagePlane()
+	imagePlane := image.NewPlaneFromProto(imagePlaneProto)
 	deserializeSpan.Finish()
 
 	w.Header().Set("Content-Type", "image/png")
@@ -66,7 +61,7 @@ func PostHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r *http
 }
 
 func Register(router *mux.Router, environ *env.Env) {
-	s := router.PathPrefix("/render").Subrouter()
+	s := router.PathPrefix("/scenes/{scene_id}/nodes/{node_id}/render").Subrouter()
 
-	s.Handle("/{id}/", handler.Handler{environ, PostHandler}).Methods("POST")
+	s.Handle("/", handler.Handler{environ, PostHandler}).Methods("POST")
 }

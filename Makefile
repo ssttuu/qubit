@@ -3,8 +3,8 @@ proto:
 	protoc -I protos/ protos/*.proto --go_out=plugins=grpc:protos
 
 vendor:
-	cd server && govendor sync && cd ..
-	cd compute && govendor sync && cd ..
+	cd server && govendor update +external && govendor update +vendor && govendor sync && cd ..
+	cd compute && govendor update +external && govendor update +vendor && govendor sync && cd ..
 
 
 build-server:

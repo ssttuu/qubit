@@ -7,6 +7,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/stupschwartz/qubit/server/api/render"
 	"github.com/stupschwartz/qubit/server/api/health"
+	"github.com/stupschwartz/qubit/server/api/scenes"
 )
 
 func Handlers(environ *env.Env) *mux.Router {
@@ -15,6 +16,8 @@ func Handlers(environ *env.Env) *mux.Router {
 	apiRouter := router.PathPrefix("/api/v0").Subrouter()
 
 	health.Register(apiRouter, environ)
+
+	scenes.Register(apiRouter, environ)
 	nodes.Register(apiRouter, environ)
 	render.Register(apiRouter, environ)
 

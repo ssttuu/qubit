@@ -26,11 +26,14 @@ type ComputeServer struct {
 }
 
 func (cs *ComputeServer) Render(ctx context.Context, renderRequest *pb.RenderRequest) (*pb.RenderResponse, error) {
+	sceneUuid := renderRequest.GetScene().GetId()
 	nodeUuid := renderRequest.GetNode().GetId()
 	boundingBox := renderRequest.GetBoundingBox()
-	nodeKey := datastore.NameKey("Node", nodeUuid, nil)
 
-	span := trace.FromContext(ctx).NewChild("compute.Render:" + nodeUuid)
+	sceneKey := datastore.NameKey("Scene", sceneUuid, nil)
+	nodeKey := datastore.NameKey("Node", nodeUuid, sceneKey)
+
+	span := trace.FromContext(ctx).NewChild("compute.Render")
 	defer span.Finish()
 
 	datastoreGet := span.NewChild("datastore.Get")
