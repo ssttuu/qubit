@@ -6,8 +6,6 @@ import (
 	"context"
 	"database/sql/driver"
 	"errors"
-	"io"
-	"io/ioutil"
 )
 
 // Implement the "QueryerContext" interface
@@ -16,12 +14,15 @@ func (cn *conn) QueryContext(ctx context.Context, query string, args []driver.Na
 	for i, nv := range args {
 		list[i] = nv.Value
 	}
-	finish := cn.watchCancel(ctx)
+	var closed chan<- struct{}
+	if ctx.Done() != nil {
+		closed = watchCancel(ctx, cn.cancel)
+	}
 	r, err := cn.query(query, list)
 	if err != nil {
 		return nil, err
 	}
-	r.finish = finish
+	r.closed = closed
 	return r, nil
 }
 
@@ -32,8 +33,9 @@ func (cn *conn) ExecContext(ctx context.Context, query string, args []driver.Nam
 		list[i] = nv.Value
 	}
 
-	if finish := cn.watchCancel(ctx); finish != nil {
-		defer finish()
+	if ctx.Done() != nil {
+		closed := watchCancel(ctx, cn.cancel)
+		defer close(closed)
 	}
 
 	return cn.Exec(query, list)
@@ -51,57 +53,40 @@ func (cn *conn) BeginTx(ctx context.Context, opts driver.TxOptions) (driver.Tx, 
 	if err != nil {
 		return nil, err
 	}
-	cn.txnFinish = cn.watchCancel(ctx)
+	if ctx.Done() != nil {
+		cn.txnClosed = watchCancel(ctx, cn.cancel)
+	}
 	return tx, nil
 }
 
-func (cn *conn) watchCancel(ctx context.Context) func() {
-	if done := ctx.Done(); done != nil {
-		finished := make(chan struct{})
-		go func() {
-			select {
-			case <-done:
-				_ = cn.cancel()
-				finished <- struct{}{}
-			case <-finished:
-			}
-		}()
-		return func() {
-			select {
-			case <-finished:
-			case finished <- struct{}{}:
-			}
+func watchCancel(ctx context.Context, cancel func()) chan<- struct{} {
+	closed := make(chan struct{})
+	go func() {
+		select {
+		case <-ctx.Done():
+			cancel()
+		case <-closed:
 		}
-	}
-	return nil
+	}()
+	return closed
 }
 
-func (cn *conn) cancel() error {
-	c, err := dial(cn.dialer, cn.opts)
+func (cn *conn) cancel() {
+	var err error
+	can := &conn{}
+	can.c, err = dial(cn.dialer, cn.opts)
 	if err != nil {
-		return err
+		return
 	}
-	defer c.Close()
+	can.ssl(cn.opts)
 
-	{
-		can := conn{
-			c: c,
-		}
-		can.ssl(cn.opts)
+	defer can.errRecover(&err)
 
-		w := can.writeBuf(0)
-		w.int32(80877102) // cancel request code
-		w.int32(cn.processID)
-		w.int32(cn.secretKey)
+	w := can.writeBuf(0)
+	w.int32(80877102) // cancel request code
+	w.int32(cn.processID)
+	w.int32(cn.secretKey)
 
-		if err := can.sendStartupPacket(w); err != nil {
-			return err
-		}
-	}
-
-	// Read until EOF to ensure that the server received the cancel.
-	{
-		_, err := io.Copy(ioutil.Discard, c)
-		return err
-	}
+	can.sendStartupPacket(w)
+	_ = can.c.Close()
 }

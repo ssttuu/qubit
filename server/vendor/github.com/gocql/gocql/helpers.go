@@ -57,8 +57,6 @@ func goType(t TypeInfo) reflect.Type {
 		return reflect.TypeOf(make([]interface{}, len(tuple.Elems)))
 	case TypeUDT:
 		return reflect.TypeOf(make(map[string]interface{}))
-	case TypeDate:
-		return reflect.TypeOf(*new(time.Time))
 	default:
 		return nil
 	}

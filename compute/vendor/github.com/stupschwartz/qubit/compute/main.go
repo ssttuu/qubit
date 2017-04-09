@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
+	"cloud.google.com/go/trace"
 	"google.golang.org/api/option"
 	"log"
 	"time"
@@ -25,15 +26,24 @@ type ComputeServer struct {
 }
 
 func (cs *ComputeServer) Render(ctx context.Context, renderRequest *pb.RenderRequest) (*pb.RenderResponse, error) {
+	sceneUuid := renderRequest.GetScene().GetId()
 	nodeUuid := renderRequest.GetNode().GetId()
 	boundingBox := renderRequest.GetBoundingBox()
-	nodeKey := datastore.NameKey("Node", nodeUuid, nil)
 
+	sceneKey := datastore.NameKey("Scene", sceneUuid, nil)
+	nodeKey := datastore.NameKey("Node", nodeUuid, sceneKey)
+
+	span := trace.FromContext(ctx).NewChild("compute.Render")
+	defer span.Finish()
+
+	datastoreGet := span.NewChild("datastore.Get")
 	var theNode node.Node
 	if err := cs.DatastoreClient.Get(ctx, nodeKey, &theNode); err != nil {
 		log.Fatalf("Failed to get node to be rendered, %v", err)
 	}
+	datastoreGet.Finish()
 
+	storageGet := span.NewChild("storage.Get")
 	var theParams params.Parameters
 	bucket := cs.StorageClient.Bucket(os.Getenv("STORAGE_BUCKET"))
 	paramsObj := bucket.Object("params/" + theNode.Id)
@@ -47,8 +57,8 @@ func (cs *ComputeServer) Render(ctx context.Context, renderRequest *pb.RenderReq
 	if err := decoder.Decode(&theParams); err != nil {
 		log.Fatal(err)
 	}
-
 	defer reader.Close()
+	storageGet.Finish()
 
 	op := operator.GetOperation(theNode.Type)
 
@@ -58,9 +68,13 @@ func (cs *ComputeServer) Render(ctx context.Context, renderRequest *pb.RenderReq
 		inputImagePlanes[index] = MakeRenderRequest(ctx, inputNodeId, boundingBox)
 	}
 
+	renderOp := span.NewChild("op.Render")
 	imagePlane := op(inputImagePlanes, theParams, int(boundingBox.GetEndX()), int(boundingBox.GetEndY()))
+	renderOp.Finish()
 
+	serialize := span.NewChild("serialize.response")
 	response := &pb.RenderResponse{ImagePlane: imagePlane.ToProto()}
+	serialize.Finish()
 
 	return response, nil
 }
@@ -68,6 +82,7 @@ func (cs *ComputeServer) Render(ctx context.Context, renderRequest *pb.RenderReq
 func MakeRenderRequest(ctx context.Context, nodeUuid string, bbox *pb.BoundingBox) image.Plane {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
+	opts = append(opts, grpc.WithUnaryInterceptor(trace.GRPCClientInterceptor()))
 
 	// TODO: client side load balancing
 	conn, err := grpc.Dial("compute:10000", opts...)
@@ -90,9 +105,9 @@ func MakeRenderRequest(ctx context.Context, nodeUuid string, bbox *pb.BoundingBo
 func newServer() *ComputeServer {
 	s := new(ComputeServer)
 
-	projID := os.Getenv("DATASTORE_PROJECT_ID")
+	projID := os.Getenv("GOOGLE_PROJECT_ID")
 	if projID == "" {
-		log.Fatal(`You need to set the environment variable "DATASTORE_PROJECT_ID"`)
+		log.Fatal(`You need to set the environment variable "GOOGLE_PROJECT_ID"`)
 	}
 
 	ctx := context.Background()
@@ -116,6 +131,8 @@ func newServer() *ComputeServer {
 	s.DatastoreClient = datastoreClient
 	s.StorageClient = storageClient
 
+	log.Println("NewServer")
+
 	return s
 }
 
@@ -124,13 +141,29 @@ func main() {
 	if err != nil {
 		grpclog.Fatalf("failed to listen: %v", err)
 	}
-	var opts []grpc.ServerOption
+
+	ctx := context.Background()
+	traceClient, err := trace.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	if err != nil {
+		log.Fatalf("Could not create trace client: %v\n", err)
+	}
+	p, err := trace.NewLimitedSampler(1.0, 10)
+	if err != nil {
+		log.Fatalf("Could not create limited sampler: %v\n", err)
+	}
+	traceClient.SetSamplingPolicy(p)
+
+	//var opts []grpc.ServerOption
+	//opts = append(opts, EnableGRPCTracingServerOption(traceClient))
 	//creds, err := credentials.NewServerTLSFromFile("server.crt", "server.key")
 	//if err != nil {
 	//	grpclog.Fatalf("Failed to generate credentials %v", err)
 	//}
 	//opts = []grpc.ServerOption{grpc.Creds(creds)}
-	grpcServer := grpc.NewServer(opts...)
+
+	log.Println("MAIN")
+
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(trace.GRPCServerInterceptor(traceClient)))
 	pb.RegisterComputeServer(grpcServer, newServer())
 	grpcServer.Serve(lis)
 }
