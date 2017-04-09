@@ -10,6 +10,7 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
+	"cloud.google.com/go/trace"
 	"google.golang.org/api/option"
 
 	"golang.org/x/net/context"
@@ -30,9 +31,9 @@ func init() {
 }
 
 func main() {
-	projID := os.Getenv("DATASTORE_PROJECT_ID")
+	projID := os.Getenv("GOOGLE_PROJECT_ID")
 	if projID == "" {
-		log.Fatal(`You need to set the environment variable "DATASTORE_PROJECT_ID"`)
+		log.Fatal(`You need to set the environment variable "GOOGLE_PROJECT_ID"`)
 	}
 
 	ctx := context.Background()
@@ -53,8 +54,20 @@ func main() {
 		storageClient, err = storage.NewClient(ctx, serviceCredentials)
 	}
 
+	traceClient, err := trace.NewClient(ctx, projID)
+	if err != nil {
+		log.Fatalf("Could not create trace client: %v\n", err)
+	}
+	p, err := trace.NewLimitedSampler(1.0, 10)
+	if err != nil {
+		log.Fatalf("Could not create limited sampler: %v\n", err)
+	}
+	traceClient.SetSamplingPolicy(p)
+
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
+	opts = append(opts, grpc.WithUnaryInterceptor(trace.GRPCClientInterceptor()))
+
 
 	conn, err := grpc.Dial("compute:10000", opts...)
 	if err != nil {
@@ -66,6 +79,7 @@ func main() {
 	environ := &env.Env{
 		DatastoreClient: datastoreClient,
 		StorageClient: storageClient,
+		TraceClient: traceClient,
 		ComputeClient: computeClient,
 	}
 

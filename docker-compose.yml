@@ -4,6 +4,7 @@ services:
     image: stupschwartz/qubit-server
     build: ./server
     environment:
+      - GOOGLE_PROJECT_ID=qubit-161916
       - DATASTORE_PROJECT_ID=qubit-161916
       - DATASTORE_DATASET=qubit
       - DATASTORE_EMULATOR_HOST=datastore:8380
@@ -23,6 +24,7 @@ services:
     image: stupschwartz/qubit-compute
     build: ./compute
     environment:
+      - GOOGLE_PROJECT_ID=qubit-161916
       - DATASTORE_PROJECT_ID=qubit-161916
       - DATASTORE_DATASET=qubit
       - DATASTORE_EMULATOR_HOST=datastore:8380

@@ -10,11 +10,12 @@ import (
 	"net/http"
 	"github.com/satori/go.uuid"
 	"cloud.google.com/go/datastore"
-	"context"
+	"golang.org/x/net/context"
 	"cloud.google.com/go/storage"
 	"os"
 	"github.com/stupschwartz/qubit/params"
 	"github.com/pkg/errors"
+	"cloud.google.com/go/trace"
 )
 
 // TODO: in memory caching of Nodes (or even just the digests)
@@ -45,21 +46,26 @@ import (
 
 // TODO: do this concurrently
 // TODO: use transaction
-func PutNode(n *node.Node, e *env.Env) error {
+func PutNode(ctx context.Context, n *node.Node, e *env.Env) error {
+	span := trace.FromContext(ctx).NewChild("PutNode")
+	defer span.Finish()
+
 	nodeKey := datastore.NameKey("Node", n.Id, nil)
-	if _, err := e.DatastoreClient.Put(context.Background(), nodeKey, n); err != nil {
+	if _, err := e.DatastoreClient.Put(ctx, nodeKey, n); err != nil {
 		return errors.Wrapf(err, "Failed to put node with digest %v", n.Id)
 	}
 
 	return nil
 }
 
-func PutParams(id string, p *params.Parameters, e *env.Env) error {
+func PutParams(ctx context.Context, id string, p *params.Parameters, e *env.Env) error {
+	span := trace.FromContext(ctx).NewChild("PutParams")
+	defer span.Finish()
+
 	bucket := e.StorageClient.Bucket(os.Getenv("STORAGE_BUCKET"))
 
 	paramsObj := bucket.Object("params/" + id)
 
-	ctx := context.Background()
 	w := paramsObj.NewWriter(ctx)
 
 	jsonBytes, err := json.Marshal(p)
@@ -85,9 +91,11 @@ func PutParams(id string, p *params.Parameters, e *env.Env) error {
 	return nil
 }
 
-func GetAllHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
+func GetAllHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *http.Request) error {
+	span := trace.FromContext(ctx).NewChild("GetAllHandler")
+	defer span.Finish()
+
 	var nodes []*node.Node
-	ctx := context.Background()
 	_, err := env.DatastoreClient.GetAll(ctx, datastore.NewQuery("Node"), &nodes)
 	if err != nil {
 		return errors.Wrap(err, "Could not get all")
@@ -102,14 +110,16 @@ func GetAllHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func GetHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
+func GetHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *http.Request) error {
+	span := trace.FromContext(ctx).NewChild("GetHandler")
+	defer span.Finish()
+
 	vars := mux.Vars(r)
 	whereNodeId := vars["id"]
 
 	nodeKey := datastore.NameKey("Node", whereNodeId, nil)
 
 	var existingNode node.Node
-	ctx := context.Background()
 	if err := env.DatastoreClient.Get(ctx, nodeKey, &existingNode); err != nil {
 		return errors.Wrap(err, "Could not get datastore entity")
 	}
@@ -132,7 +142,10 @@ type RequestBody struct {
 	Params params.Parameters `json:"params"`
 }
 
-func PostHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
+func PostHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *http.Request) error {
+	span := trace.FromContext(ctx).NewChild("PostHandler")
+	defer span.Finish()
+
 	nodeUuid := uuid.NewV4()
 
 	requestBody := RequestBody{}
@@ -149,8 +162,8 @@ func PostHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 
 	newNode.Id = nodeUuid.String()
 	newNode.Version = 0
-	PutNode(newNode, env)
-	PutParams(newNode.Id, &newParams, env)
+	PutNode(ctx, newNode, env)
+	PutParams(ctx, newNode.Id, &newParams, env)
 
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
@@ -165,7 +178,10 @@ func PostHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func PutHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
+func PutHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *http.Request) error {
+	span := trace.FromContext(ctx).NewChild("PutHandler")
+	defer span.Finish()
+
 	vars := mux.Vars(r)
 	whereNodeId := vars["id"]
 	nodeKey := datastore.NameKey("Node", whereNodeId, nil)
@@ -180,7 +196,6 @@ func PutHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 
 	newNode := requestBody.Node
 
-	ctx := context.Background()
 	_, err := env.DatastoreClient.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		var existingNode node.Node
 		if err := tx.Get(nodeKey, &existingNode); err != nil {
@@ -189,7 +204,7 @@ func PutHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 		existingNode.Version += 1
 		existingNode.Name = newNode.Name
 		existingNode.Inputs = newNode.Inputs
-		PutNode(&existingNode, env)
+		PutNode(ctx, &existingNode, env)
 
 		_, err := tx.Put(nodeKey, &existingNode)
 		if err != nil {
@@ -215,9 +230,11 @@ func PutHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func DeleteAllHandler(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+func DeleteAllHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	span := trace.FromContext(ctx).NewChild("DeleteAllHandler")
+	defer span.Finish()
+
 	var nodes interface{}
-	ctx := context.Background()
 	nodeIds, err := e.DatastoreClient.GetAll(ctx, datastore.NewQuery("Node").KeysOnly(), nodes)
 	if err != nil {
 		return errors.Wrap(err, "Failed to get all keys only")
@@ -231,7 +248,10 @@ func DeleteAllHandler(e *env.Env, w http.ResponseWriter, r *http.Request) error 
 	return nil
 }
 
-func DeleteHandler(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+func DeleteHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	span := trace.FromContext(ctx).NewChild("DeleteHandler")
+	defer span.Finish()
+
 	return nil
 }
 
@@ -249,7 +269,10 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
-func ConnectHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
+func ConnectHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *http.Request) error {
+	span := trace.FromContext(ctx).NewChild("ConnectHandler")
+	defer span.Finish()
+
 	decoder := json.NewDecoder(r.Body)
 
 	connection := ConnectionData{}
@@ -258,7 +281,6 @@ func ConnectHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error 
 		return errors.Wrap(err, "Failed to decode connection data")
 	}
 
-	ctx := context.Background()
 	_, err := env.DatastoreClient.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		fromNodeKey := datastore.NameKey("Node", connection.From, nil)
 		toNodeKey := datastore.NameKey("Node", connection.To, nil)
@@ -285,7 +307,7 @@ func ConnectHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error 
 		if !stringInSlice(connection.From, toNode.Inputs) {
 			toNode.Inputs = append(toNode.Inputs, connection.From)
 
-			if err := PutNode(&toNode, env); err != nil {
+			if err := PutNode(ctx, &toNode, env); err != nil {
 				return errors.Wrap(err, "Failed to put toNode")
 			}
 		}
@@ -296,7 +318,10 @@ func ConnectHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error 
 	return err
 }
 
-func DisconnectHandler(env *env.Env, w http.ResponseWriter, r *http.Request) error {
+func DisconnectHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *http.Request) error {
+	span := trace.FromContext(ctx).NewChild("DisconnectHandler")
+	defer span.Finish()
+
 	return nil
 }
 
