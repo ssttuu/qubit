@@ -7,10 +7,9 @@ service Compute {
 }
 
 message RenderRequest {
-    Scene scene = 1;
-    Node node = 2;
+    string sceneId = 1;
+    string nodeId = 2;
     BoundingBox boundingBox = 3;
-//    repeated Parameter parameters = 2;
 }
 
 message RenderResponse {
@@ -19,22 +18,26 @@ message RenderResponse {
 
 // Image
 
-message ImageComponent {
-    string label = 1;
-    int32 width = 2;
-    int32 height = 3;
-    repeated double data = 4;
+message ImageFrame {
+    repeated string labels = 1;
+    repeated ImagePlane imagePlanes = 2;
 }
-
 
 message ImagePlane {
-    string label = 1;
-    repeated ImageComponent components = 2;
+    int64 width = 1;
+    int64 height = 2;
+    repeated string labels = 3;
+    repeated ImageComponent components = 4;
 }
 
-message ImageFrame {
-    repeated ImagePlane imagePlanes = 1;
+message ImageComponent {
+    repeated Row rows = 4;
 }
+
+message Row {
+    repeated double data = 1 [packed=true];
+}
+
 
 // Node
 

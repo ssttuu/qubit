@@ -6,10 +6,10 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"net"
 	pb "github.com/stupschwartz/qubit/protos"
-	"github.com/stupschwartz/qubit/operator"
-	"github.com/stupschwartz/qubit/image"
-	"github.com/stupschwartz/qubit/node"
-	"github.com/stupschwartz/qubit/params"
+	"github.com/stupschwartz/qubit/core/operator"
+	"github.com/stupschwartz/qubit/core/image"
+	"github.com/stupschwartz/qubit/core/node"
+	"github.com/stupschwartz/qubit/core/params"
 	"os"
 	"encoding/json"
 	"cloud.google.com/go/datastore"
@@ -23,11 +23,12 @@ import (
 type ComputeServer struct {
 	DatastoreClient *datastore.Client
 	StorageClient   *storage.Client
+	ComputeClient   *pb.ComputeClient
 }
 
 func (cs *ComputeServer) Render(ctx context.Context, renderRequest *pb.RenderRequest) (*pb.RenderResponse, error) {
-	sceneUuid := renderRequest.GetScene().GetId()
-	nodeUuid := renderRequest.GetNode().GetId()
+	sceneUuid := renderRequest.GetSceneId()
+	nodeUuid := renderRequest.GetNodeId()
 	boundingBox := renderRequest.GetBoundingBox()
 
 	sceneKey := datastore.NameKey("Scene", sceneUuid, nil)
@@ -65,11 +66,11 @@ func (cs *ComputeServer) Render(ctx context.Context, renderRequest *pb.RenderReq
 	inputImagePlanes := make([]image.Plane, len(theNode.Inputs))
 
 	for index, inputNodeId := range theNode.Inputs {
-		inputImagePlanes[index] = MakeRenderRequest(ctx, inputNodeId, boundingBox)
+		inputImagePlanes[index] = cs.RenderInput(ctx, sceneUuid, inputNodeId, boundingBox)
 	}
 
 	renderOp := span.NewChild("op.Render")
-	imagePlane := op(inputImagePlanes, theParams, int(boundingBox.GetEndX()), int(boundingBox.GetEndY()))
+	imagePlane := op(inputImagePlanes, theParams, boundingBox.GetEndX(), boundingBox.GetEndY())
 	renderOp.Finish()
 
 	serialize := span.NewChild("serialize.response")
@@ -79,7 +80,7 @@ func (cs *ComputeServer) Render(ctx context.Context, renderRequest *pb.RenderReq
 	return response, nil
 }
 
-func MakeRenderRequest(ctx context.Context, nodeUuid string, bbox *pb.BoundingBox) image.Plane {
+func (cs *ComputeServer) RenderInput(ctx context.Context, sceneUuid string, nodeUuid string, bbox *pb.BoundingBox) image.Plane {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
 	opts = append(opts, grpc.WithUnaryInterceptor(trace.GRPCClientInterceptor()))
@@ -92,9 +93,7 @@ func MakeRenderRequest(ctx context.Context, nodeUuid string, bbox *pb.BoundingBo
 	defer conn.Close()
 	computeClient := pb.NewComputeClient(conn)
 
-	renderRequest := &pb.RenderRequest{Node: &pb.Node{Id: nodeUuid}, BoundingBox: bbox}
-
-	renderResponse, err := computeClient.Render(ctx, renderRequest)
+	renderResponse, err := computeClient.Render(ctx, &pb.RenderRequest{SceneId: sceneUuid, NodeId: nodeUuid, BoundingBox: bbox})
 	if err != nil {
 		grpclog.Fatal("failed to render")
 	}
