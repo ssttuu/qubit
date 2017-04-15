@@ -5,12 +5,15 @@ import (
 	"github.com/stupschwartz/qubit/core/params"
 )
 
-func ConstantOperation(inputs []image.Plane, p params.Parameters, width int64, height int64) image.Plane {
+func ConstantOperation(inputs []image.Plane, p params.Parameters, startX int64, startY int64, endX int64, endY int64) image.Plane {
 	colorParam := p.GetByName("Color")
 
 	redValue := colorParam.GetComponentValueByLabel("Red")
 	greenValue := colorParam.GetComponentValueByLabel("Green")
 	blueValue := colorParam.GetComponentValueByLabel("Blue")
+
+	width := endX - startX
+	height := endY - startY
 
 	redComponent := image.Component{Rows: make([]*image.Row, height)}
 	greenComponent := image.Component{Rows: make([]*image.Row, height)}

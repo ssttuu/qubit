@@ -279,28 +279,28 @@
 			"revisionTime": "2016-09-27T10:08:44Z"
 		},
 		{
-			"checksumSHA1": "vCrYVxr6UzkwDEw7jUUwTnCSe58=",
+			"checksumSHA1": "LvaIvAPYRt9d3W3NZ/CKa4t+qNI=",
 			"path": "github.com/stupschwartz/qubit/core/image",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "deRF5LgwZCsO2DQ24OjaUpyt/5g=",
 			"path": "github.com/stupschwartz/qubit/core/node",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "niaJN/36XiJgUpUT48RM53BS4jg=",
 			"path": "github.com/stupschwartz/qubit/core/params",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "pxKn2nVFE8i4VTM+hcboDd2ynb8=",
 			"path": "github.com/stupschwartz/qubit/core/scene",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "GtMSCsP06VZ0+VdlBMpfw3g24ts=",
@@ -327,58 +327,58 @@
 			"revisionTime": "2017-04-06T10:34:35Z"
 		},
 		{
-			"checksumSHA1": "rbP3bLV8z4kZq7iKarZvDwXMMdU=",
+			"checksumSHA1": "v8/3Nj7aGvFKThpMn/vWOwMf5nY=",
 			"path": "github.com/stupschwartz/qubit/protos",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
-			"checksumSHA1": "hDk0YPkRGqYwMEMS2iWEfp9FT40=",
+			"checksumSHA1": "y8cCTy7sG8CS/wb7KHqkoeTxcco=",
 			"path": "github.com/stupschwartz/qubit/server",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "OL+mUsPoMfSLcvOR6J5ifccDLmY=",
 			"path": "github.com/stupschwartz/qubit/server/api",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "ZAtZY9giGAsMGIbzhkPXYEUg6OM=",
 			"path": "github.com/stupschwartz/qubit/server/api/health",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "DDyrFXD4GQP/K522wreP9R+JAA8=",
 			"path": "github.com/stupschwartz/qubit/server/api/nodes",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
-			"checksumSHA1": "mM+/5eKoT7iDdjiz6ck/cGoWbsM=",
+			"checksumSHA1": "7q19K+jTZ1au8hMZXxuXtrUqcW8=",
 			"path": "github.com/stupschwartz/qubit/server/api/render",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "2p/uzZba6cWsHPNRP7f17t4RuCs=",
 			"path": "github.com/stupschwartz/qubit/server/api/scenes",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "aYBPfsM4JrPYOhR2VBkjKFj4f9g=",
 			"path": "github.com/stupschwartz/qubit/server/env",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "xWNU7zoYIqSJM0jp0hpRpTghAYc=",
 			"path": "github.com/stupschwartz/qubit/server/handler",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",

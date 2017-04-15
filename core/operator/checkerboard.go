@@ -5,9 +5,12 @@ import (
 	"github.com/stupschwartz/qubit/core/params"
 )
 
-func CheckerBoardOperation(inputs []image.Plane, p params.Parameters, width int64, height int64) image.Plane {
+func CheckerBoardOperation(inputs []image.Plane, p params.Parameters, startX int64, startY int64, endX int64, endY int64) image.Plane {
 	sizeParam := p.GetByName("Size")
 	sizeValue := int64(sizeParam.GetValue(0))
+
+	width := endX - startX
+	height := endY - startY
 
 	redComponent := image.Component{Rows: make([]*image.Row, height)}
 	greenComponent := image.Component{Rows: make([]*image.Row, height)}
@@ -18,8 +21,8 @@ func CheckerBoardOperation(inputs []image.Plane, p params.Parameters, width int6
 	for row = 0; row < height; row++ {
 		rowData := make([]float64, width)
 		for col = 0; col < width; col++ {
-			checkerBoardRow := row / sizeValue
-			checkerBoardColumn := col / sizeValue
+			checkerBoardRow := (row + startY) / sizeValue
+			checkerBoardColumn := (col + startX) / sizeValue
 
 			value := 0.0
 			if ((checkerBoardRow + checkerBoardColumn) % 2) == 0 {

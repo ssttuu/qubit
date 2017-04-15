@@ -19,6 +19,8 @@ import (
 	"google.golang.org/grpc"
 
 	pb "github.com/stupschwartz/qubit/protos"
+	"fmt"
+	"google.golang.org/grpc/metadata"
 )
 
 type Credentials struct {
@@ -66,8 +68,7 @@ func main() {
 
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
-	opts = append(opts, grpc.WithUnaryInterceptor(trace.GRPCClientInterceptor()))
-
+	opts = append(opts, grpc.WithStreamInterceptor(clientInterceptor))
 
 	conn, err := grpc.Dial("compute:10000", opts...)
 	if err != nil {
@@ -85,4 +86,22 @@ func main() {
 
 
 	log.Fatal(http.ListenAndServeTLS(":8443", "server.crt", "server.key", api.Handlers(environ)))
+}
+
+
+
+func clientInterceptor(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+	fmt.Println("Client Interceptor")
+	fmt.Println(method)
+
+	span := trace.FromContext(ctx).NewChild(method + "-REQUEST")
+	defer span.Finish()
+
+	md := metadata.Pairs(
+		"x-cloud-trace-context", fmt.Sprintf("%s/%d;o=1", span.TraceID(), 0),
+	)
+
+	ctx = metadata.NewContext(ctx, md)
+
+	return streamer(ctx, desc, cc, method, opts...)
 }

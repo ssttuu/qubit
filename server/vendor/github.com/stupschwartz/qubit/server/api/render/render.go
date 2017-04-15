@@ -13,11 +13,13 @@ import (
 	"strconv"
 	"github.com/pkg/errors"
 	"cloud.google.com/go/trace"
+	"io"
+	"fmt"
 )
-
 
 func PostHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	span := trace.FromContext(ctx).NewChild("PostHandler")
+	fmt.Println("PostHandler")
 	defer span.Finish()
 
 	vars := mux.Vars(r)
@@ -36,18 +38,45 @@ func PostHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r *http
 		return errors.Wrap(err, "Failed to parse height")
 	}
 
-	serializeSpan := span.NewChild("Serialize gRPC Request")
-	renderRequest := &pb.RenderRequest{SceneId: sceneId, NodeId: nodeId, BoundingBox: &pb.BoundingBox{StartX: 0, StartY: 0, EndX: width, EndY: height}}
-	serializeSpan.Finish()
-
-	renderResponse, err := e.ComputeClient.Render(ctx, renderRequest)
+	fmt.Println("Get Stream")
+	stream, err := e.ComputeClient.Render(ctx)
 	if err != nil {
-		return errors.Wrap(err, "Failed to render")
+		return errors.Wrap(err, "Failed to get stream")
 	}
 
-	deserializeSpan := span.NewChild("Deserialize gRPC Request")
-	imagePlaneProto := renderResponse.GetImagePlane()
-	imagePlane := image.NewPlaneFromProto(imagePlaneProto)
+	fmt.Println("Send Stream")
+
+	var i int64
+	for i = 0; i < height; i++ {
+		fmt.Printf("%v;", i)
+		renderRequest := &pb.RenderRequest{SceneId: sceneId, NodeId: nodeId, BoundingBox: &pb.BoundingBox{StartX: 0, StartY: i, EndX: width, EndY: i + 1 }}
+		err := stream.Send(renderRequest)
+		if err != nil {
+			return errors.Wrap(err, "Failed to send stream")
+		}
+	}
+	stream.CloseSend()
+
+	imagePlane := image.NewRGBZeroPlane(width, height)
+
+	deserializeSpan := span.NewChild("Get gRPC Response")
+	fmt.Println(deserializeSpan)
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			//fmt.Printf("Failed to receive response: %v", err)
+			//continue
+			return errors.Wrap(err, "Failed to receive response")
+		}
+
+		imagePlanePart := image.NewPlaneFromProto(in.GetImagePlane())
+		partBBox := in.GetBoundingBox()
+		imagePlane.Merge(&imagePlanePart, partBBox.GetStartX(), partBBox.GetStartY())
+	}
+
 	deserializeSpan.Finish()
 
 	w.Header().Set("Content-Type", "image/png")

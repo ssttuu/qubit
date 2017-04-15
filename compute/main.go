@@ -18,33 +18,56 @@ import (
 	"google.golang.org/api/option"
 	"log"
 	"time"
+	"io"
+	"google.golang.org/grpc/metadata"
+	"strings"
+	"sync"
+	"github.com/pkg/errors"
 )
 
 type ComputeServer struct {
 	DatastoreClient *datastore.Client
 	StorageClient   *storage.Client
+	TraceClient     *trace.Client
 	ComputeClient   *pb.ComputeClient
 }
 
-func (cs *ComputeServer) Render(ctx context.Context, renderRequest *pb.RenderRequest) (*pb.RenderResponse, error) {
-	sceneUuid := renderRequest.GetSceneId()
-	nodeUuid := renderRequest.GetNodeId()
-	boundingBox := renderRequest.GetBoundingBox()
+func (cs *ComputeServer) Render(stream pb.Compute_RenderServer) error {
+	ctx := stream.Context()
 
+	grp := sync.WaitGroup{}
+	mu := sync.Mutex{}
+
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+
+		grp.Add(1)
+		go func(ctx context.Context, sceneUuid string, nodeUuid string, boundingBox *pb.BoundingBox, stream pb.Compute_RenderServer, mu *sync.Mutex) {
+			cs.ActuallyRender(ctx, sceneUuid, nodeUuid, boundingBox, stream, mu)
+			grp.Done()
+		}(ctx, in.GetSceneId(), in.GetNodeId(), in.GetBoundingBox(), stream, &mu)
+	}
+
+	grp.Wait()
+
+	return nil
+}
+
+func (cs *ComputeServer) ActuallyRender(ctx context.Context, sceneUuid string, nodeUuid string, boundingBox *pb.BoundingBox, stream pb.Compute_RenderServer, mu *sync.Mutex) error {
 	sceneKey := datastore.NameKey("Scene", sceneUuid, nil)
 	nodeKey := datastore.NameKey("Node", nodeUuid, sceneKey)
 
-	span := trace.FromContext(ctx).NewChild("compute.Render")
-	defer span.Finish()
-
-	datastoreGet := span.NewChild("datastore.Get")
 	var theNode node.Node
 	if err := cs.DatastoreClient.Get(ctx, nodeKey, &theNode); err != nil {
 		log.Fatalf("Failed to get node to be rendered, %v", err)
 	}
-	datastoreGet.Finish()
 
-	storageGet := span.NewChild("storage.Get")
 	var theParams params.Parameters
 	bucket := cs.StorageClient.Bucket(os.Getenv("STORAGE_BUCKET"))
 	paramsObj := bucket.Object("params/" + theNode.Id)
@@ -58,50 +81,58 @@ func (cs *ComputeServer) Render(ctx context.Context, renderRequest *pb.RenderReq
 	if err := decoder.Decode(&theParams); err != nil {
 		log.Fatal(err)
 	}
-	defer reader.Close()
-	storageGet.Finish()
+	reader.Close()
+
+
+	//renderInputsSpan := span.NewChild("render:" + stringBBox)
+	//inputImagePlanes := make([]image.Plane, len(theNode.Inputs))
+	//for index, inputNodeId := range theNode.Inputs {
+	//	inputImagePlanes[index] = cs.RenderInput(ctx, sceneUuid, inputNodeId, boundingBox)
+	//}
+	//renderInputsSpan.Finish()
 
 	op := operator.GetOperation(theNode.Type)
+	imagePlane := op([]image.Plane{}, theParams, boundingBox.GetStartX(), boundingBox.GetStartY(), boundingBox.GetEndX(), boundingBox.GetEndY())
 
-	inputImagePlanes := make([]image.Plane, len(theNode.Inputs))
 
-	for index, inputNodeId := range theNode.Inputs {
-		inputImagePlanes[index] = cs.RenderInput(ctx, sceneUuid, inputNodeId, boundingBox)
+	response := &pb.RenderResponse{ImagePlane: imagePlane.ToProto(), BoundingBox: boundingBox}
+
+	//fmt.Printf("Sending Response: %v\n", boundingBox)
+	//fmt.Printf(" -- w: %v, h: %v, cs: %v, rs: %v, data: %v\n", imagePlane.Width, imagePlane.Height, len(imagePlane.Components), len(imagePlane.Components[0].Rows), len(imagePlane.Components[0].Rows[0].Data))
+
+	mu.Lock()
+	err = stream.Send(response)
+	mu.Unlock()
+
+	if err != nil {
+		return errors.Wrap(err, "Failed to send stream")
 	}
 
-	renderOp := span.NewChild("op.Render")
-	imagePlane := op(inputImagePlanes, theParams, boundingBox.GetEndX(), boundingBox.GetEndY())
-	renderOp.Finish()
-
-	serialize := span.NewChild("serialize.response")
-	response := &pb.RenderResponse{ImagePlane: imagePlane.ToProto()}
-	serialize.Finish()
-
-	return response, nil
+	return nil
 }
 
-func (cs *ComputeServer) RenderInput(ctx context.Context, sceneUuid string, nodeUuid string, bbox *pb.BoundingBox) image.Plane {
-	var opts []grpc.DialOption
-	opts = append(opts, grpc.WithInsecure())
-	opts = append(opts, grpc.WithUnaryInterceptor(trace.GRPCClientInterceptor()))
+//func (cs *ComputeServer) RenderInput(ctx context.Context, sceneUuid string, nodeUuid string, bbox *pb.BoundingBox) image.Plane {
+//	var opts []grpc.DialOption
+//	opts = append(opts, grpc.WithInsecure())
+//	opts = append(opts, grpc.WithUnaryInterceptor(trace.GRPCClientInterceptor()))
+//
+//	// TODO: client side load balancing
+//	conn, err := grpc.Dial("compute:10000", opts...)
+//	if err != nil {
+//		grpclog.Fatalf("fail to dial: %v", err)
+//	}
+//	defer conn.Close()
+//	computeClient := pb.NewComputeClient(conn)
+//
+//	renderResponse, err := computeClient.Render(ctx, &pb.RenderRequest{SceneId: sceneUuid, NodeId: nodeUuid, BoundingBox: bbox})
+//	if err != nil {
+//		grpclog.Fatal("failed to render")
+//	}
+//
+//	return image.NewPlaneFromProto(renderResponse.GetImagePlane())
+//}
 
-	// TODO: client side load balancing
-	conn, err := grpc.Dial("compute:10000", opts...)
-	if err != nil {
-		grpclog.Fatalf("fail to dial: %v", err)
-	}
-	defer conn.Close()
-	computeClient := pb.NewComputeClient(conn)
-
-	renderResponse, err := computeClient.Render(ctx, &pb.RenderRequest{SceneId: sceneUuid, NodeId: nodeUuid, BoundingBox: bbox})
-	if err != nil {
-		grpclog.Fatal("failed to render")
-	}
-
-	return image.NewPlaneFromProto(renderResponse.GetImagePlane())
-}
-
-func newServer() *ComputeServer {
+func newServer(traceClient *trace.Client) *ComputeServer {
 	s := new(ComputeServer)
 
 	projID := os.Getenv("GOOGLE_PROJECT_ID")
@@ -129,6 +160,7 @@ func newServer() *ComputeServer {
 
 	s.DatastoreClient = datastoreClient
 	s.StorageClient = storageClient
+	s.TraceClient = traceClient
 
 	log.Println("NewServer")
 
@@ -142,6 +174,7 @@ func main() {
 	}
 
 	ctx := context.Background()
+
 	traceClient, err := trace.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
 	if err != nil {
 		log.Fatalf("Could not create trace client: %v\n", err)
@@ -152,17 +185,24 @@ func main() {
 	}
 	traceClient.SetSamplingPolicy(p)
 
-	//var opts []grpc.ServerOption
-	//opts = append(opts, EnableGRPCTracingServerOption(traceClient))
-	//creds, err := credentials.NewServerTLSFromFile("server.crt", "server.key")
-	//if err != nil {
-	//	grpclog.Fatalf("Failed to generate credentials %v", err)
-	//}
-	//opts = []grpc.ServerOption{grpc.Creds(creds)}
-
 	log.Println("MAIN")
 
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(trace.GRPCServerInterceptor(traceClient)))
-	pb.RegisterComputeServer(grpcServer, newServer())
+	grpcServer := grpc.NewServer(grpc.StreamInterceptor(serverInterceptor(traceClient)))
+	pb.RegisterComputeServer(grpcServer, newServer(traceClient))
 	grpcServer.Serve(lis)
+}
+
+func serverInterceptor(traceClient *trace.Client) grpc.StreamServerInterceptor {
+	return func(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+		md, ok := metadata.FromIncomingContext(ss.Context())
+		if !ok {
+			md = metadata.New(nil)
+		}
+		header := strings.Join(md["x-cloud-trace-context"], "")
+
+		span := traceClient.SpanFromHeader(info.FullMethod, header)
+		defer span.Finish()
+
+		return handler(srv, ss)
+	}
 }

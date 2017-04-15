@@ -75,6 +75,30 @@
 			"revisionTime": "2017-04-07T21:08:25Z"
 		},
 		{
+			"checksumSHA1": "HVgmVrMTR24UZC16fLr/eLvK3Ng=",
+			"path": "github.com/gogo/protobuf/gogoproto",
+			"revision": "9c5b7bafbfccf2b40d274e0496f3a09418a87af4",
+			"revisionTime": "2017-02-07T10:23:50Z"
+		},
+		{
+			"checksumSHA1": "6ZxSmrIx3Jd15aou16oG0HPylP4=",
+			"path": "github.com/gogo/protobuf/proto",
+			"revision": "9c5b7bafbfccf2b40d274e0496f3a09418a87af4",
+			"revisionTime": "2017-02-07T10:23:50Z"
+		},
+		{
+			"checksumSHA1": "iGFgLlMcKNAAYdZEx12i/q3P4mQ=",
+			"path": "github.com/gogo/protobuf/protoc-gen-gogo/descriptor",
+			"revision": "9c5b7bafbfccf2b40d274e0496f3a09418a87af4",
+			"revisionTime": "2017-02-07T10:23:50Z"
+		},
+		{
+			"checksumSHA1": "hWLZdPWUXbed4WhlKIhNLMLWlI8=",
+			"path": "github.com/gogo/protobuf/test/group",
+			"revision": "9c5b7bafbfccf2b40d274e0496f3a09418a87af4",
+			"revisionTime": "2017-02-07T10:23:50Z"
+		},
+		{
 			"checksumSHA1": "kBeNcaKk56FguvPSUCEaH6AxpRc=",
 			"path": "github.com/golang/protobuf/proto",
 			"revision": "2bba0603135d7d7f5cb73b2125beeda19c09f4ef",
@@ -195,34 +219,40 @@
 			"revisionTime": "2017-03-05T23:04:05Z"
 		},
 		{
-			"checksumSHA1": "AKRn2l0nt34vgt3+1wD6CpfH5t0=",
-			"path": "github.com/stupschwartz/qubit/compute",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"checksumSHA1": "ynJSWoF6v+3zMnh9R0QmmG6iGV8=",
+			"path": "github.com/pkg/errors",
+			"revision": "ff09b135c25aae272398c51a07235b90a75aa4f0",
+			"revisionTime": "2017-03-16T20:15:38Z"
 		},
 		{
-			"checksumSHA1": "vCrYVxr6UzkwDEw7jUUwTnCSe58=",
+			"checksumSHA1": "ePMNSUv9KJ1uKRdxtPo+uUlurh4=",
+			"path": "github.com/stupschwartz/qubit/compute",
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
+		},
+		{
+			"checksumSHA1": "LvaIvAPYRt9d3W3NZ/CKa4t+qNI=",
 			"path": "github.com/stupschwartz/qubit/core/image",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "deRF5LgwZCsO2DQ24OjaUpyt/5g=",
 			"path": "github.com/stupschwartz/qubit/core/node",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
-			"checksumSHA1": "r4gFZHCF5+ufVQ/bZEg/083TMRA=",
+			"checksumSHA1": "u7jTKNLf8CVpNY2YGY0CUuYlabI=",
 			"path": "github.com/stupschwartz/qubit/core/operator",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "niaJN/36XiJgUpUT48RM53BS4jg=",
 			"path": "github.com/stupschwartz/qubit/core/params",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "GtMSCsP06VZ0+VdlBMpfw3g24ts=",
@@ -249,10 +279,10 @@
 			"revisionTime": "2017-04-06T10:34:35Z"
 		},
 		{
-			"checksumSHA1": "rbP3bLV8z4kZq7iKarZvDwXMMdU=",
+			"checksumSHA1": "v8/3Nj7aGvFKThpMn/vWOwMf5nY=",
 			"path": "github.com/stupschwartz/qubit/protos",
-			"revision": "6be7878c9bbbebbbb4a8a0c2afe50bcdba2cc368",
-			"revisionTime": "2017-04-09T20:34:12Z"
+			"revision": "ac4e2d7904256440085e61c0c9ead8c7ca623c8b",
+			"revisionTime": "2017-04-12T03:13:03Z"
 		},
 		{
 			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",

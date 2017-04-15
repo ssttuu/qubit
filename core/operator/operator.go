@@ -12,7 +12,7 @@ type Operator struct {
 	Inputs []string               `json:"inputs"`
 }
 
-type Operation func(inputs []image.Plane, p params.Parameters, width int64, height int64) image.Plane
+type Operation func(inputs []image.Plane, p params.Parameters, startX int64, startY int64, endX int64, endY int64) image.Plane
 
 var Operators = make(map[string]Operation)
 var Parameters = make(map[string]params.Parameters)

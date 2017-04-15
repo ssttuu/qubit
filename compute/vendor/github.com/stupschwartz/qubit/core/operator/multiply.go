@@ -6,7 +6,7 @@ import (
 )
 
 
-func MultiplyOperation(inputs []image.Plane, p params.Parameters, width int64, height int64) image.Plane {
+func MultiplyOperation(inputs []image.Plane, p params.Parameters, startX int64, startY int64, endX int64, endY int64) image.Plane {
 	multiplyByParam := p.GetByName("MultiplyBy")
 	multiplyByValue := multiplyByParam.GetValue(0)
 
