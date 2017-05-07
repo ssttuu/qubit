@@ -1,6 +1,6 @@
 
 proto:
-	protoc -I protos/ protos/*.proto --go_out=plugins=grpc:protos
+	protoc -I /usr/local/include/ -I ./compute/ --include_imports --include_source_info compute/compute.proto --descriptor_set_out compute/compute.pb
 
 vendor:
 	cd server && govendor update +external && govendor update +vendor && cd ..

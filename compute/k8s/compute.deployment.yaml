@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: compute-esp
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: compute-esp
+    spec:
+      containers:
+      - name: esp
+        image: gcr.io/endpoints-release/endpoints-runtime:1
+        args: [
+          "-P", "9000",
+          "-s", {{name}},
+          "-v", {{id}},
+          "-a", "grpc://127.0.0.1:8000"
+        ]
+        ports:
+          - containerPort: 9000
+      - name: compute
+        image: gcr.io/qubit-161916/qubit-compute:latest
+        ports:
+          - containerPort: 8000

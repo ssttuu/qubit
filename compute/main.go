@@ -168,7 +168,7 @@ func newServer(traceClient *trace.Client) *ComputeServer {
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":10000")
+	lis, err := net.Listen("tcp", ":8000")
 	if err != nil {
 		grpclog.Fatalf("failed to listen: %v", err)
 	}

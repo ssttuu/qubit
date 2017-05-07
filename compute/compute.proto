@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package protos;
+package compute;
 
 service Compute {
     rpc Render (stream RenderRequest) returns (stream RenderResponse) {}
