@@ -25,6 +25,8 @@ steps:
   # Compute - Test Unit
   - name: "gcr.io/cloud-builders/go"
     args: ["test", "."]
+    env:
+      - "GOPATH=."
     id: "compute-docker-test-unit"
     dir: "compute"
     waitFor: ["compute-docker-build"]
