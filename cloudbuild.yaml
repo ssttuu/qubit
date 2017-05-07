@@ -1,22 +1,58 @@
 steps:
-  # Server
+  # Server - Build
   - name: "gcr.io/cloud-builders/docker"
     args: ["build", "-t", "gcr.io/${PROJECT_ID}/qubit-server:${COMMIT_SHA}", "-t", "gcr.io/${PROJECT_ID}/qubit-server:latest", "."]
     id: "server-docker-build"
     dir: "server"
     waitFor: ["-"]
 
-  # Compute
+  # Server - Push SHA1
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/${PROJECT_ID}/qubit-server:${COMMIT_SHA}"]
+    id: "server-docker-push-sha1"
+    dir: "server"
+    waitFor: ["server-docker-build"]
+
+
+
+  # Compute - Build
   - name: "gcr.io/cloud-builders/docker"
     args: ["build", "-t", "gcr.io/${PROJECT_ID}/qubit-compute:${COMMIT_SHA}", "-t", "gcr.io/${PROJECT_ID}/qubit-compute:latest", "."]
     id: "compute-docker-build"
     dir: "compute"
     waitFor: ["-"]
 
+  # Compute - Test Unit
+  - name: "gcr.io/cloud-builders/go"
+    args: ["test", "."]
+    id: "compute-docker-test-unit"
+    dir: "compute"
+    waitFor: ["compute-docker-build"]
 
-images: [
-  "gcr.io/${PROJECT_ID}/qubit-server:${COMMIT_SHA}",
-  "gcr.io/${PROJECT_ID}/qubit-server:latest",
-  "gcr.io/${PROJECT_ID}/qubit-compute:${COMMIT_SHA}",
-  "gcr.io/${PROJECT_ID}/qubit-compute:latest",
-]
+  # Compute - Test Integration
+
+  # Compute - Push SHA1
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/${PROJECT_ID}/qubit-compute:${COMMIT_SHA}"]
+    id: "compute-docker-push-sha1"
+    dir: "compute"
+    waitFor: ["compute-docker-test-unit"]
+
+
+
+  # Deploy
+  - name: "ubuntu"
+    args: ["bash", "./deploy.sh"]
+    id: "deploy-compute"
+    dir: "compute"
+    waitFor: ["compute-docker-push-sha1"]
+
+
+  # Compute - Push Latest
+#  - name: "gcr.io/cloud-builders/docker"
+#    args: ["push", "gcr.io/${PROJECT_ID}/qubit-compute:latest"]
+#    id: "compute-docker-push-latest"
+#    dir: "compute"
+#    waitFor: "compute-docker-test"
+
+images: []

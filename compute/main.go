@@ -1,28 +1,28 @@
 package main
 
 import (
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
-	"net"
-	pb "github.com/stupschwartz/qubit/protos"
-	"github.com/stupschwartz/qubit/core/operator"
-	"github.com/stupschwartz/qubit/core/image"
-	"github.com/stupschwartz/qubit/core/node"
-	"github.com/stupschwartz/qubit/core/params"
-	"os"
-	"encoding/json"
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
 	"cloud.google.com/go/trace"
+	"encoding/json"
+	"github.com/pkg/errors"
+	"github.com/stupschwartz/qubit/core/image"
+	"github.com/stupschwartz/qubit/core/node"
+	"github.com/stupschwartz/qubit/core/operator"
+	"github.com/stupschwartz/qubit/core/params"
+	pb "github.com/stupschwartz/qubit/protos"
+	"golang.org/x/net/context"
 	"google.golang.org/api/option"
-	"log"
-	"time"
-	"io"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
+	"io"
+	"log"
+	"net"
+	"os"
 	"strings"
 	"sync"
-	"github.com/pkg/errors"
+	"time"
 )
 
 type ComputeServer struct {
@@ -83,7 +83,6 @@ func (cs *ComputeServer) ActuallyRender(ctx context.Context, sceneUuid string, n
 	}
 	reader.Close()
 
-
 	//renderInputsSpan := span.NewChild("render:" + stringBBox)
 	//inputImagePlanes := make([]image.Plane, len(theNode.Inputs))
 	//for index, inputNodeId := range theNode.Inputs {
@@ -93,7 +92,6 @@ func (cs *ComputeServer) ActuallyRender(ctx context.Context, sceneUuid string, n
 
 	op := operator.GetOperation(theNode.Type)
 	imagePlane := op([]image.Plane{}, theParams, boundingBox.GetStartX(), boundingBox.GetStartY(), boundingBox.GetEndX(), boundingBox.GetEndY())
-
 
 	response := &pb.RenderResponse{ImagePlane: imagePlane.ToProto(), BoundingBox: boundingBox}
 

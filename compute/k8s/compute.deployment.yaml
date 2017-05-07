@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: compute-esp
+  name: compute-esp-{{id}}
 spec:
   replicas: 1
   template:
@@ -14,8 +14,8 @@ spec:
         image: gcr.io/endpoints-release/endpoints-runtime:1
         args: [
           "-P", "9000",
-          "-s", {{name}},
-          "-v", {{id}},
+          "-s", "{{name}}",
+          "-v", "{{id}}",
           "-a", "grpc://127.0.0.1:8000"
         ]
         ports:
@@ -24,3 +24,21 @@ spec:
         image: gcr.io/qubit-161916/qubit-compute:latest
         ports:
           - containerPort: 8000
+        env:
+          - name: GOOGLE_PROJECT_ID
+            value: qubit-161916
+          - name: DATASTORE_PROJECT_ID
+            value: qubit-161916
+          - name: DATASTORE_DATASET
+            value: qubit
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /opt/etc/credentials/service-account-key-file.json
+          - name: STORAGE_BUCKET
+            value: qubit-dev-161916
+        volumeMounts:
+          - name: google-credentials
+            mountPath: /opt/etc/credentials
+      volumes:
+        - name: google-credentials
+          secret:
+            secretName: google-service-account
