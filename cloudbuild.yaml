@@ -23,8 +23,8 @@ steps:
     waitFor: ["-"]
 
   # Compute - Test Unit
-  - name: "gcr.io/cloud-builders/go"
-    args: ["test", "."]
+  - name: "ubuntu"
+    args: ["pwd"]
     env:
       - "GOPATH=."
     id: "compute-docker-test-unit"
