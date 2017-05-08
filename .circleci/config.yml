@@ -1,0 +1,70 @@
+version: 2
+jobs:
+    build:
+        docker:
+            - image: ubuntu:16.04
+
+        working_directory: /workspace
+
+        steps:
+            - checkout
+            - setup_remote_docker
+
+            - run:
+                name: Install Dependencies
+                command: scripts/install-deps.sh
+
+            - run:
+                name: Authenticate GCloud
+                command: scripts/auth-gcloud.sh
+
+            - run:
+                name: Pull
+                command: |
+                    docker pull ${EXTERNALREGISTRYENDPOINT}/qubit-container || echo "Getting qubit-container"
+
+            - run:
+                name: Build
+                command: |
+                    docker build -t ${EXTERNALREGISTRYENDPOINT}/qubit-container:${CIRCLE_SHA1} -t ${EXTERNALREGISTRYENDPOINT}/qubit-container:latest .
+
+            - run:
+                name: Push
+                command: |
+                    docker push ${EXTERNALREGISTRYENDPOINT}/qubit-container:${CIRCLE_SHA1}
+                    docker push ${EXTERNALREGISTRYENDPOINT}/qubit-container:latest
+
+    build_compute:
+        docker:
+            - image: ubuntu:16.04
+
+        working_directory: /go/src/github.com/stupschwartz/qubit
+
+        environment:
+            TEST_RESULTS: /tmp/test-results
+
+        steps:
+            - checkout
+
+            - run:
+                name: Ls
+                command: ls
+
+            - run:
+                name: Pwd
+                command: pwd
+
+            - run:
+                name: Install Dependencies
+                command: scripts/install-deps.sh
+
+            - run:
+                name: Authenticate GCloud
+                command: scripts/auth-gcloud.sh
+
+            - run:
+                name: Build Compute Container
+                command: |
+                    docker build -t ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1} ./compute/
+                    docker push ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1}
+

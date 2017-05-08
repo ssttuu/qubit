@@ -60,8 +60,9 @@ steps:
 
   # Compute - Deploy - Jinja Template
   - name: "vikingco/jinja2cli"
+    entrypoint: "bash"
     args: [
-      "bash",
+      "jinja2",
       "k8s/compute.deployment.yaml",
       "api-deployment.response.json",
       ">",
