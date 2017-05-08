@@ -41,13 +41,26 @@ steps:
     waitFor: ["compute-docker-test-unit"]
 
 
-
-  # Deploy
-  - name: "ubuntu"
-    args: ["bash", "./deploy.sh"]
-    id: "deploy-compute"
+  # Compute - Deploy API
+  - name: "gcr.io/cloud-builders/gcloud"
+    args: ["service-management", "deploy", "compute.pb", "api_config.yaml", "--format", "json", ">", "api-deployment.response.json"]
+    id: "compute-deploy-api"
     dir: "compute"
     waitFor: ["compute-docker-push-sha1"]
+
+  # Compute - Deploy - Jinja Template
+  - name: "vikingco/jinja2cli"
+    args: ["k8s/compute.deployment.yaml", "api-deployment.response.json", ">", "k8s/compute.deployment.formatted.yaml"]
+    id: "compute-deploy-api-jinja"
+    dir: "compute"
+    waitFor: ["compute-deploy-api"]
+
+  # Compute - Deploy - Kubernetes
+  - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "bash"
+    args: ["k8s/deploy.sh"]
+    dir: "compute"
+    waitFor: ["compute-deploy-api-jinja"]
 
 
   # Compute - Push Latest
