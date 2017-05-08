@@ -2,7 +2,7 @@ version: 2
 jobs:
     build:
         docker:
-            - image: ubuntu:16.04
+            - image: docker:17
 
         working_directory: /workspace
 
@@ -11,32 +11,30 @@ jobs:
             - setup_remote_docker
 
             - run:
-                name: Install Dependencies
-                command: scripts/install-deps.sh
-
-            - run:
-                name: Authenticate GCloud
-                command: scripts/auth-gcloud.sh
-
-            - run:
                 name: Pull
                 command: |
-                    docker pull ${EXTERNALREGISTRYENDPOINT}/qubit-container || echo "Getting qubit-container"
+                    docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
+                    docker pull ${DOCKER_USER}/qubit-builder || echo "Getting qubit-builder"
 
             - run:
                 name: Build
                 command: |
-                    docker build -t ${EXTERNALREGISTRYENDPOINT}/qubit-container:${CIRCLE_SHA1} -t ${EXTERNALREGISTRYENDPOINT}/qubit-container:latest .
+                    docker build -t ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1} -t ${DOCKER_USER}/qubit-builder:latest ./builder/
 
             - run:
                 name: Push
                 command: |
-                    docker push ${EXTERNALREGISTRYENDPOINT}/qubit-container:${CIRCLE_SHA1}
-                    docker push ${EXTERNALREGISTRYENDPOINT}/qubit-container:latest
+                    docker push ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1}
+                    docker push ${DOCKER_USER}/qubit-builder:latest
+
+            - run:
+                name:
+                command: |
+                    curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=build_compute --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
 
     build_compute:
         docker:
-            - image: ubuntu:16.04
+            - image: stuschwartz/qubit-builder:latest
 
         working_directory: /go/src/github.com/stupschwartz/qubit
 
@@ -45,18 +43,7 @@ jobs:
 
         steps:
             - checkout
-
-            - run:
-                name: Ls
-                command: ls
-
-            - run:
-                name: Pwd
-                command: pwd
-
-            - run:
-                name: Install Dependencies
-                command: scripts/install-deps.sh
+            - setup_remote_docker
 
             - run:
                 name: Authenticate GCloud
@@ -65,6 +52,6 @@ jobs:
             - run:
                 name: Build Compute Container
                 command: |
-                    docker build -t ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1} ./compute/
-                    docker push ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1}
+                    gcloud --project=qubit-161916 docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1} ./compute/
+                    gcloud --project=qubit-161916 docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1}
 

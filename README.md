@@ -1,4 +1,5 @@
 # Qubit
+[![CircleCI](https://circleci.com/gh/stupschwartz/qubit/tree/master.svg?style=svg&circle-token=91ae7b7dd5787a1c7c4250d32b91da07a4a471b0)](https://circleci.com/gh/stupschwartz/qubit/tree/master)
 
 ### Setup
 
