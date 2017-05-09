@@ -31,6 +31,7 @@ jobs:
                 name:
                 command: |
                     curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=build_compute --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
+                    curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=build_server --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
 
     build_compute:
         docker:
@@ -55,3 +56,25 @@ jobs:
                     gcloud --project=qubit-161916 docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1} ./compute/
                     gcloud --project=qubit-161916 docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1}
 
+    build_server:
+        docker:
+            - image: stuschwartz/qubit-builder:latest
+
+        working_directory: /go/src/github.com/stupschwartz/qubit
+
+        environment:
+            TEST_RESULTS: /tmp/test-results
+
+        steps:
+            - checkout
+            - setup_remote_docker
+
+            - run:
+                name: Authenticate GCloud
+                command: scripts/auth-gcloud.sh
+
+            - run:
+                name: Build Server Container
+                command: |
+                    gcloud --project=qubit-161916 docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1} ./server/
+                    gcloud --project=qubit-161916 docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1}
