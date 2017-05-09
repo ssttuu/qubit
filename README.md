@@ -5,7 +5,7 @@
 
 1.  Install jq
 2.  Install jinja2-cli
-3.  Install gclou
+3.  Install gcloud
 4.  Install kubectl
 
 #### Service Account Secret setup

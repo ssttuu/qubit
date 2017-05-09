@@ -18,9 +18,15 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s
 RUN apt-cache policy docker-engine
 RUN apt-get install -y docker-engine
 
-RUN apt-get install -y kubectl jq jinja2-cli
+RUN apt-get install -y kubectl
+RUN apt-get install -y jq
 
 RUN curl -OL https://github.com/google/protobuf/releases/download/v3.3.0/protoc-3.3.0-linux-x86_64.zip
 RUN unzip protoc-3.3.0-linux-x86_64.zip -d protoc3
 RUN mv protoc3/bin/* /usr/bin/
 RUN mv protoc3/include/* /usr/local/include/
+
+RUN apt-get install -y python-pip python-dev build-essential
+RUN pip install --upgrade pip
+
+RUN pip install jinja2-cli
