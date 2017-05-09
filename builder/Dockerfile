@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 
 RUN apt-get update -y
-RUN apt-get install -y lsb-release curl apt-transport-https ssh software-properties-common
+RUN apt-get install -y lsb-release curl apt-transport-https ssh software-properties-common zip
 RUN apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
 
 RUN echo "deb https://packages.cloud.google.com/apt cloud-sdk-$(lsb_release -c -s) main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
@@ -18,3 +18,9 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s
 RUN apt-cache policy docker-engine
 RUN apt-get install -y docker-engine
 
+RUN apt-get install -y kubectl jq jinja2-cli
+
+RUN curl -OL https://github.com/google/protobuf/releases/download/v3.3.0/protoc-3.3.0-linux-x86_64.zip
+RUN unzip protoc-3.3.0-linux-x86_64.zip -d protoc3
+RUN mv protoc3/bin/* /usr/bin/
+RUN mv protoc3/include/* /usr/local/include/

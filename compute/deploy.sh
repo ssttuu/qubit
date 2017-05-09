@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 
-yaml2json='python -c "import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)"'
+set -euo pipefail
+
+function onExit {
+    popd
+}
+trap onExit EXIT
+pushd `dirname $0`
+
+# Create Compute Service Description
+protoc -I /usr/local/include/ -I ./ --include_imports --include_source_info compute.proto --descriptor_set_out compute.pb
 
 # Deploy Compute Service
 service_response=$(gcloud service-management deploy compute.pb api_config.yaml --format json)
@@ -10,15 +19,10 @@ service_name=$(echo ${service_response} | jq -r '.serviceConfig.name')
 
 echo "Deployment: ${service_id} of ${service_name}"
 
-# Evaluate jinja templated YAML file
-compute_template_yaml=$(jinja2 k8s/compute.deployment.yaml -D id=${service_id} -D name=${service_name} -D githash=$(git rev-parse HEAD))
+deployment_formatted="k8s/compute.deployment.formatted.yaml"
 
-# Convert YAML to JSON
-compute_template_json=$(echo "${compute_template_yaml}" | eval ${yaml2json})
+# Evaluate jinja templated YAML file
+jinja2 k8s/compute.deployment.yaml -D id=${service_id} -D name=${service_name} -D githash=$(git rev-parse HEAD) > ${deployment_formatted}
 
 # Create deployment using JSON configuration
-k8_result=$(echo ${compute_template_json} | kubectl create -f -)
-
-
-echo ${k8_result}
-
+kubectl create -f ${deployment_formatted}

@@ -28,12 +28,11 @@ jobs:
                     docker push ${DOCKER_USER}/qubit-builder:latest
 
             - run:
-                name:
+                name: Trigger Containers Build
                 command: |
-                    curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=build_compute --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
-                    curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=build_server --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
+                    curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=build_containers --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
 
-    build_compute:
+    build_containers:
         docker:
             - image: stuschwartz/qubit-builder:latest
 
@@ -53,10 +52,22 @@ jobs:
             - run:
                 name: Build Compute Container
                 command: |
-                    gcloud --project=qubit-161916 docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1} ./compute/
-                    gcloud --project=qubit-161916 docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1}
+                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1} ./compute/
+                    gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1}
 
-    build_server:
+            - run:
+                name: Build Server Container
+                command: |
+                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1} ./server/
+                    gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1}
+
+            - run:
+                name: Trigger Containers Deployment
+                command: |
+                    curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=deploy_containers --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
+
+
+    deploy_containers:
         docker:
             - image: stuschwartz/qubit-builder:latest
 
@@ -74,7 +85,10 @@ jobs:
                 command: scripts/auth-gcloud.sh
 
             - run:
-                name: Build Server Container
+                name: Cluster Credentials
                 command: |
-                    gcloud --project=qubit-161916 docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1} ./server/
-                    gcloud --project=qubit-161916 docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1}
+                    gcloud container clusters get-credentials dev-cluster --zone us-central1-a
+
+            - run:
+                name: Deploy Compute API Service
+                command: compute/deploy.sh
