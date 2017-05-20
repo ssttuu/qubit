@@ -91,4 +91,4 @@ jobs:
 
             - run:
                 name: Deploy API Services
-                command: deploy.sh
+                command: ./deploy.sh
