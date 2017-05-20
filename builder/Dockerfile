@@ -26,7 +26,4 @@ RUN unzip protoc-3.3.0-linux-x86_64.zip -d protoc3
 RUN mv protoc3/bin/* /usr/bin/
 RUN mv protoc3/include/* /usr/local/include/
 
-RUN apt-get install -y python-pip python-dev build-essential
-RUN pip install --upgrade pip
-
-RUN pip install jinja2-cli
+RUN curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash

@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package server;
+
+service Server {
+    rpc Render (stream RenderRequest) returns (stream RenderResponse) {}
+}

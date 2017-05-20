@@ -1,40 +1,40 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: compute-esp-{{id}}
+  name: {{ .Values.Compute.AppName }}-{{ .Values.Compute.ApiId }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.Compute.Replicas }}
   template:
     metadata:
       labels:
-        app: compute-esp
+        app: {{ .Values.Compute.AppName }}
     spec:
       containers:
       - name: esp
         image: gcr.io/endpoints-release/endpoints-runtime:1
         args: [
-          "-P", "9000",
-          "-s", "{{name}}",
-          "-v", "{{id}}",
-          "-a", "grpc://127.0.0.1:8000"
+          "-P", "{{ .Values.Compute.ExternalPort }}",
+          "-s", "{{ .Values.Compute.ApiName }}",
+          "-v", "{{ .Values.Compute.ApiId }}",
+          "-a", "grpc://127.0.0.1:{{ .Values.Compute.InternalPort }}"
         ]
         ports:
-          - containerPort: 9000
+          - containerPort: {{ .Values.Compute.ExternalPort }}
       - name: compute
-        image: gcr.io/qubit-161916/qubit-compute:latest
+        image: gcr.io/qubit-161916/qubit-compute:{{ .Values.GITHASH }}
         ports:
-          - containerPort: 8000
+          - containerPort: {{ .Values.Compute.InternalPort }}
         env:
           - name: GOOGLE_PROJECT_ID
-            value: qubit-161916
+            value: {{ .Values.GoogleProjectId }}
           - name: DATASTORE_PROJECT_ID
-            value: qubit-161916
+            value: {{ .Values.GoogleProjectId }}
           - name: DATASTORE_DATASET
-            value: qubit
+            value: {{ .Values.DatastoreDataset }}
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /opt/etc/credentials/service-account-key-file.json
           - name: STORAGE_BUCKET
-            value: qubit-dev-161916
+            value: {{ .Values.Compute.StorageBucket }}
         volumeMounts:
           - name: google-credentials
             mountPath: /opt/etc/credentials

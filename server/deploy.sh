@@ -9,7 +9,7 @@ trap onExit EXIT
 pushd `dirname $0`
 
 # Create Compute Service Description
-protoc -I /usr/local/include/ -I ./ --include_imports --include_source_info compute.proto --descriptor_set_out compute.pb
+protoc -I /usr/local/include/ -I ./ --include_imports --include_source_info server.proto --descriptor_set_out server.pb
 
 # Deploy Compute Service
 echo "Deploying to Google Endpoints"
