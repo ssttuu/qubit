@@ -30,7 +30,7 @@ jobs:
             - run:
                 name: Trigger Containers Build
                 command: |
-                    curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=build_containers --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
+                    docker run --rm ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1} curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=build_containers --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
 
     build_containers:
         docker:
