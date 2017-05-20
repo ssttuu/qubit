@@ -12,4 +12,5 @@ service_response=$(gcloud service-management deploy compute/compute.pb compute/a
 service_id=$(echo ${service_response} | jq -r '.serviceConfig.id')
 service_name=$(echo ${service_response} | jq -r '.serviceConfig.name')
 
+helm init
 helm install --dry-run --debug --set Compute.ApiId=${service_id},Githash=${CIRCLE_SHA1} ./qubit-helm
