@@ -58,12 +58,21 @@ jobs:
                 name: Compute - Build Container
                 command: |
                     gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1} ./compute/
+
+            - run:
+                name: Compute - Push Container
+                command: |
                     gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1}
 
             - run:
-                name: Build Server Container
+                name: Server - Build Container
                 command: |
                     gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1} ./server/
+
+
+            - run:
+                name: Server - Push Container
+                command: |
                     gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1}
 
             - run:
