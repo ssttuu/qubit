@@ -19,7 +19,7 @@ jobs:
             - run:
                 name: Build
                 command: |
-                    docker build -t ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1} -t ${DOCKER_USER}/qubit-builder:latest ./builder/
+                    docker build --no-cache -t ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1} -t ${DOCKER_USER}/qubit-builder:latest ./builder/
 
             - run:
                 name: Push
