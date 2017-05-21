@@ -52,7 +52,7 @@ jobs:
             - run:
                 name: Compute - Build Go Executable
                 command: |
-                    docker run --rm -v "$PWD":/go/src/github.com/stupschwartz/qubit -w /go/src/github.com/stupschwartz/qubit/compute golang:1.8 bash -c "go get .; go build"
+                    docker run --rm -v $(pwd):/go/src/github.com/stupschwartz/qubit -w /go/src/github.com/stupschwartz/qubit/compute golang:1.8 bash -c "go get .; go build"
 
             - run:
                 name: Compute - Build Container
