@@ -56,6 +56,11 @@ jobs:
                     gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1}
 
             - run:
+                name: Generate Golang Compute Client for Server
+                command: |
+                    docker run --rm -v $(pwd):/workspace -w /workspace znly/protoc -I ./compute/  --go_out=plugins=grpc:./server/clients/ compute/compute.proto
+
+            - run:
                 name: Build Server Container
                 command: |
                     gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1} ./server/
