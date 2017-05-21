@@ -10,4 +10,4 @@ service_id=$(echo ${service_response} | jq -r '.serviceConfig.id')
 service_name=$(echo ${service_response} | jq -r '.serviceConfig.name')
 
 helm init
-helm install --debug --set Compute.ApiId=${service_id},Githash=${CIRCLE_SHA1} ./qubit-helm
+helm install --debug --set Compute.ApiId=${service_id},Githash=${CIRCLE_SHA1} ./helm/qubit/

@@ -1,4 +1,4 @@
 apiVersion: v1
 description: Qubit Helm chart for Kubernetes
-name: qubit-helm
+name: qubit
 version: 0.1.0
