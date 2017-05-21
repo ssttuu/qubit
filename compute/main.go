@@ -10,7 +10,7 @@ import (
 	"github.com/stupschwartz/qubit/core/node"
 	"github.com/stupschwartz/qubit/core/operator"
 	"github.com/stupschwartz/qubit/core/params"
-	pb "github.com/stupschwartz/qubit/protos"
+	pb "github.com/stupschwartz/qubit/compute/protos/compute"
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"

@@ -1,6 +1,6 @@
 package node
 
-import pb "github.com/stupschwartz/qubit/protos"
+import pb "github.com/stupschwartz/qubit/compute/protos/compute"
 
 type Node struct {
 	Id string `json:"id" datastore:"id"`

@@ -1,13 +1,8 @@
 FROM golang:1.8
 
-ENV APP /go/src/github.com/stupschwartz/qubit/compute
+WORKDIR /app
 
-RUN apt-get update -y && apt-get install -y ntp
-RUN /etc/init.d/ntp restart
-
-ADD . ${APP}
-WORKDIR ${APP}
-
-CMD go run main.go
+ADD ./compute ./compute
+CMD ./compute
 
 EXPOSE 10000

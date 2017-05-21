@@ -1,25 +1,34 @@
 package api
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/stupschwartz/qubit/server/api/nodes"
-	"github.com/stupschwartz/qubit/server/env"
-	_ "github.com/lib/pq"
-	"github.com/stupschwartz/qubit/server/api/render"
-	"github.com/stupschwartz/qubit/server/api/health"
-	"github.com/stupschwartz/qubit/server/api/scenes"
+	"net"
+	"google.golang.org/grpc/grpclog"
+	"os"
 )
 
-func Handlers(environ *env.Env) *mux.Router {
-	router := mux.NewRouter()
+func Handlers(environ *env.Env)  {
+	lis, err := net.Listen("tcp", ":8000")
+	if err != nil {
+		grpclog.Fatalf("failed to listen: %v", err)
+	}
 
-	apiRouter := router.PathPrefix("/api/v0").Subrouter()
+	ctx := context.Background()
 
-	health.Register(apiRouter, environ)
+	traceClient, err := trace.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	if err != nil {
+		log.Fatalf("Could not create trace client: %v\n", err)
+	}
+	p, err := trace.NewLimitedSampler(1.0, 10)
+	if err != nil {
+		log.Fatalf("Could not create limited sampler: %v\n", err)
+	}
+	traceClient.SetSamplingPolicy(p)
 
-	scenes.Register(apiRouter, environ)
-	nodes.Register(apiRouter, environ)
-	render.Register(apiRouter, environ)
+	log.Println("MAIN")
 
-	return router
+	grpcServer := grpc.NewServer(grpc.StreamInterceptor(serverInterceptor(traceClient)))
+	pb.RegisterComputeServer(grpcServer, newServer(traceClient))
+	grpcServer.Serve(lis)
+
+
 }

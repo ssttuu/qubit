@@ -1,9 +1,7 @@
 package main
 
 import (
-	"github.com/stupschwartz/qubit/server/api"
 	"log"
-	"net/http"
 	_ "github.com/lib/pq"
 	"time"
 	"github.com/stupschwartz/qubit/server/env"
@@ -18,9 +16,11 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc"
 
-	pb "github.com/stupschwartz/qubit/protos"
+	health "github.com/stupschwartz/qubit/server/api/health"
+	computepb "github.com/stupschwartz/qubit/compute/protos/compute"
 	"fmt"
 	"google.golang.org/grpc/metadata"
+	"net"
 )
 
 type Credentials struct {
@@ -75,7 +75,7 @@ func main() {
 		grpclog.Fatalf("fail to dial: %v", err)
 	}
 	defer conn.Close()
-	computeClient := pb.NewComputeClient(conn)
+	computeClient := computepb.NewComputeClient(conn)
 
 	environ := &env.Env{
 		DatastoreClient: datastoreClient,
@@ -85,7 +85,20 @@ func main() {
 	}
 
 
-	log.Fatal(http.ListenAndServeTLS(":8443", "server.crt", "server.key", api.Handlers(environ)))
+
+	lis, err := net.Listen("tcp", ":8443")
+	if err != nil {
+		grpclog.Fatalf("failed to listen: %v", err)
+	}
+
+
+	log.Println("MAIN")
+
+	grpcServer := grpc.NewServer()
+
+	health.Register(grpcServer)
+
+	grpcServer.Serve(lis)
 }
 
 

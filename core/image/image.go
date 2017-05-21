@@ -4,7 +4,7 @@ import (
 	"image"
 	"image/color"
 	"log"
-	pb "github.com/stupschwartz/qubit/protos"
+	pb "github.com/stupschwartz/qubit/compute/protos/compute"
 	//"fmt"
 )
 

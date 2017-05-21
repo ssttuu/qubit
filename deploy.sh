@@ -3,7 +3,7 @@
 set -eo pipefail
 
 # Create Compute Service Description
-protoc -I /usr/local/include/ -I ./compute/ --include_imports --include_source_info compute/compute.proto --descriptor_set_out compute/compute.pb
+docker run --rm -v $(pwd):/workspace -w /workspace znly/protoc --include_imports --include_source_info compute/compute.proto --descriptor_set_out compute/compute.pb
 
 # Deploy Compute Service
 echo "Deploying to Google Endpoints"

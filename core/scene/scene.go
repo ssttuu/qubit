@@ -1,6 +1,6 @@
 package scene
 
-import pb "github.com/stupschwartz/qubit/protos"
+import pb "github.com/stupschwartz/qubit/compute/protos/compute"
 
 type Scene struct {
 	Id string `json:"id" datastore:"id"`

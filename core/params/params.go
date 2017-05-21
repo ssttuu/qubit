@@ -1,6 +1,6 @@
 package params
 
-import pb "github.com/stupschwartz/qubit/protos"
+import pb "github.com/stupschwartz/qubit/compute/protos/compute"
 
 type Component struct {
 	Label string `json:"label"`
