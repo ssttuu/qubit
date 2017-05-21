@@ -65,10 +65,14 @@ jobs:
                     gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1}
 
             - run:
+                name: Server - Build Go Executable
+                command: |
+                    docker run --rm -v $(pwd):/go/src/github.com/stupschwartz/qubit -w /go/src/github.com/stupschwartz/qubit/server golang:1.8 bash -c "go get .; go build"
+
+            - run:
                 name: Server - Build Container
                 command: |
                     gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1} ./server/
-
 
             - run:
                 name: Server - Push Container
