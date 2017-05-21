@@ -10,4 +10,5 @@ service_id=$(echo ${service_response} | jq -r '.serviceConfig.id')
 service_name=$(echo ${service_response} | jq -r '.serviceConfig.name')
 
 helm init
-helm install --debug --set Compute.ApiId=${service_id},Githash=${CIRCLE_SHA1} ./helm/qubit/
+# TODO: --replace is not safe for production
+helm upgrade --install --debug --recreate-pods --reset-values --wait --set Compute.ApiId=${service_id},Githash=${CIRCLE_SHA1} ./helm/qubit/
