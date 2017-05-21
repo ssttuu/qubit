@@ -50,9 +50,24 @@ jobs:
                 command: scripts/auth-gcloud.sh
 
             - run:
-                name: Compute - Build Go Executable
+                name: Compute - Start Go Build
                 command: |
-                    docker run --rm -v $(pwd):/go/src/github.com/stupschwartz/qubit -w /go/src/github.com/stupschwartz/qubit/compute golang:1.8 bash -c "go get .; go build"
+                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/compute --name go-compute-build-volumes alpine:3.4 /bin/true
+
+            - run:
+                name: Compute - Copy Source to Container
+                command: |
+                    docker cp ./ go-compute-build-volumes:/go/src/github.com/stupschwartz/qubit
+
+            - run:
+                name: Compute - Build Go Code
+                command: |
+                    docker run --volumes-from go-compute-build-volumes -w /go/src/github.com/stupschwartz/qubit/compute golang:1.8 bash -c "go get .; go build"
+
+            - run:
+                name: Compute - Copy Back Artifacts
+                command: |
+                    docker cp go-compute-build-volumes:/go/src/github.com/stupschwartz/qubit/compute/compute `pwd`/compute/compute
 
             - run:
                 name: Compute - Build Container
@@ -67,7 +82,7 @@ jobs:
             - run:
                 name: Server - Build Go Executable
                 command: |
-                    docker run --rm -v $(pwd):/go/src/github.com/stupschwartz/qubit -w /go/src/github.com/stupschwartz/qubit/server golang:1.8 bash -c "go get .; go build"
+                    docker create -w /go/src/github.com/stupschwartz/qubit/server golang:1.8 bash -c "go get .; go build"
 
             - run:
                 name: Server - Build Container
