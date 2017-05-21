@@ -21,7 +21,7 @@ spec:
         ports:
           - containerPort: {{ .Values.Compute.ExternalPort }}
       - name: compute
-        image: gcr.io/qubit-161916/qubit-compute:{{ .Values.GITHASH }}
+        image: gcr.io/qubit-161916/qubit-compute:{{ .Values.Githash }}
         ports:
           - containerPort: {{ .Values.Compute.InternalPort }}
         env:
