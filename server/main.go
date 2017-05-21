@@ -96,7 +96,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 
-	health.Register(grpcServer)
+	health.Register(grpcServer, environ)
 
 	grpcServer.Serve(lis)
 }
