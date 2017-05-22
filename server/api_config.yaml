@@ -26,14 +26,14 @@ config_version: 3
 #
 # Name of the service configuration.
 #
-name: compute.endpoints.qubit-161916.cloud.goog
+name: server.endpoints.qubit-161916.cloud.goog
 
 #
 # API title to appear in the user interface (Google Cloud Console).
 #
-title: Compute gRPC API
+title: Server gRPC API
 apis:
-- name: compute.Compute
+- name: health.Health
 
 #
 # API usage restrictions.
@@ -41,5 +41,5 @@ apis:
 usage:
   rules:
   # ListShelves methods can be called without an API Key.
-  - selector: compute.Compute.Render
+  - selector: health.Health.Check
     allow_unregistered_calls: true

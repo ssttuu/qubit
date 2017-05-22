@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.Server.AppName }}
+spec:
+  replicas: {{ .Values.Server.Replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.Server.AppName }}
+    spec:
+      containers:
+      - name: esp
+        image: gcr.io/endpoints-release/endpoints-runtime:1
+        args: [
+          "-P", "{{ .Values.Server.ExternalPort }}",
+          "-s", "{{ .Values.Server.ApiName }}",
+          "-v", "{{ .Values.Server.ApiId }}",
+          "-a", "grpc://127.0.0.1:{{ .Values.Server.InternalPort }}"
+        ]
+        ports:
+          - containerPort: {{ .Values.Server.ExternalPort }}
+      - name: server
+        image: us.gcr.io/qubit-161916/qubit-server:{{ .Values.Githash }}
+        ports:
+          - containerPort: {{ .Values.Server.InternalPort }}
+        env:
+          - name: GOOGLE_PROJECT_ID
+            value: {{ .Values.GoogleProjectId }}
+          - name: DATASTORE_PROJECT_ID
+            value: {{ .Values.GoogleProjectId }}
+          - name: DATASTORE_DATASET
+            value: {{ .Values.DatastoreDataset }}
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /opt/etc/credentials/service-account-key-file.json
+          - name: STORAGE_BUCKET
+            value: {{ .Values.Server.StorageBucket }}
+        volumeMounts:
+          - name: google-credentials
+            mountPath: /opt/etc/credentials
+      volumes:
+        - name: google-credentials
+          secret:
+            secretName: google-service-account

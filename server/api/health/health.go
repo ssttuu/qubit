@@ -14,18 +14,10 @@ import (
 
 // Server implements `service Health`.
 type Server struct {
-	mu sync.Mutex
+	mu        sync.Mutex
 	// statusMap stores the serving status of the services this Server monitors.
 	statusMap map[string]healthpb.HealthCheckResponse_ServingStatus
-	env env.Env
-}
-
-// NewServer returns a new Server.
-func newServer(e *env.Env) *Server {
-	return &Server{
-		statusMap: make(map[string]healthpb.HealthCheckResponse_ServingStatus),
-		env: e,
-	}
+	env       env.Env
 }
 
 // Check implements `service Health`.
@@ -52,6 +44,14 @@ func (s *Server) SetServingStatus(service string, status healthpb.HealthCheckRes
 	s.mu.Lock()
 	s.statusMap[service] = status
 	s.mu.Unlock()
+}
+
+// NewServer returns a new Server.
+func newServer(e *env.Env) *Server {
+	return &Server{
+		statusMap: make(map[string]healthpb.HealthCheckResponse_ServingStatus),
+		env: *e,
+	}
 }
 
 func Register(server *grpc.Server, e *env.Env) {

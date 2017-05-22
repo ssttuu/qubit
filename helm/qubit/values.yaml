@@ -45,7 +45,13 @@ Compute:
     StorageBucket: qubit-dev-161916
     ExternalPort: 9000
     InternalPort: 8000
+    Replicas: 1
 
 Server:
     ApiName: server.endpoints.qubit-161916.cloud.goog
     ApiId:
+    AppName: server-esp
+    StorageBucket: qubit-dev-161916
+    ExternalPort: 9000
+    InternalPort: 8001
+    Replicas: 1

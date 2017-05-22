@@ -70,7 +70,7 @@ func main() {
 	opts = append(opts, grpc.WithInsecure())
 	opts = append(opts, grpc.WithStreamInterceptor(clientInterceptor))
 
-	conn, err := grpc.Dial("compute:10000", opts...)
+	conn, err := grpc.Dial("compute:8001", opts...)
 	if err != nil {
 		grpclog.Fatalf("fail to dial: %v", err)
 	}

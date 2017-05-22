@@ -5,4 +5,4 @@ WORKDIR /app
 ADD ./server ./server
 CMD ./server
 
-EXPOSE 10000
+EXPOSE 8001

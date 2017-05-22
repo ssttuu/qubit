@@ -49,6 +49,7 @@ jobs:
                 name: Authenticate GCloud
                 command: scripts/auth-gcloud.sh
 
+            # BUILD COMPUTE
             - run:
                 name: Compute - Start Go Build
                 command: |
@@ -79,21 +80,38 @@ jobs:
                 command: |
                     gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1}
 
-#            - run:
-#                name: Server - Build Go Executable
-#                command: |
-#                    docker create -w /go/src/github.com/stupschwartz/qubit/server golang:1.8 bash -c "go get .; go build"
-#
-#            - run:
-#                name: Server - Build Container
-#                command: |
-#                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1} ./server/
-#
-#            - run:
-#                name: Server - Push Container
-#                command: |
-#                    gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1}
+            # BUILD SERVER
+            - run:
+                name: Server - Start Go Build
+                command: |
+                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/server --name go-server-build-volumes alpine:3.4 /bin/true
 
+            - run:
+                name: Server - Copy Source to Container
+                command: |
+                    docker cp ./ go-server-build-volumes:/go/src/github.com/stupschwartz/qubit
+
+            - run:
+                name: Server - Build Go Code
+                command: |
+                    docker run --volumes-from go-server-build-volumes -w /go/src/github.com/stupschwartz/qubit/server golang:1.8 bash -c "go get .; go build"
+
+            - run:
+                name: Server - Copy Back Artifacts
+                command: |
+                    docker cp go-server-build-volumes:/go/src/github.com/stupschwartz/qubit/server/server `pwd`/server/server
+
+            - run:
+                name: Server - Build Container
+                command: |
+                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1} ./server/
+
+            - run:
+                name: Server - Push Container
+                command: |
+                    gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1}
+
+            # TRIGGER NEXT STEP
             - run:
                 name: Trigger Containers Deployment
                 command: |
