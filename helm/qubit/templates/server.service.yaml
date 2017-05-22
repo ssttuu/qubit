@@ -7,12 +7,12 @@ metadata:
 spec:
   ports:
   # Port that accepts gRPC and JSON/HTTP2 requests over HTTP.
-  - port: 8001
-    targetPort: {{ .Values.Server.ExternalPort }}
+  - port: {{ .Values.Server.ExternalHttp2Port }}
+    targetPort: {{ .Values.Server.ExternalHttp2Port }}
     protocol: TCP
     name: http2
-  - port: 8080
-    targetPort: 8080
+  - port: {{ .Values.Server.ExternalHttpPort }}
+    targetPort: {{ .Values.Server.ExternalHttpPort }}
     protocol: TCP
     name: http
   selector:

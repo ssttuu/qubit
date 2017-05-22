@@ -43,7 +43,8 @@ Compute:
     ApiId:
     AppName: compute
     StorageBucket: qubit-dev-161916
-    ExternalPort: 9000
+    ExternalHttpPort: 9000
+    ExternalHttp2Port: 9010
     InternalPort: 8000
     Replicas: 1
 
@@ -52,6 +53,7 @@ Server:
     ApiId:
     AppName: server
     StorageBucket: qubit-dev-161916
-    ExternalPort: 9000
+    ExternalHttpPort: 9000
+    ExternalHttp2Port: 9010
     InternalPort: 8001
     Replicas: 1

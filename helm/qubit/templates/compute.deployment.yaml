@@ -13,14 +13,15 @@ spec:
       - name: esp
         image: gcr.io/endpoints-release/endpoints-runtime:1
         args: [
-          "--http_port", "8080",
-          "-S", "{{ .Values.Server.ExternalPort }}",
+          "--http_port", "{{ .Values.Compute.ExternalHttpPort }}",
+          "--http2_port", "{{ .Values.Compute.ExternalHttp2Port }}",
           "-s", "{{ .Values.Compute.ApiName }}",
           "-v", "{{ .Values.Compute.ApiId }}",
           "-a", "grpc://127.0.0.1:{{ .Values.Compute.InternalPort }}"
         ]
         ports:
-          - containerPort: {{ .Values.Compute.ExternalPort }}
+          - containerPort: {{ .Values.Compute.ExternalHttpPort }}
+          - containerPort: {{ .Values.Compute.ExternalHttp2Port }}
         resources:
           limits:
             cpu: 100m
@@ -43,6 +44,8 @@ spec:
             value: /opt/etc/credentials/service-account-key-file.json
           - name: STORAGE_BUCKET
             value: {{ .Values.Compute.StorageBucket }}
+          - name: PORT
+            value: {{ .Values.Compute.InternalPort }}
         volumeMounts:
           - name: google-credentials
             mountPath: /opt/etc/credentials

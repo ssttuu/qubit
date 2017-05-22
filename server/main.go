@@ -70,7 +70,12 @@ func main() {
 	opts = append(opts, grpc.WithInsecure())
 	opts = append(opts, grpc.WithStreamInterceptor(clientInterceptor))
 
-	conn, err := grpc.Dial("compute:8080", opts...)
+	computeServiceUrl := os.Getenv("COMPUTE_SERVICE_URL")
+	if computeServiceUrl == "" {
+		log.Fatal(`You need to set the environment variable "COMPUTE_SERVICE_URL"`)
+	}
+
+	conn, err := grpc.Dial(computeServiceUrl, opts...)
 	if err != nil {
 		grpclog.Fatalf("fail to dial: %v", err)
 	}
@@ -84,9 +89,12 @@ func main() {
 		ComputeClient: computeClient,
 	}
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal(`You need to set the environment variable "PORT"`)
+	}
 
-
-	lis, err := net.Listen("tcp", ":8001")
+	lis, err := net.Listen("tcp", ":" + port)
 	if err != nil {
 		grpclog.Fatalf("failed to listen: %v", err)
 	}

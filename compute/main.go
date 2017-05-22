@@ -166,7 +166,12 @@ func newServer(traceClient *trace.Client) *ComputeServer {
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":8000")
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal(`You need to set the environment variable "PORT"`)
+	}
+
+	lis, err := net.Listen("tcp", ":" + port)
 	if err != nil {
 		grpclog.Fatalf("failed to listen: %v", err)
 	}

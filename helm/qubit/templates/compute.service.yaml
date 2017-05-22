@@ -7,10 +7,14 @@ metadata:
 spec:
   ports:
   # Port that accepts gRPC and JSON/HTTP2 requests over HTTP.
-  - port: 8000
-    targetPort: {{ .Values.Compute.ExternalPort }}
+  - port: {{ .Values.Compute.ExternalHttp2Port }}
+    targetPort: {{ .Values.Compute.ExternalHttp2Port }}
     protocol: TCP
     name: http2
+  - port: {{ .Values.Compute.ExternalHttpPort }}
+    targetPort: {{ .Values.Compute.ExternalHttpPort }}
+    protocol: TCP
+    name: http
   selector:
     app: {{ .Values.Compute.AppName }}
   type: LoadBalancer
