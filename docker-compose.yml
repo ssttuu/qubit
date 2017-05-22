@@ -1,27 +1,27 @@
 version: '2'
 services:
-  server:
-    image: stupschwartz/qubit-server
-    build: ./server
-    environment:
-      - GOOGLE_PROJECT_ID=qubit-161916
-      - DATASTORE_PROJECT_ID=qubit-161916
-      - DATASTORE_DATASET=qubit
-      - DATASTORE_EMULATOR_HOST=datastore:8380
-      - DATASTORE_HOST=datastore:8380
-      - STORAGE_BUCKET=qubit-dev-161916
-      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
-    ports:
-      - 8443:8443
-    command: go run main.go
-    volumes:
-      - ./credentials:/opt/etc/credentials
-    depends_on:
-      - datastore
-      - pubsub
+#  server:
+#    image: gcr.io/qubit-161916/qubit-server
+#    build: ./server
+#    environment:
+#      - GOOGLE_PROJECT_ID=qubit-161916
+#      - DATASTORE_PROJECT_ID=qubit-161916
+#      - DATASTORE_DATASET=qubit
+#      - DATASTORE_EMULATOR_HOST=datastore:8380
+#      - DATASTORE_HOST=datastore:8380
+#      - STORAGE_BUCKET=qubit-dev-161916
+#      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
+#    ports:
+#      - 8443:8443
+#    command: go run main.go
+#    volumes:
+#      - ./credentials:/opt/etc/credentials
+#    depends_on:
+#      - datastore
+#      - pubsub
 
   compute:
-    image: stupschwartz/qubit-compute
+    image: gcr.io/qubit-161916/qubit-compute
     build: ./compute
     environment:
       - GOOGLE_PROJECT_ID=qubit-161916
@@ -31,7 +31,6 @@ services:
       - DATASTORE_HOST=datastore:8380
       - STORAGE_BUCKET=qubit-dev-161916
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
-    command: go run main.go
     volumes:
       - ./credentials:/opt/etc/credentials
     depends_on:

@@ -5,4 +5,4 @@ WORKDIR /app
 ADD ./compute ./compute
 CMD ./compute
 
-EXPOSE 10000
+EXPOSE 8000
