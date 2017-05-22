@@ -20,6 +20,13 @@ spec:
         ]
         ports:
           - containerPort: {{ .Values.Server.ExternalPort }}
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
       - name: server
         image: us.gcr.io/qubit-161916/qubit-server:{{ .Values.Githash }}
         ports:
@@ -38,6 +45,10 @@ spec:
         volumeMounts:
           - name: google-credentials
             mountPath: /opt/etc/credentials
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
       volumes:
         - name: google-credentials
           secret:
