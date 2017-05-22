@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc"
 
-	health "github.com/stupschwartz/qubit/server/api/health"
+	"github.com/stupschwartz/qubit/server/api/health"
 	computepb "github.com/stupschwartz/qubit/compute/protos/compute"
 	"fmt"
 	"google.golang.org/grpc/metadata"
@@ -70,7 +70,7 @@ func main() {
 	opts = append(opts, grpc.WithInsecure())
 	opts = append(opts, grpc.WithStreamInterceptor(clientInterceptor))
 
-	conn, err := grpc.Dial("compute:8001", opts...)
+	conn, err := grpc.Dial("compute:8000", opts...)
 	if err != nil {
 		grpclog.Fatalf("fail to dial: %v", err)
 	}
@@ -86,7 +86,7 @@ func main() {
 
 
 
-	lis, err := net.Listen("tcp", ":8443")
+	lis, err := net.Listen("tcp", ":8001")
 	if err != nil {
 		grpclog.Fatalf("failed to listen: %v", err)
 	}

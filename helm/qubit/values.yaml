@@ -41,7 +41,7 @@ DatastoreDataset: qubit
 Compute:
     ApiName: compute.endpoints.qubit-161916.cloud.goog
     ApiId:
-    AppName: compute-esp
+    AppName: compute
     StorageBucket: qubit-dev-161916
     ExternalPort: 9000
     InternalPort: 8000
@@ -50,7 +50,7 @@ Compute:
 Server:
     ApiName: server.endpoints.qubit-161916.cloud.goog
     ApiId:
-    AppName: server-esp
+    AppName: server
     StorageBucket: qubit-dev-161916
     ExternalPort: 9000
     InternalPort: 8001
