@@ -10,27 +10,28 @@ jobs:
             - checkout
             - setup_remote_docker
 
-            - run:
-                name: Pull
-                command: |
-                    docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
-                    docker pull ${DOCKER_USER}/qubit-builder || echo "Getting qubit-builder"
-
-            - run:
-                name: Build
-                command: |
-                    docker build --no-cache -t ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1} -t ${DOCKER_USER}/qubit-builder:latest ./builder/
-
-            - run:
-                name: Push
-                command: |
-                    docker push ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1}
-                    docker push ${DOCKER_USER}/qubit-builder:latest
+#   Speed Up Build Time For a Bit
+#            - run:
+#                name: Pull
+#                command: |
+#                    docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
+#                    docker pull ${DOCKER_USER}/qubit-builder || echo "Getting qubit-builder"
+#
+#            - run:
+#                name: Build
+#                command: |
+#                    docker build --no-cache -t ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1} -t ${DOCKER_USER}/qubit-builder:latest ./builder/
+#
+#            - run:
+#                name: Push
+#                command: |
+#                    docker push ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1}
+#                    docker push ${DOCKER_USER}/qubit-builder:latest
 
             - run:
                 name: Trigger Containers Build
                 command: |
-                    docker run --rm ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1} curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=build_containers --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
+                    docker run --rm ${DOCKER_USER}/qubit-builder:latest curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=build_containers --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
 
     build_containers:
         docker:
@@ -63,7 +64,7 @@ jobs:
             - run:
                 name: Compute - Build Go Code
                 command: |
-                    docker run --volumes-from go-compute-build-volumes -w /go/src/github.com/stupschwartz/qubit/compute golang:1.8 bash -c "go get .; go build"
+                    docker run --volumes-from go-compute-build-volumes -w /go/src/github.com/stupschwartz/qubit/compute golang:1.8 bash -c "go get ./...; go build"
 
             - run:
                 name: Compute - Copy Back Artifacts
@@ -94,7 +95,7 @@ jobs:
             - run:
                 name: Server - Build Go Code
                 command: |
-                    docker run --volumes-from go-server-build-volumes -w /go/src/github.com/stupschwartz/qubit/server golang:1.8 bash -c "go get .; go build"
+                    docker run --volumes-from go-server-build-volumes -w /go/src/github.com/stupschwartz/qubit/server golang:1.8 bash -c "go get ./...; go build"
 
             - run:
                 name: Server - Copy Back Artifacts

@@ -4,7 +4,7 @@ proto:
 	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./compute/protos/compute/  --go_out=plugins=grpc:./compute/protos/compute/ ./compute/protos/compute/compute.proto
 
 	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/health/ --include_imports --include_source_info ./server/protos/health/health.proto --descriptor_set_out ./server/protos/health/health.pb
-	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/health/  --go_out=plugins=grpc:./server/protos/health/ ./server/protos/health/health.proto
+	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/health/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,plugins=grpc:./server/protos/health/ ./server/protos/health/health.proto
 
 build-go:
 	docker run -it -v `pwd`:/go/src/github.com/stupschwartz/qubit -w /go/src/github.com/stupschwartz/qubit/compute golang:1.8 bash -c "go get .; go build; chmod 777 ./compute"

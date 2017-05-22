@@ -5,7 +5,7 @@ import (
 	"github.com/stupschwartz/qubit/server/env"
 	"github.com/stupschwartz/qubit/server/handler"
 	"github.com/stupschwartz/qubit/core/image"
-	pb "github.com/stupschwartz/qubit/protos"
+	pb "github.com/stupschwartz/qubit/compute/protos/compute"
 	"net/http"
 
 	"golang.org/x/net/context"

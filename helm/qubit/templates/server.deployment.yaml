@@ -13,7 +13,8 @@ spec:
       - name: esp
         image: gcr.io/endpoints-release/endpoints-runtime:1
         args: [
-          "-P", "{{ .Values.Server.ExternalPort }}",
+          "--http_port", "8080",
+          "-S", "{{ .Values.Server.ExternalPort }}",
           "-s", "{{ .Values.Server.ApiName }}",
           "-v", "{{ .Values.Server.ApiId }}",
           "-a", "grpc://127.0.0.1:{{ .Values.Server.InternalPort }}"
