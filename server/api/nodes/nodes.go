@@ -37,7 +37,7 @@ func (s *Server) List(ctx context.Context, in *nodes_pb.ListNodesRequest) (*node
 		return nil, errors.Wrap(err, "Could not get all")
 	}
 
-	return nodes.ToProto(), nil
+	return nodes.ToProto()
 }
 
 func (s *Server) Get(ctx context.Context, in *nodes_pb.GetNodeRequest) (*nodes_pb.Node, error) {
@@ -49,7 +49,7 @@ func (s *Server) Get(ctx context.Context, in *nodes_pb.GetNodeRequest) (*nodes_p
 		return nil, errors.Wrap(err, "Could not get datastore entity")
 	}
 
-	return existingNode.ToProto(), nil
+	return existingNode.ToProto()
 }
 
 func (s *Server) Create(ctx context.Context, in *nodes_pb.CreateNodeRequest) (*nodes_pb.Node, error) {
@@ -59,13 +59,12 @@ func (s *Server) Create(ctx context.Context, in *nodes_pb.CreateNodeRequest) (*n
 	nodeKey := datastore.IDKey(NodeKind, nodeId, sceneKey)
 
 	newNode := node.NewNodeFromProto(in.Node)
-	newNode.Id = nodeId
 
 	if _, err := s.env.DatastoreClient.Put(ctx, nodeKey, &newNode); err != nil {
 		return nil, errors.Wrapf(err, "Failed to put node %v", newNode.Id)
 	}
 
-	return newNode.ToProto(), nil
+	return newNode.ToProto()
 }
 
 func (s *Server) Update(ctx context.Context, in *nodes_pb.UpdateNodeRequest) (*nodes_pb.Node, error) {
@@ -96,7 +95,7 @@ func (s *Server) Update(ctx context.Context, in *nodes_pb.UpdateNodeRequest) (*n
 		return nil, errors.Wrap(err, "Failed to update node")
 	}
 
-	return newNode.ToProto(), nil
+	return newNode.ToProto()
 }
 
 func (s *Server) Delete(ctx context.Context, in *nodes_pb.DeleteNodeRequest) (*empty.Empty, error) {

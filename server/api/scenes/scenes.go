@@ -32,7 +32,7 @@ func (s *Server) List(ctx context.Context, in *empty.Empty) (*scenes_pb.ScenesLi
 		return nil, errors.Wrap(err, "Could not get all")
 	}
 
-	return scenes.ToProto(), nil
+	return scenes.ToProto()
 }
 
 func (s *Server) Get(ctx context.Context, in *scenes_pb.GetSceneRequest) (*scenes_pb.Scene, error) {
@@ -43,21 +43,20 @@ func (s *Server) Get(ctx context.Context, in *scenes_pb.GetSceneRequest) (*scene
 		return nil, errors.Wrap(err, "Could not get datastore entity")
 	}
 
-	return existingScene.ToProto(), nil
+	return existingScene.ToProto()
 }
 
 func (s *Server) Create(ctx context.Context, in *scenes_pb.CreateSceneRequest) (*scenes_pb.Scene, error) {
-	sceneId := r.Int63()
-	sceneKey := datastore.IDKey("Scene", sceneId, nil)
+	in.Scene.Id = r.Int63()
+	sceneKey := datastore.IDKey("Scene", in.Scene.Id, nil)
 
 	newScene := scene.NewSceneFromProto(in.Scene)
-	newScene.Id = sceneId
 
-	if _, err := s.env.DatastoreClient.Put(ctx, sceneKey, newScene); err != nil {
-		return nil, errors.Wrapf(err, "Failed to put node %v", newScene.Id)
+	if _, err := s.env.DatastoreClient.Put(ctx, sceneKey, &newScene); err != nil {
+		return nil, errors.Wrapf(err, "Failed to put scene, %v", newScene)
 	}
 
-	return newScene.ToProto(), nil
+	return newScene.ToProto()
 }
 
 func (s *Server) Update(ctx context.Context, in *scenes_pb.UpdateSceneRequest) (*scenes_pb.Scene, error) {
@@ -87,7 +86,7 @@ func (s *Server) Update(ctx context.Context, in *scenes_pb.UpdateSceneRequest) (
 		return nil, errors.Wrap(err, "Failed to update scene")
 	}
 
-	return newScene.ToProto(), nil
+	return newScene.ToProto()
 }
 
 func (s *Server) Delete(ctx context.Context, in *scenes_pb.DeleteSceneRequest) (*empty.Empty, error) {
