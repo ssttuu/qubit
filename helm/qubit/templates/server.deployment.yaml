@@ -47,7 +47,7 @@ spec:
           - name: PORT
             value: {{ .Values.Server.InternalPort }}
           - name: COMPUTE_SERVICE_URL
-            value: {{ .Values.Compute.AppName }}:{{ .Values.Compute.ExternalHttp2Port }}
+            value: "{{ .Values.Compute.AppName }}:{{ .Values.Compute.ExternalHttp2Port }}"
         volumeMounts:
           - name: google-credentials
             mountPath: /opt/etc/credentials
