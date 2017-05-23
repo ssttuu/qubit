@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package scenes;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+
+service Scenes {
+    rpc List (google.protobuf.Empty) returns (ScenesList) {
+        option (google.api.http) = {
+            get: "/v1/scenes"
+        };
+    }
+    rpc Get (GetSceneRequest) returns (Scene) {
+        option (google.api.http) = {
+            get: "/v1/scenes/{scene_id}"
+        };
+    }
+    rpc Create (CreateSceneRequest) returns (Scene) {
+        option (google.api.http) = {
+            post: "/v1/scenes"
+            body: "scene"
+        };
+    }
+    rpc Update (UpdateSceneRequest) returns (Scene) {
+        option (google.api.http) = {
+            put: "/v1/scenes/{scene_id}"
+            body: "scene"
+        };
+    }
+    rpc Delete (DeleteSceneRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/scenes/{scene_id}"
+        };
+    }
+}
+
+message Scene {
+    int64 id = 1;
+}
+
+message ScenesList {
+    repeated Scene scenes = 1;
+}
+
+
+message GetSceneRequest {
+    int64 scene_id = 1;
+}
+
+message CreateSceneRequest {
+    Scene scene = 1;
+}
+
+message UpdateSceneRequest {
+    int64 scene_id = 1;
+    Scene scene = 2;
+}
+
+message DeleteSceneRequest {
+    int64 scene_id = 1;
+}

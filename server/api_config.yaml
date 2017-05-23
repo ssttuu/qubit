@@ -34,12 +34,12 @@ name: server.endpoints.qubit-161916.cloud.goog
 title: Server gRPC API
 apis:
 - name: health.Health
+- name: scenes.Scenes
 
 #
 # API usage restrictions.
 #
 usage:
   rules:
-  # ListShelves methods can be called without an API Key.
-  - selector: health.Health.Check
+  - selector: "*"
     allow_unregistered_calls: true

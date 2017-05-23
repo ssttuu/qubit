@@ -17,7 +17,7 @@ type Server struct {
 	mu        sync.Mutex
 	// statusMap stores the serving status of the services this Server monitors.
 	statusMap map[string]healthpb.HealthCheckResponse_ServingStatus
-	env       env.Env
+	env       *env.Env
 }
 
 // Check implements `service Health`.
@@ -50,7 +50,7 @@ func (s *Server) SetServingStatus(service string, status healthpb.HealthCheckRes
 func newServer(e *env.Env) *Server {
 	return &Server{
 		statusMap: make(map[string]healthpb.HealthCheckResponse_ServingStatus),
-		env: *e,
+		env: e,
 	}
 }
 

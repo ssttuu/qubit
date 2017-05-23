@@ -1,207 +1,111 @@
 package scenes
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/stupschwartz/qubit/core/params"
 	"github.com/stupschwartz/qubit/server/env"
-	"github.com/stupschwartz/qubit/server/handler"
-	"net/http"
-	"github.com/satori/go.uuid"
 	"cloud.google.com/go/datastore"
 	"golang.org/x/net/context"
 	"github.com/pkg/errors"
-	"cloud.google.com/go/trace"
 	"github.com/stupschwartz/qubit/core/scene"
+	scenes_pb "github.com/stupschwartz/qubit/server/protos/scenes"
+	"github.com/golang/protobuf/ptypes/empty"
+	"math/rand"
+	"time"
+	"google.golang.org/grpc"
 )
 
+var r *rand.Rand
 
-func PutScene(ctx context.Context, sceneKey *datastore.Key, s *scene.Scene, e *env.Env) error {
-	span := trace.FromContext(ctx).NewChild("PutScene")
-	defer span.Finish()
-
-	if _, err := e.DatastoreClient.Put(ctx, sceneKey, s); err != nil {
-		return errors.Wrapf(err, "Failed to put node with digest %v", s.Id)
-	}
-
-	return nil
+func init() {
+	r = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
 
-func GetAllHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *http.Request) error {
-	span := trace.FromContext(ctx).NewChild("GetAllHandler")
-	defer span.Finish()
+// Server implements `service Health`.
+type Server struct {
+	env *env.Env
+}
 
-	var scenes []*scene.Scene
-	_, err := env.DatastoreClient.GetAll(ctx, datastore.NewQuery("Scene"), &scenes)
+func (s *Server) List(ctx context.Context, in *empty.Empty) (*scenes_pb.ScenesList, error) {
+	var scenes scene.Scenes
+	_, err := s.env.DatastoreClient.GetAll(ctx, datastore.NewQuery("Scene"), &scenes)
 	if err != nil {
-		return errors.Wrap(err, "Could not get all")
+		return nil, errors.Wrap(err, "Could not get all")
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-
-	jsonData, _ := json.Marshal(&scenes)
-	fmt.Fprint(w, string(jsonData))
-
-	return nil
+	return scenes.ToProto(), nil
 }
 
-func GetHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *http.Request) error {
-	span := trace.FromContext(ctx).NewChild("GetHandler")
-	defer span.Finish()
-
-	vars := mux.Vars(r)
-
-	sceneId := vars["scene_id"]
-
-	sceneKey := datastore.NameKey("Scene", sceneId, nil)
+func (s *Server) Get(ctx context.Context, in *scenes_pb.GetSceneRequest) (*scenes_pb.Scene, error) {
+	sceneKey := datastore.IDKey("Scene", in.SceneId, nil)
 
 	var existingScene scene.Scene
-	if err := env.DatastoreClient.Get(ctx, sceneKey, &existingScene); err != nil {
-		return errors.Wrap(err, "Could not get datastore entity")
+	if err := s.env.DatastoreClient.Get(ctx, sceneKey, &existingScene); err != nil {
+		return nil, errors.Wrap(err, "Could not get datastore entity")
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-
-	sceneAsJson, err := json.Marshal(&existingScene)
-	if err != nil {
-		return errors.Wrap(err, "failed to marshal json")
-	}
-
-	fmt.Fprintf(w, string(sceneAsJson))
-
-	return nil
+	return existingScene.ToProto(), nil
 }
 
-type RequestBody struct {
-	Scene   *scene.Scene `json:"scene"`
-	Params params.Parameters `json:"params"`
+func (s *Server) Create(ctx context.Context, in *scenes_pb.CreateSceneRequest) (*scenes_pb.Scene, error) {
+	sceneId := r.Int63()
+	sceneKey := datastore.IDKey("Scene", sceneId, nil)
+
+	newScene := scene.NewSceneFromProto(in.Scene)
+	newScene.Id = sceneId
+
+	if _, err := s.env.DatastoreClient.Put(ctx, sceneKey, newScene); err != nil {
+		return nil, errors.Wrapf(err, "Failed to put node %v", newScene.Id)
+	}
+
+	return newScene.ToProto(), nil
 }
 
-func PostHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *http.Request) error {
-	span := trace.FromContext(ctx).NewChild("PostHandler")
-	defer span.Finish()
+func (s *Server) Update(ctx context.Context, in *scenes_pb.UpdateSceneRequest) (*scenes_pb.Scene, error) {
+	sceneKey := datastore.IDKey("Scene", in.SceneId, nil)
 
-	sceneUuid := uuid.NewV4()
-	sceneKey := datastore.NameKey("Scene", sceneUuid.String(), nil)
+	newScene := scene.NewSceneFromProto(in.Scene)
 
-	requestBody := RequestBody{}
-
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&requestBody); err != nil {
-		return errors.Wrap(err, "Failed to decode json request body")
-	}
-
-	newScene := requestBody.Scene
-
-	defer r.Body.Close()
-
-	newScene.Id = sceneUuid.String()
-	newScene.Version = 0
-	PutScene(ctx, sceneKey, newScene, env)
-
-	w.WriteHeader(http.StatusCreated)
-	w.Header().Set("Content-Type", "application/json")
-
-	sceneAsJson, err := json.Marshal(newScene)
-	if err != nil {
-		return errors.Wrap(err, "Failed to marshal json")
-	}
-
-	fmt.Fprintf(w, string(sceneAsJson))
-
-	return nil
-}
-
-func PutHandler(ctx context.Context, env *env.Env, w http.ResponseWriter, r *http.Request) error {
-	span := trace.FromContext(ctx).NewChild("PutHandler")
-	defer span.Finish()
-
-	vars := mux.Vars(r)
-	sceneId := vars["scene_id"]
-
-	sceneKey := datastore.NameKey("Scene", sceneId, nil)
-
-	decoder := json.NewDecoder(r.Body)
-
-	requestBody := RequestBody{}
-
-	if err := decoder.Decode(&requestBody); err != nil {
-		return errors.Wrap(err, "Failed to decode request body")
-	}
-
-	newScene := requestBody.Scene
-
-	_, err := env.DatastoreClient.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
+	_, err := s.env.DatastoreClient.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		var existingScene scene.Scene
 		if err := tx.Get(sceneKey, &existingScene); err != nil {
-			return errors.Wrap(err, "Failed to get scene in tx")
+			return errors.Wrapf(err, "Failed to get scene in tx %v", existingScene)
 		}
-		existingScene.Version += 1
+
 		existingScene.Name = newScene.Name
-		PutScene(ctx, sceneKey, &existingScene, env)
 
 		_, err := tx.Put(sceneKey, &existingScene)
 		if err != nil {
-			return errors.Wrap(err, "Failed to put scene in tx")
+			return errors.Wrapf(err, "Failed to put scene in tx %v", existingScene)
 		}
+
+		newScene = existingScene
+
 		return nil
 	})
 
 	if err != nil {
-		return errors.Wrap(err, "Failed to update scene")
+		return nil, errors.Wrap(err, "Failed to update scene")
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	w.Header().Set("Content-Type", "application/json")
-
-	sceneAsJson, err := json.Marshal(&newScene)
-	if err != nil {
-		return errors.Wrap(err, "Failed to marshal json")
-	}
-
-	fmt.Fprintf(w, string(sceneAsJson))
-
-	return nil
+	return newScene.ToProto(), nil
 }
 
-func DeleteAllHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	span := trace.FromContext(ctx).NewChild("DeleteAllHandler")
-	defer span.Finish()
+func (s *Server) Delete(ctx context.Context, in *scenes_pb.DeleteSceneRequest) (*empty.Empty, error) {
+	sceneKey := datastore.IDKey("Scene", in.SceneId, nil)
 
-	var scenes interface{}
-	sceneIds, err := e.DatastoreClient.GetAll(ctx, datastore.NewQuery("Scene").KeysOnly(), scenes)
-	if err != nil {
-		return errors.Wrap(err, "Failed to get all keys only")
+	if err := s.env.DatastoreClient.Delete(ctx, sceneKey); err != nil {
+		return nil, errors.Wrapf(err, "Failed to deleted scene by id: %v", in.SceneId)
 	}
 
-	err = e.DatastoreClient.DeleteMulti(ctx, sceneIds)
-	if err != nil {
-		return errors.Wrap(err, "Failed to delete multi")
+	return &empty.Empty{}, nil
+}
+
+func newServer(e *env.Env) *Server {
+	return &Server{
+		env: e,
 	}
-
-	return nil
 }
 
-func DeleteHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	span := trace.FromContext(ctx).NewChild("DeleteHandler")
-	defer span.Finish()
-
-	return nil
-}
-
-
-func Register(router *mux.Router, environ *env.Env) {
-	s := router.PathPrefix("/scenes/").Subrouter()
-
-	s.Handle("/", handler.Handler{environ, GetAllHandler}).Methods("GET")
-	s.Handle("/{scene_id}/", handler.Handler{environ, GetHandler}).Methods("GET")
-
-	s.Handle("/", handler.Handler{environ, PostHandler}).Methods("POST")
-	s.Handle("/{scene_id}/", handler.Handler{environ, PutHandler}).Methods("PUT")
-	s.Handle("/DELETE/", handler.Handler{environ, DeleteAllHandler}).Methods("DELETE")
-	s.Handle("/{scene_id}/", handler.Handler{environ, DeleteHandler}).Methods("DELETE")
+func Register(server *grpc.Server, e *env.Env) {
+	scenes_pb.RegisterScenesServer(server, newServer(e))
 }

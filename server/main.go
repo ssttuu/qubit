@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/stupschwartz/qubit/server/api/health"
+	"github.com/stupschwartz/qubit/server/api/scenes"
 	computepb "github.com/stupschwartz/qubit/compute/protos/compute"
 	"fmt"
 	"google.golang.org/grpc/metadata"
@@ -104,6 +105,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 
 	health.Register(grpcServer, environ)
+	scenes.Register(grpcServer, environ)
 
 	grpcServer.Serve(lis)
 }
