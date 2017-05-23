@@ -23,6 +23,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"fmt"
 )
 
 type ComputeServer struct {
@@ -70,7 +71,7 @@ func (cs *ComputeServer) ActuallyRender(ctx context.Context, sceneUuid string, n
 
 	var theParams params.Parameters
 	bucket := cs.StorageClient.Bucket(os.Getenv("STORAGE_BUCKET"))
-	paramsObj := bucket.Object("params/" + theNode.Id)
+	paramsObj := bucket.Object(fmt.Sprintf("params/%s", theNode.Id))
 
 	reader, err := paramsObj.NewReader(ctx)
 	if err != nil {

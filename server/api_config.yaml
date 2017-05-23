@@ -35,6 +35,7 @@ title: Server gRPC API
 apis:
 - name: health.Health
 - name: scenes.Scenes
+- name: nodes.Nodes
 
 #
 # API usage restrictions.

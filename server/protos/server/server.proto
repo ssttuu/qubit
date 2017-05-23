@@ -1,3 +1,5 @@
+syntax = "proto3";
 
-import "health/health.proto";
-import "scenes/scenes.proto";
+import public "health/health.proto";
+import public "scenes/scenes.proto";
+import public "nodes/nodes.proto";
