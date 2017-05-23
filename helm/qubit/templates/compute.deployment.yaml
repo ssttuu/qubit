@@ -35,17 +35,17 @@ spec:
           - containerPort: {{ .Values.Compute.InternalPort }}
         env:
           - name: GOOGLE_PROJECT_ID
-            value: {{ .Values.GoogleProjectId }}
+            value: "{{ .Values.GoogleProjectId }}"
           - name: DATASTORE_PROJECT_ID
-            value: {{ .Values.GoogleProjectId }}
+            value: "{{ .Values.GoogleProjectId }}"
           - name: DATASTORE_DATASET
-            value: {{ .Values.DatastoreDataset }}
+            value: "{{ .Values.DatastoreDataset }}"
           - name: GOOGLE_APPLICATION_CREDENTIALS
-            value: /opt/etc/credentials/service-account-key-file.json
+            value: "/opt/etc/credentials/service-account-key-file.json"
           - name: STORAGE_BUCKET
-            value: {{ .Values.Compute.StorageBucket }}
+            value: "{{ .Values.Compute.StorageBucket }}"
           - name: PORT
-            value: {{ .Values.Compute.InternalPort }}
+            value: "{{ .Values.Compute.InternalPort }}"
         volumeMounts:
           - name: google-credentials
             mountPath: /opt/etc/credentials
