@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package organizations;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+
+service Organizations {
+    rpc List (ListOrganizationsRequest) returns (ListOrganizationsResponse) {
+        option (google.api.http) = {
+            get: "/v1/organizations"
+            additional_bindings {
+                get: "/v1/orgs"
+            }
+        };
+    }
+    rpc Get (GetOrganizationRequest) returns (Organization) {
+        option (google.api.http) = {
+            get: "/v1/organizations/{organization_id}"
+            additional_bindings {
+                get: "/v1/orgs/{organization_id}"
+            }
+        };
+    }
+    rpc Create (CreateOrganizationRequest) returns (Organization) {
+        option (google.api.http) = {
+            post: "/v1/organizations"
+            body: "organization"
+            additional_bindings {
+                post: "/v1/orgs"
+                body: "organization"
+
+            }
+        };
+    }
+    rpc Update (UpdateOrganizationRequest) returns (Organization) {
+        option (google.api.http) = {
+            put: "/v1/organizations/{organization_id}"
+            body: "organization"
+            additional_bindings {
+                put: "/v1/orgs/{organization_id}"
+                body: "organization"
+            }
+        };
+    }
+    rpc Delete (DeleteOrganizationRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/organizations/{organization_id}"
+            additional_bindings {
+                delete: "/v1/orgs/{organization_id}"
+            }
+        };
+    }
+}
+
+message Organization {
+    int64 id = 1;
+}
+
+message ListOrganizationsRequest {
+    int32 page_size = 2;
+    string page_token = 3;
+}
+
+message ListOrganizationsResponse {
+    repeated Organization organizations = 1;
+    string next_page_token = 2;
+}
+
+message GetOrganizationRequest {
+    int64 organization_id = 1;
+}
+
+message CreateOrganizationRequest {
+    Organization organization = 1;
+}
+
+message UpdateOrganizationRequest {
+    int64 organization_id = 1;
+    Organization organization = 2;
+}
+
+message DeleteOrganizationRequest {
+    int64 organization_id = 1;
+}

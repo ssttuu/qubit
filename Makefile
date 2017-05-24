@@ -8,6 +8,10 @@ protos:
 	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/health/ --include_imports --include_source_info ./server/protos/health/health.proto --descriptor_set_out ./server/protos/health/health.pb
 	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/health/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,plugins=grpc:./server/protos/health/ ./server/protos/health/health.proto
 
+    # Server - Organizations
+	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/organizations/ --include_imports --include_source_info ./server/protos/organizations/organizations.proto --descriptor_set_out ./server/protos/organizations/organizations.pb
+	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/organizations/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,plugins=grpc:./server/protos/organizations/ ./server/protos/organizations/organizations.proto
+
     # Server - Scenes
 	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/scenes/ --include_imports --include_source_info ./server/protos/scenes/scenes.proto --descriptor_set_out ./server/protos/scenes/scenes.pb
 	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/scenes/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,plugins=grpc:./server/protos/scenes/ ./server/protos/scenes/scenes.proto
