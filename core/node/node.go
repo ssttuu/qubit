@@ -24,7 +24,7 @@ func (n *Node) ToProto() (*pb.Node, error) {
 }
 
 func NewNodeFromProto(pbnode *pb.Node) Node {
-	return Node{Id: fmt.Sprintf("%s", pbnode.Id)}
+	return Node{Id: fmt.Sprintf("%d", pbnode.Id)}
 }
 
 type Nodes []*Node

@@ -4,6 +4,10 @@ metadata:
   name: {{ .Values.Server.AppName }}
   labels:
     chart: '{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}'
+    version: {{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    revision: {{ .Release.Revision | quote }}
+    githash: {{ .Values.Githash }}
 spec:
   ports:
   # Port that accepts gRPC and JSON/HTTP2 requests over HTTP.

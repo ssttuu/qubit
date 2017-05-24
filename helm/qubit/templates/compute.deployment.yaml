@@ -15,6 +15,7 @@ spec:
         version: {{ .Chart.Version }}
         release: {{ .Release.Name }}
         revision: {{ .Release.Revision | quote }}
+        githash: {{ .Values.Githash }}
     spec:
       containers:
       - name: esp
