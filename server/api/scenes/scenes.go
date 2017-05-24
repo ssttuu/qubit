@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"time"
 	"google.golang.org/grpc"
+	"cloud.google.com/go/trace"
 )
 
 var r *rand.Rand
@@ -26,6 +27,9 @@ type Server struct {
 }
 
 func (s *Server) List(ctx context.Context, in *scenes_pb.ListScenesRequest) (*scenes_pb.ListScenesResponse, error) {
+	span := trace.FromContext(ctx).NewChild("scenes.List")
+	defer span.Finish()
+
 	var scenes scene.Scenes
 	_, err := s.env.DatastoreClient.GetAll(ctx, datastore.NewQuery("Scene"), &scenes)
 	if err != nil {
