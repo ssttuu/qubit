@@ -47,6 +47,7 @@ Compute:
     ExternalHttp2Port: 9010
     InternalPort: 8000
     Replicas: 1
+    MaxSurge: 2
 
 Server:
     ApiName: server.endpoints.qubit-161916.cloud.goog
@@ -57,3 +58,4 @@ Server:
     ExternalHttp2Port: 9010
     InternalPort: 8001
     Replicas: 1
+    MaxSurge: 2

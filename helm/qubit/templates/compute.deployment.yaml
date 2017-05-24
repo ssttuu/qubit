@@ -4,10 +4,17 @@ metadata:
   name: {{ .Values.Compute.AppName }}
 spec:
   replicas: {{ .Values.Compute.Replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+        maxSurge: {{ .Values.Compute.MaxSurge }}
   template:
     metadata:
       labels:
         app: {{ .Values.Compute.AppName }}
+        version: {{ .Chart.Version }}
+        release: {{ .Release.Name }}
+        revision: {{ .Release.Revision | quote }}
     spec:
       containers:
       - name: esp
