@@ -27,7 +27,7 @@ func NewSceneFromProto(pbscene *pb.Scene) Scene {
 
 type Scenes []*Scene
 
-func (s *Scenes) ToProto() (*pb.ScenesList, error) {
+func (s *Scenes) ToProto() ([]*pb.Scene, error) {
 	var pbscenes []*pb.Scene
 	for _, scene := range *s {
 		scene_proto, err := scene.ToProto()
@@ -37,5 +37,5 @@ func (s *Scenes) ToProto() (*pb.ScenesList, error) {
 		pbscenes = append(pbscenes, scene_proto)
 	}
 
-	return &pb.ScenesList{Scenes:pbscenes}, nil
+	return pbscenes, nil
 }

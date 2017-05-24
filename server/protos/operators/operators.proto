@@ -7,7 +7,7 @@ import "google/protobuf/empty.proto";
 
 
 service Operators {
-    rpc List (ListOperatorsRequest) returns (OperatorsList) {
+    rpc List (ListOperatorsRequest) returns (ListOperatorsResponse) {
         option (google.api.http) = {
             get: "/v1/scenes/{scene_id}/operators"
         };
@@ -36,18 +36,19 @@ service Operators {
     }
 }
 
-// Types
 message Operator {
     int64 id = 1;
 }
 
-message OperatorsList {
-    repeated Operator operators = 1;
-}
-
-// Requests
 message ListOperatorsRequest {
     int64 scene_id = 1;
+    int32 page_size = 2;
+    string page_token = 3;
+}
+
+message ListOperatorsResponse {
+    repeated Operator operators = 1;
+    string next_page_token = 2;
 }
 
 message GetOperatorRequest {

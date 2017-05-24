@@ -25,14 +25,19 @@ type Server struct {
 	env *env.Env
 }
 
-func (s *Server) List(ctx context.Context, in *empty.Empty) (*scenes_pb.ScenesList, error) {
+func (s *Server) List(ctx context.Context, in *scenes_pb.ListScenesRequest) (*scenes_pb.ListScenesResponse, error) {
 	var scenes scene.Scenes
 	_, err := s.env.DatastoreClient.GetAll(ctx, datastore.NewQuery("Scene"), &scenes)
 	if err != nil {
 		return nil, errors.Wrap(err, "Could not get all")
 	}
 
-	return scenes.ToProto()
+	scenes_proto, err := scenes.ToProto()
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to convert scenes to proto, %v", scenes)
+	}
+
+	return &scenes_pb.ListScenesResponse{Scenes:scenes_proto, NextPageToken:""}, nil
 }
 
 func (s *Server) Get(ctx context.Context, in *scenes_pb.GetSceneRequest) (*scenes_pb.Scene, error) {

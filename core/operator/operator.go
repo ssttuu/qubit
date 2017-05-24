@@ -31,7 +31,7 @@ func NewOperatorFromProto(pboperator *pb.Operator) Operator {
 
 type Operators []*Operator
 
-func (n *Operators) ToProto() (*pb.OperatorsList, error) {
+func (n *Operators) ToProto() ([]*pb.Operator, error) {
 	var pboperators []*pb.Operator
 	for _, operator := range *n {
 		operator_proto, err := operator.ToProto()
@@ -41,7 +41,7 @@ func (n *Operators) ToProto() (*pb.OperatorsList, error) {
 		pboperators = append(pboperators, operator_proto)
 	}
 
-	return &pb.OperatorsList{Operators:pboperators}, nil
+	return pboperators, nil
 }
 
 // TODO: cleanup

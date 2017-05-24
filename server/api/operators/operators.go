@@ -28,7 +28,7 @@ type Server struct {
 	env *env.Env
 }
 
-func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest) (*operators_pb.OperatorsList, error) {
+func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest) (*operators_pb.ListOperatorsResponse, error) {
 	sceneKey := datastore.IDKey(SceneKind, in.SceneId, nil)
 
 	var operators operator.Operators
@@ -37,7 +37,12 @@ func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest
 		return nil, errors.Wrap(err, "Could not get all")
 	}
 
-	return operators.ToProto()
+	operators_proto, err := operators.ToProto()
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to convert operators to proto, %v", operators_proto)
+	}
+
+	return &operators_pb.ListOperatorsResponse{Operators:operators_proto, NextPageToken:""}, nil
 }
 
 func (s *Server) Get(ctx context.Context, in *operators_pb.GetOperatorRequest) (*operators_pb.Operator, error) {

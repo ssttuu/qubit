@@ -7,7 +7,7 @@ import "google/protobuf/empty.proto";
 
 
 service Scenes {
-    rpc List (google.protobuf.Empty) returns (ScenesList) {
+    rpc List (ListScenesRequest) returns (ListScenesResponse) {
         option (google.api.http) = {
             get: "/v1/scenes"
         };
@@ -40,10 +40,15 @@ message Scene {
     int64 id = 1;
 }
 
-message ScenesList {
-    repeated Scene scenes = 1;
+message ListScenesRequest {
+    int32 page_size = 2;
+    string page_token = 3;
 }
 
+message ListScenesResponse {
+    repeated Scene scenes = 1;
+    string next_page_token = 2;
+}
 
 message GetSceneRequest {
     int64 scene_id = 1;
