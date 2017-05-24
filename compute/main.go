@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"github.com/pkg/errors"
 	"github.com/stupschwartz/qubit/core/image"
-	"github.com/stupschwartz/qubit/core/node"
 	"github.com/stupschwartz/qubit/core/operator"
 	"github.com/stupschwartz/qubit/core/params"
 	pb "github.com/stupschwartz/qubit/compute/protos/compute"
@@ -49,10 +48,10 @@ func (cs *ComputeServer) Render(stream pb.Compute_RenderServer) error {
 		}
 
 		grp.Add(1)
-		go func(ctx context.Context, sceneUuid string, nodeUuid string, boundingBox *pb.BoundingBox, stream pb.Compute_RenderServer, mu *sync.Mutex) {
-			cs.ActuallyRender(ctx, sceneUuid, nodeUuid, boundingBox, stream, mu)
+		go func(ctx context.Context, sceneUuid string, operatorUuid string, boundingBox *pb.BoundingBox, stream pb.Compute_RenderServer, mu *sync.Mutex) {
+			cs.ActuallyRender(ctx, sceneUuid, operatorUuid, boundingBox, stream, mu)
 			grp.Done()
-		}(ctx, in.GetSceneId(), in.GetNodeId(), in.GetBoundingBox(), stream, &mu)
+		}(ctx, in.GetSceneId(), in.GetOperatorId(), in.GetBoundingBox(), stream, &mu)
 	}
 
 	grp.Wait()
@@ -60,18 +59,18 @@ func (cs *ComputeServer) Render(stream pb.Compute_RenderServer) error {
 	return nil
 }
 
-func (cs *ComputeServer) ActuallyRender(ctx context.Context, sceneUuid string, nodeUuid string, boundingBox *pb.BoundingBox, stream pb.Compute_RenderServer, mu *sync.Mutex) error {
+func (cs *ComputeServer) ActuallyRender(ctx context.Context, sceneUuid string, operatorUuid string, boundingBox *pb.BoundingBox, stream pb.Compute_RenderServer, mu *sync.Mutex) error {
 	sceneKey := datastore.NameKey("Scene", sceneUuid, nil)
-	nodeKey := datastore.NameKey("Node", nodeUuid, sceneKey)
+	operatorKey := datastore.NameKey("Operator", operatorUuid, sceneKey)
 
-	var theNode node.Node
-	if err := cs.DatastoreClient.Get(ctx, nodeKey, &theNode); err != nil {
-		log.Fatalf("Failed to get node to be rendered, %v", err)
+	var theOperator operator.Operator
+	if err := cs.DatastoreClient.Get(ctx, operatorKey, &theOperator); err != nil {
+		log.Fatalf("Failed to get operator to be rendered, %v", err)
 	}
 
 	var theParams params.Parameters
 	bucket := cs.StorageClient.Bucket(os.Getenv("STORAGE_BUCKET"))
-	paramsObj := bucket.Object(fmt.Sprintf("params/%s", theNode.Id))
+	paramsObj := bucket.Object(fmt.Sprintf("params/%s", theOperator.Id))
 
 	reader, err := paramsObj.NewReader(ctx)
 	if err != nil {
@@ -85,13 +84,13 @@ func (cs *ComputeServer) ActuallyRender(ctx context.Context, sceneUuid string, n
 	reader.Close()
 
 	//renderInputsSpan := span.NewChild("render:" + stringBBox)
-	//inputImagePlanes := make([]image.Plane, len(theNode.Inputs))
-	//for index, inputNodeId := range theNode.Inputs {
-	//	inputImagePlanes[index] = cs.RenderInput(ctx, sceneUuid, inputNodeId, boundingBox)
+	//inputImagePlanes := make([]image.Plane, len(theOperator.Inputs))
+	//for index, inputOperatorId := range theOperator.Inputs {
+	//	inputImagePlanes[index] = cs.RenderInput(ctx, sceneUuid, inputOperatorId, boundingBox)
 	//}
 	//renderInputsSpan.Finish()
 
-	op := operator.GetOperation(theNode.Type)
+	op := operator.GetOperation(theOperator.Type)
 	imagePlane := op([]image.Plane{}, theParams, boundingBox.GetStartX(), boundingBox.GetStartY(), boundingBox.GetEndX(), boundingBox.GetEndY())
 
 	response := &pb.RenderResponse{ImagePlane: imagePlane.ToProto(), BoundingBox: boundingBox}
@@ -110,7 +109,7 @@ func (cs *ComputeServer) ActuallyRender(ctx context.Context, sceneUuid string, n
 	return nil
 }
 
-//func (cs *ComputeServer) RenderInput(ctx context.Context, sceneUuid string, nodeUuid string, bbox *pb.BoundingBox) image.Plane {
+//func (cs *ComputeServer) RenderInput(ctx context.Context, sceneUuid string, operatorUuid string, bbox *pb.BoundingBox) image.Plane {
 //	var opts []grpc.DialOption
 //	opts = append(opts, grpc.WithInsecure())
 //	opts = append(opts, grpc.WithUnaryInterceptor(trace.GRPCClientInterceptor()))
@@ -123,7 +122,7 @@ func (cs *ComputeServer) ActuallyRender(ctx context.Context, sceneUuid string, n
 //	defer conn.Close()
 //	computeClient := pb.NewComputeClient(conn)
 //
-//	renderResponse, err := computeClient.Render(ctx, &pb.RenderRequest{SceneId: sceneUuid, NodeId: nodeUuid, BoundingBox: bbox})
+//	renderResponse, err := computeClient.Render(ctx, &pb.RenderRequest{SceneId: sceneUuid, OperatorId: operatorUuid, BoundingBox: bbox})
 //	if err != nil {
 //		grpclog.Fatal("failed to render")
 //	}

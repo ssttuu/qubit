@@ -26,7 +26,7 @@ func PostHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r *http
 	queryParams := r.URL.Query()
 
 	sceneId := vars["scene_id"]
-	nodeId := vars["node_id"]
+	operatorId := vars["operator_id"]
 
 	width, err := strconv.ParseInt(queryParams.Get("width"), 10, 64)
 	if err != nil {
@@ -49,7 +49,7 @@ func PostHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r *http
 	var i int64
 	for i = 0; i < height; i++ {
 		fmt.Printf("%v;", i)
-		renderRequest := &pb.RenderRequest{SceneId: sceneId, NodeId: nodeId, BoundingBox: &pb.BoundingBox{StartX: 0, StartY: i, EndX: width, EndY: i + 1 }}
+		renderRequest := &pb.RenderRequest{SceneId: sceneId, OperatorId: operatorId, BoundingBox: &pb.BoundingBox{StartX: 0, StartY: i, EndX: width, EndY: i + 1 }}
 		err := stream.Send(renderRequest)
 		if err != nil {
 			return errors.Wrap(err, "Failed to send stream")
@@ -87,7 +87,7 @@ func PostHandler(ctx context.Context, e *env.Env, w http.ResponseWriter, r *http
 }
 
 func Register(router *mux.Router, environ *env.Env) {
-	s := router.PathPrefix("/scenes/{scene_id}/nodes/{node_id}/render").Subrouter()
+	s := router.PathPrefix("/scenes/{scene_id}/operators/{operator_id}/render").Subrouter()
 
 	s.Handle("/", handler.Handler{environ, PostHandler}).Methods("POST")
 }

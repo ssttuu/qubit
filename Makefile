@@ -12,9 +12,9 @@ protos:
 	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/scenes/ --include_imports --include_source_info ./server/protos/scenes/scenes.proto --descriptor_set_out ./server/protos/scenes/scenes.pb
 	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/scenes/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,plugins=grpc:./server/protos/scenes/ ./server/protos/scenes/scenes.proto
 
-    # Server - Nodes
-	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/nodes/ --include_imports --include_source_info ./server/protos/nodes/nodes.proto --descriptor_set_out ./server/protos/nodes/nodes.pb
-	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/nodes/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,plugins=grpc:./server/protos/nodes/ ./server/protos/nodes/nodes.proto
+    # Server - Operators
+	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/operators/ --include_imports --include_source_info ./server/protos/operators/operators.proto --descriptor_set_out ./server/protos/operators/operators.pb
+	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/operators/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,plugins=grpc:./server/protos/operators/ ./server/protos/operators/operators.proto
 
     # Server
 	docker run --rm -v ${PWD}:/workspace -w /workspace znly/protoc -I ./server/protos/server/ -I ./server/protos/ --include_imports --include_source_info ./server/protos/server/server.proto --descriptor_set_out ./server/protos/server/server.pb

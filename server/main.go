@@ -18,7 +18,7 @@ import (
 
 	"github.com/stupschwartz/qubit/server/api/health"
 	"github.com/stupschwartz/qubit/server/api/scenes"
-	"github.com/stupschwartz/qubit/server/api/nodes"
+	"github.com/stupschwartz/qubit/server/api/operators"
 	computepb "github.com/stupschwartz/qubit/compute/protos/compute"
 	"fmt"
 	"google.golang.org/grpc/metadata"
@@ -107,7 +107,7 @@ func main() {
 
 	health.Register(grpcServer, environ)
 	scenes.Register(grpcServer, environ)
-	nodes.Register(grpcServer, environ)
+	operators.Register(grpcServer, environ)
 
 	grpcServer.Serve(lis)
 }

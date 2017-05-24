@@ -2,4 +2,4 @@ syntax = "proto3";
 
 import public "health/health.proto";
 import public "scenes/scenes.proto";
-import public "nodes/nodes.proto";
+import public "operators/operators.proto";

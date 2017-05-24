@@ -8,7 +8,7 @@ service Compute {
 
 message RenderRequest {
     string sceneId = 1;
-    string nodeId = 2;
+    string operatorId = 2;
     BoundingBox boundingBox = 3;
 }
 
@@ -40,9 +40,9 @@ message Row {
 }
 
 
-// Node
+// Operator
 
-message Node {
+message Operator {
     string id = 1;
 //    string type = 2;
 }
