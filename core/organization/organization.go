@@ -21,7 +21,10 @@ func (s *Organization) ToProto() (*pb.Organization, error) {
 }
 
 func NewOrganizationFromProto(pborganization *pb.Organization) Organization {
-	return Organization{Id: fmt.Sprint(pborganization.Id)}
+	return Organization{
+		Id: fmt.Sprint(pborganization.Id),
+		Name: pborganization.Name,
+	}
 }
 
 type Organizations []*Organization

@@ -9,6 +9,13 @@ import (
 	"github.com/stupschwartz/qubit/core/image"
 )
 
+
+type Type string
+const (
+	IMAGE Type = "image"
+	GEOMETRY Type = "geometry"
+)
+
 type Operator struct {
 	Id      string `json:"id" datastore:"id"`
 	Name    string `json:"name" datastore:"name"`
