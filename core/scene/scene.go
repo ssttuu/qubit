@@ -22,7 +22,7 @@ func (s *Scene) ToProto() (*pb.Scene, error) {
 }
 
 func NewSceneFromProto(pbscene *pb.Scene) Scene {
-	return Scene{Id: fmt.Sprintf("%d", pbscene.Id)}
+	return Scene{Id: fmt.Sprint(pbscene.Id)}
 }
 
 type Scenes []*Scene

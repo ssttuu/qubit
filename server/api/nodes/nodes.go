@@ -53,10 +53,9 @@ func (s *Server) Get(ctx context.Context, in *nodes_pb.GetNodeRequest) (*nodes_p
 }
 
 func (s *Server) Create(ctx context.Context, in *nodes_pb.CreateNodeRequest) (*nodes_pb.Node, error) {
+	in.Node.Id = r.Int63()
 	sceneKey := datastore.IDKey(SceneKind, in.SceneId, nil)
-
-	nodeId := r.Int63()
-	nodeKey := datastore.IDKey(NodeKind, nodeId, sceneKey)
+	nodeKey := datastore.IDKey(NodeKind, in.Node.Id, sceneKey)
 
 	newNode := node.NewNodeFromProto(in.Node)
 
