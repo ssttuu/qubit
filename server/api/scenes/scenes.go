@@ -14,6 +14,9 @@ import (
 	"cloud.google.com/go/trace"
 )
 
+const OrganizationKind string = "Organization"
+const SceneKind string = "Scene"
+
 var r *rand.Rand
 
 func init() {
@@ -30,8 +33,10 @@ func (s *Server) List(ctx context.Context, in *scenes_pb.ListScenesRequest) (*sc
 	span := trace.FromContext(ctx).NewChild("scenes.List")
 	defer span.Finish()
 
+	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+
 	var scenes scene.Scenes
-	_, err := s.env.DatastoreClient.GetAll(ctx, datastore.NewQuery("Scene"), &scenes)
+	_, err := s.env.DatastoreClient.GetAll(ctx, datastore.NewQuery(SceneKind).Ancestor(orgKey), &scenes)
 	if err != nil {
 		return nil, errors.Wrap(err, "Could not get all")
 	}
@@ -45,7 +50,8 @@ func (s *Server) List(ctx context.Context, in *scenes_pb.ListScenesRequest) (*sc
 }
 
 func (s *Server) Get(ctx context.Context, in *scenes_pb.GetSceneRequest) (*scenes_pb.Scene, error) {
-	sceneKey := datastore.IDKey("Scene", in.SceneId, nil)
+	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
 
 	var existingScene scene.Scene
 	if err := s.env.DatastoreClient.Get(ctx, sceneKey, &existingScene); err != nil {
@@ -57,7 +63,8 @@ func (s *Server) Get(ctx context.Context, in *scenes_pb.GetSceneRequest) (*scene
 
 func (s *Server) Create(ctx context.Context, in *scenes_pb.CreateSceneRequest) (*scenes_pb.Scene, error) {
 	in.Scene.Id = r.Int63()
-	sceneKey := datastore.IDKey("Scene", in.Scene.Id, nil)
+	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.IDKey(SceneKind, in.Scene.Id, orgKey)
 
 	newScene := scene.NewSceneFromProto(in.Scene)
 
@@ -69,7 +76,8 @@ func (s *Server) Create(ctx context.Context, in *scenes_pb.CreateSceneRequest) (
 }
 
 func (s *Server) Update(ctx context.Context, in *scenes_pb.UpdateSceneRequest) (*scenes_pb.Scene, error) {
-	sceneKey := datastore.IDKey("Scene", in.SceneId, nil)
+	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
 
 	newScene := scene.NewSceneFromProto(in.Scene)
 
@@ -99,10 +107,11 @@ func (s *Server) Update(ctx context.Context, in *scenes_pb.UpdateSceneRequest) (
 }
 
 func (s *Server) Delete(ctx context.Context, in *scenes_pb.DeleteSceneRequest) (*empty.Empty, error) {
-	sceneKey := datastore.IDKey("Scene", in.SceneId, nil)
+	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
 
 	if err := s.env.DatastoreClient.Delete(ctx, sceneKey); err != nil {
-		return nil, errors.Wrapf(err, "Failed to deleted scene by id: %v", in.SceneId)
+		return nil, errors.Wrapf(err, "Failed to deleted scene by key: %v", sceneKey)
 	}
 
 	return &empty.Empty{}, nil

@@ -34,6 +34,7 @@ name: server.endpoints.qubit-161916.cloud.goog
 title: Server gRPC API
 apis:
 - name: health.Health
+- name: organizations.Organizations
 - name: scenes.Scenes
 - name: operators.Operators
 

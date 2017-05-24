@@ -9,29 +9,29 @@ import "google/protobuf/empty.proto";
 service Scenes {
     rpc List (ListScenesRequest) returns (ListScenesResponse) {
         option (google.api.http) = {
-            get: "/v1/scenes"
+            get: "/v1/organizations/{organization_id}/scenes"
         };
     }
     rpc Get (GetSceneRequest) returns (Scene) {
         option (google.api.http) = {
-            get: "/v1/scenes/{scene_id}"
+            get: "/v1/organizations/{organization_id}/scenes/{scene_id}"
         };
     }
     rpc Create (CreateSceneRequest) returns (Scene) {
         option (google.api.http) = {
-            post: "/v1/scenes"
+            post: "/v1/organizations/{organization_id}/scenes"
             body: "scene"
         };
     }
     rpc Update (UpdateSceneRequest) returns (Scene) {
         option (google.api.http) = {
-            put: "/v1/scenes/{scene_id}"
+            put: "/v1/organizations/{organization_id}/scenes/{scene_id}"
             body: "scene"
         };
     }
     rpc Delete (DeleteSceneRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/scenes/{scene_id}"
+            delete: "/v1/organizations/{organization_id}/scenes/{scene_id}"
         };
     }
 }
@@ -41,6 +41,7 @@ message Scene {
 }
 
 message ListScenesRequest {
+    int64 organization_id = 1;
     int32 page_size = 2;
     string page_token = 3;
 }
@@ -51,18 +52,22 @@ message ListScenesResponse {
 }
 
 message GetSceneRequest {
-    int64 scene_id = 1;
+    int64 organization_id = 1;
+    int64 scene_id = 2;
 }
 
 message CreateSceneRequest {
-    Scene scene = 1;
-}
-
-message UpdateSceneRequest {
-    int64 scene_id = 1;
+    int64 organization_id = 1;
     Scene scene = 2;
 }
 
+message UpdateSceneRequest {
+    int64 organization_id = 1;
+    int64 scene_id = 2;
+    Scene scene = 3;
+}
+
 message DeleteSceneRequest {
-    int64 scene_id = 1;
+    int64 organization_id = 1;
+    int64 scene_id = 2;
 }

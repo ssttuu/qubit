@@ -9,29 +9,29 @@ import "google/protobuf/empty.proto";
 service Operators {
     rpc List (ListOperatorsRequest) returns (ListOperatorsResponse) {
         option (google.api.http) = {
-            get: "/v1/scenes/{scene_id}/operators"
+            get: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators"
         };
     }
     rpc Get (GetOperatorRequest) returns (Operator) {
         option (google.api.http) = {
-            get: "/v1/scenes/{scene_id}/operators/{operator_id}"
+            get: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}"
         };
     }
     rpc Create (CreateOperatorRequest) returns (Operator) {
         option (google.api.http) = {
-            post: "/v1/scenes/{scene_id}/operators"
+            post: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators"
             body: "operator"
         };
     }
     rpc Update (UpdateOperatorRequest) returns (Operator) {
         option (google.api.http) = {
-            put: "/v1/scenes/{scene_id}/operators/{operator_id}"
+            put: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}"
             body: "operator"
         };
     }
     rpc Delete (DeleteOperatorRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/scenes/{scene_id}/operators/{operator_id}"
+            delete: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}"
         };
     }
 }
@@ -41,9 +41,10 @@ message Operator {
 }
 
 message ListOperatorsRequest {
-    int64 scene_id = 1;
-    int32 page_size = 2;
-    string page_token = 3;
+    int64 organization_id = 1;
+    int64 scene_id = 2;
+    int32 page_size = 3;
+    string page_token = 4;
 }
 
 message ListOperatorsResponse {
@@ -52,22 +53,26 @@ message ListOperatorsResponse {
 }
 
 message GetOperatorRequest {
-    int64 scene_id = 1;
-    int64 operator_id = 2;
+    int64 organization_id = 1;
+    int64 scene_id = 2;
+    int64 operator_id = 3;
 }
 
 message CreateOperatorRequest {
-    int64 scene_id = 1;
-    Operator operator = 2;
-}
-
-message UpdateOperatorRequest {
-    int64 scene_id = 1;
-    int64 operator_id = 2;
+    int64 organization_id = 1;
+    int64 scene_id = 2;
     Operator operator = 3;
 }
 
+message UpdateOperatorRequest {
+    int64 organization_id = 1;
+    int64 scene_id = 2;
+    int64 operator_id = 3;
+    Operator operator = 4;
+}
+
 message DeleteOperatorRequest {
-    int64 scene_id = 1;
-    int64 operator_id = 2;
+    int64 organization_id = 1;
+    int64 scene_id = 2;
+    int64 operator_id = 3;
 }

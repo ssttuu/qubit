@@ -13,6 +13,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
+const OrganizationKind string = "Organization"
 const SceneKind string = "Scene"
 const OperatorKind string = "Operator"
 
@@ -29,7 +30,8 @@ type Server struct {
 }
 
 func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest) (*operators_pb.ListOperatorsResponse, error) {
-	sceneKey := datastore.IDKey(SceneKind, in.SceneId, nil)
+	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
 
 	var operators operator.Operators
 	_, err := s.env.DatastoreClient.GetAll(ctx, datastore.NewQuery(OperatorKind).Ancestor(sceneKey), &operators)
@@ -46,7 +48,8 @@ func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest
 }
 
 func (s *Server) Get(ctx context.Context, in *operators_pb.GetOperatorRequest) (*operators_pb.Operator, error) {
-	sceneKey := datastore.IDKey(SceneKind, in.SceneId, nil)
+	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
 	operatorKey := datastore.IDKey(OperatorKind, in.OperatorId, sceneKey)
 
 	var existingOperator operator.Operator
@@ -59,7 +62,8 @@ func (s *Server) Get(ctx context.Context, in *operators_pb.GetOperatorRequest) (
 
 func (s *Server) Create(ctx context.Context, in *operators_pb.CreateOperatorRequest) (*operators_pb.Operator, error) {
 	in.Operator.Id = r.Int63()
-	sceneKey := datastore.IDKey(SceneKind, in.SceneId, nil)
+	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
 	operatorKey := datastore.IDKey(OperatorKind, in.Operator.Id, sceneKey)
 
 	newOperator := operator.NewOperatorFromProto(in.Operator)
@@ -72,7 +76,8 @@ func (s *Server) Create(ctx context.Context, in *operators_pb.CreateOperatorRequ
 }
 
 func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequest) (*operators_pb.Operator, error) {
-	sceneKey := datastore.IDKey(SceneKind, in.SceneId, nil)
+	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
 	operatorKey := datastore.IDKey(OperatorKind, in.OperatorId, sceneKey)
 
 	newOperator := operator.NewOperatorFromProto(in.Operator)
@@ -103,7 +108,8 @@ func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequ
 }
 
 func (s *Server) Delete(ctx context.Context, in *operators_pb.DeleteOperatorRequest) (*empty.Empty, error) {
-	sceneKey := datastore.IDKey(SceneKind, in.SceneId, nil)
+	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
 	operatorKey := datastore.IDKey(OperatorKind, in.OperatorId, sceneKey)
 
 	if err := s.env.DatastoreClient.Delete(ctx, operatorKey); err != nil {
