@@ -20,7 +20,6 @@ import (
 	"github.com/stupschwartz/qubit/server/api/organizations"
 	"github.com/stupschwartz/qubit/server/api/scenes"
 	"github.com/stupschwartz/qubit/server/api/operators"
-	computepb "github.com/stupschwartz/qubit/compute/protos/compute"
 	"fmt"
 	"google.golang.org/grpc/metadata"
 	"net"
@@ -69,27 +68,10 @@ func main() {
 	}
 	traceClient.SetSamplingPolicy(p)
 
-	var opts []grpc.DialOption
-	opts = append(opts, grpc.WithInsecure())
-	opts = append(opts, grpc.WithStreamInterceptor(clientInterceptor))
-
-	computeServiceUrl := os.Getenv("COMPUTE_SERVICE_URL")
-	if computeServiceUrl == "" {
-		log.Fatal(`You need to set the environment variable "COMPUTE_SERVICE_URL"`)
-	}
-
-	conn, err := grpc.Dial(computeServiceUrl, opts...)
-	if err != nil {
-		grpclog.Fatalf("fail to dial: %v", err)
-	}
-	defer conn.Close()
-	computeClient := computepb.NewComputeClient(conn)
-
 	environ := &env.Env{
 		DatastoreClient: datastoreClient,
 		StorageClient: storageClient,
 		TraceClient: traceClient,
-		ComputeClient: computeClient,
 	}
 
 	port := os.Getenv("PORT")
