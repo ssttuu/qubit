@@ -12,6 +12,7 @@ import (
 	"time"
 	"google.golang.org/grpc"
 	"cloud.google.com/go/trace"
+	"fmt"
 )
 
 const OrganizationKind string = "Organization"
@@ -47,7 +48,7 @@ func (s *Server) List(ctx context.Context, in *organizations_pb.ListOrganization
 }
 
 func (s *Server) Get(ctx context.Context, in *organizations_pb.GetOrganizationRequest) (*organizations_pb.Organization, error) {
-	organizationKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+	organizationKey := datastore.NameKey(OrganizationKind, in.OrganizationId, nil)
 
 	var existingOrganization organization.Organization
 	if err := s.env.DatastoreClient.Get(ctx, organizationKey, &existingOrganization); err != nil {
@@ -58,8 +59,8 @@ func (s *Server) Get(ctx context.Context, in *organizations_pb.GetOrganizationRe
 }
 
 func (s *Server) Create(ctx context.Context, in *organizations_pb.CreateOrganizationRequest) (*organizations_pb.Organization, error) {
-	in.Organization.Id = r.Int63()
-	organizationKey := datastore.IDKey(OrganizationKind, in.Organization.Id, nil)
+	in.Organization.Id = fmt.Sprint(r.Int63())
+	organizationKey := datastore.NameKey(OrganizationKind, in.Organization.Id, nil)
 
 	newOrganization := organization.NewOrganizationFromProto(in.Organization)
 
@@ -71,7 +72,7 @@ func (s *Server) Create(ctx context.Context, in *organizations_pb.CreateOrganiza
 }
 
 func (s *Server) Update(ctx context.Context, in *organizations_pb.UpdateOrganizationRequest) (*organizations_pb.Organization, error) {
-	organizationKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+	organizationKey := datastore.NameKey(OrganizationKind, in.OrganizationId, nil)
 
 	newOrganization := organization.NewOrganizationFromProto(in.Organization)
 
@@ -101,7 +102,7 @@ func (s *Server) Update(ctx context.Context, in *organizations_pb.UpdateOrganiza
 }
 
 func (s *Server) Delete(ctx context.Context, in *organizations_pb.DeleteOrganizationRequest) (*empty.Empty, error) {
-	organizationKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+	organizationKey := datastore.NameKey(OrganizationKind, in.OrganizationId, nil)
 
 	if err := s.env.DatastoreClient.Delete(ctx, organizationKey); err != nil {
 		return nil, errors.Wrapf(err, "Failed to deleted organization by id: %v", in.OrganizationId)

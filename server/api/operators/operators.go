@@ -14,9 +14,9 @@ import (
 	"fmt"
 	"github.com/stupschwartz/qubit/core/params"
 	"os"
-	"encoding/json"
 	"github.com/stupschwartz/qubit/core/image"
 	"github.com/golang/protobuf/proto"
+	"image/png"
 )
 
 const OrganizationKind string = "Organization"
@@ -36,8 +36,8 @@ type Server struct {
 }
 
 func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest) (*operators_pb.ListOperatorsResponse, error) {
-	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
-	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
+	orgKey := datastore.NameKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.NameKey(SceneKind, in.SceneId, orgKey)
 
 	var operators operator.Operators
 	_, err := s.env.DatastoreClient.GetAll(ctx, datastore.NewQuery(OperatorKind).Ancestor(sceneKey), &operators)
@@ -54,9 +54,9 @@ func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest
 }
 
 func (s *Server) Get(ctx context.Context, in *operators_pb.GetOperatorRequest) (*operators_pb.Operator, error) {
-	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
-	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
-	operatorKey := datastore.IDKey(OperatorKind, in.OperatorId, sceneKey)
+	orgKey := datastore.NameKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.NameKey(SceneKind, in.SceneId, orgKey)
+	operatorKey := datastore.NameKey(OperatorKind, in.OperatorId, sceneKey)
 
 	var existingOperator operator.Operator
 	if err := s.env.DatastoreClient.Get(ctx, operatorKey, &existingOperator); err != nil {
@@ -67,10 +67,10 @@ func (s *Server) Get(ctx context.Context, in *operators_pb.GetOperatorRequest) (
 }
 
 func (s *Server) Create(ctx context.Context, in *operators_pb.CreateOperatorRequest) (*operators_pb.Operator, error) {
-	in.Operator.Id = r.Int63()
-	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
-	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
-	operatorKey := datastore.IDKey(OperatorKind, in.Operator.Id, sceneKey)
+	in.Operator.Id = fmt.Sprint(r.Int63())
+	orgKey := datastore.NameKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.NameKey(SceneKind, in.SceneId, orgKey)
+	operatorKey := datastore.NameKey(OperatorKind, in.Operator.Id, sceneKey)
 
 	newOperator := operator.NewOperatorFromProto(in.Operator)
 
@@ -82,9 +82,9 @@ func (s *Server) Create(ctx context.Context, in *operators_pb.CreateOperatorRequ
 }
 
 func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequest) (*operators_pb.Operator, error) {
-	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
-	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
-	operatorKey := datastore.IDKey(OperatorKind, in.OperatorId, sceneKey)
+	orgKey := datastore.NameKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.NameKey(SceneKind, in.SceneId, orgKey)
+	operatorKey := datastore.NameKey(OperatorKind, in.OperatorId, sceneKey)
 
 	newOperator := operator.NewOperatorFromProto(in.Operator)
 
@@ -114,9 +114,9 @@ func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequ
 }
 
 func (s *Server) Delete(ctx context.Context, in *operators_pb.DeleteOperatorRequest) (*empty.Empty, error) {
-	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
-	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
-	operatorKey := datastore.IDKey(OperatorKind, in.OperatorId, sceneKey)
+	orgKey := datastore.NameKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.NameKey(SceneKind, in.SceneId, orgKey)
+	operatorKey := datastore.NameKey(OperatorKind, in.OperatorId, sceneKey)
 
 	if err := s.env.DatastoreClient.Delete(ctx, operatorKey); err != nil {
 		return nil, errors.Wrapf(err, "Failed to delete operator by id: %v", in.OperatorId)
@@ -126,9 +126,9 @@ func (s *Server) Delete(ctx context.Context, in *operators_pb.DeleteOperatorRequ
 }
 
 func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequest) (*operators_pb.RenderOperatorResponse, error) {
-	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
-	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
-	operatorKey := datastore.IDKey(OperatorKind, in.OperatorId, sceneKey)
+	orgKey := datastore.NameKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.NameKey(SceneKind, in.SceneId, orgKey)
+	operatorKey := datastore.NameKey(OperatorKind, in.OperatorId, sceneKey)
 
 	// TODO: make gRPC request for the operator?
 	var theOperator operator.Operator
@@ -137,25 +137,28 @@ func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequ
 	}
 
 	// TODO: make gRPC request for the parameters?
-	var theParams params.Parameters
+	var theParams params.Parameters = params.Parameters{}
 	bucket := s.env.StorageClient.Bucket(os.Getenv("STORAGE_BUCKET"))
 	// TODO: create bucket per Organization
 	// TODO: hash OrgId, SceneId, and OperatorId to get bucket path
-	paramsObjectPath := fmt.Sprintf("organizations/%d/scenes/%d/operators/%d/params.json", in.OrganizationId, in.SceneId, in.OperatorId)
-	paramsObj := bucket.Object(paramsObjectPath)
+	//paramsObjectPath := fmt.Sprintf("organizations/%d/scenes/%d/operators/%d/params.json", in.OrganizationId, in.SceneId, in.OperatorId)
+	//paramsObj := bucket.Object(paramsObjectPath)
+	//
+	//reader, err := paramsObj.NewReader(ctx)
+	//if err != nil {
+	//	return nil, errors.Wrapf(err, "Failed to create Reader, %v", paramsObjectPath)
+	//}
+	//
+	//decoder := json.NewDecoder(reader)
+	//if err := decoder.Decode(&theParams); err != nil {
+	//	return nil, errors.Wrapf(err, "Failed to decode params, %v", paramsObjectPath)
+	//}
+	//reader.Close()
 
-	reader, err := paramsObj.NewReader(ctx)
+	op, err := operator.GetOperation(theOperator.Type)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to create Reader, %v", paramsObjectPath)
+		return nil, errors.Wrapf(err, "Failed to get Operation for rendering, %v", theOperator.Type)
 	}
-
-	decoder := json.NewDecoder(reader)
-	if err := decoder.Decode(&theParams); err != nil {
-		return nil, errors.Wrapf(err, "Failed to decode params, %v", paramsObjectPath)
-	}
-	reader.Close()
-
-	op := operator.GetOperation(theOperator.Type)
 	imagePlane := op.Process([]image.Plane{}, theParams, in.BoundingBox.StartX, in.BoundingBox.StartY, in.BoundingBox.EndX, in.BoundingBox.EndY)
 
 	// TODO: create bucket per Organization
@@ -164,19 +167,31 @@ func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequ
 	imagePngObjectPath := fmt.Sprintf("organizations/%d/scenes/%d/operators/%d/images/%d/image.png", in.OrganizationId, in.SceneId, in.OperatorId, in.Frame)
 
 	imageProtoObject := bucket.Object(imageProtoObjectPath)
-	writer := imageProtoObject.NewWriter(ctx)
+
+	// PROTO
+	protoWriter := imageProtoObject.NewWriter(ctx)
+	protoWriter.ContentType = "application/octet-stream"
 
 	image_bytes, err := proto.Marshal(imagePlane.ToProto())
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to marshal imagePlane proto, %v", imagePlane)
 	}
-	writer.Write(image_bytes)
-	writer.Close()
 
+	protoWriter.Write(image_bytes)
+	protoWriter.Close()
+
+	// PNG
+	pngWriter := imageProtoObject.NewWriter(ctx)
+	pngWriter.ContentType = "image/png"
+
+	if err := png.Encode(pngWriter, imagePlane.ToNRGBA()); err != nil {
+		return nil, errors.Wrap(err, "Failed to encode png")
+	}
+
+	pngWriter.Close()
 
 	return &operators_pb.RenderOperatorResponse{ResultUrl:imagePngObjectPath, ResultType: operator.IMAGE }, nil
 }
-
 
 func newServer(e *env.Env) *Server {
 	return &Server{

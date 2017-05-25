@@ -2,7 +2,6 @@ package scene
 
 import (
 	pb "github.com/stupschwartz/qubit/server/protos/scenes"
-	"strconv"
 	"fmt"
 	"github.com/pkg/errors"
 )
@@ -14,11 +13,7 @@ type Scene struct {
 }
 
 func (s *Scene) ToProto() (*pb.Scene, error) {
-	i, err := strconv.ParseInt(s.Id, 10, 64)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to convert Id from string to int64: %v", s.Id)
-	}
-	return &pb.Scene{Id: i}, nil
+	return &pb.Scene{Id: s.Id}, nil
 }
 
 func NewSceneFromProto(pbscene *pb.Scene) Scene {

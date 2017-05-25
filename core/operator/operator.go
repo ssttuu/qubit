@@ -3,7 +3,6 @@ package operator
 import (
 	pb "github.com/stupschwartz/qubit/server/protos/operators"
 	"fmt"
-	"strconv"
 	"github.com/pkg/errors"
 	"github.com/stupschwartz/qubit/core/params"
 	"github.com/stupschwartz/qubit/core/image"
@@ -24,12 +23,8 @@ type Operator struct {
 	Outputs []string `json:"outputs" datastore:"outputs"`
 }
 
-func (n *Operator) ToProto() (*pb.Operator, error) {
-	i, err := strconv.ParseInt(n.Id, 10, 64)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to convert Id from string to int64, %v", n.Id)
-	}
-	return &pb.Operator{Id: i}, nil
+func (o *Operator) ToProto() (*pb.Operator, error) {
+	return &pb.Operator{Id: o.Id}, nil
 }
 
 func NewOperatorFromProto(pb_op *pb.Operator) Operator {
@@ -38,9 +33,9 @@ func NewOperatorFromProto(pb_op *pb.Operator) Operator {
 
 type Operators []*Operator
 
-func (n *Operators) ToProto() ([]*pb.Operator, error) {
+func (o *Operators) ToProto() ([]*pb.Operator, error) {
 	var pb_ops []*pb.Operator
-	for _, operator := range *n {
+	for _, operator := range *o {
 		operator_proto, err := operator.ToProto()
 		if err != nil {
 			return nil, errors.Wrapf(err, "Failed to convert operator to proto, %v", operator)
@@ -63,10 +58,16 @@ func RegisterOperation(opType string, operation Operable, parameters params.Para
 	ParametersRegistry[opType] = parameters
 }
 
-func GetOperation(opType string) Operable {
-	return OperatorsRegistry[opType]
+func GetOperation(opType string) (Operable, error) {
+	if operable, ok := OperatorsRegistry[opType]; ok {
+		return operable, nil
+	}
+	return nil, errors.Errorf("Operation does not exist, %v", opType)
 }
 
-func GetParameters(opType string) params.Parameters {
-	return ParametersRegistry[opType]
+func GetParameters(opType string) (params.Parameters, error) {
+	if parameters, ok := ParametersRegistry[opType]; ok {
+		return parameters, nil
+	}
+	return nil, errors.Errorf("Parameters do not exist for operation type, %v", opType)
 }

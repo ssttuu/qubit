@@ -20,8 +20,6 @@ import (
 	"github.com/stupschwartz/qubit/server/api/organizations"
 	"github.com/stupschwartz/qubit/server/api/scenes"
 	"github.com/stupschwartz/qubit/server/api/operators"
-	"fmt"
-	"google.golang.org/grpc/metadata"
 	"net"
 )
 
@@ -84,8 +82,6 @@ func main() {
 		grpclog.Fatalf("failed to listen: %v", err)
 	}
 
-	log.Println("MAIN")
-
 	grpcServer := grpc.NewServer()
 
 	health.Register(grpcServer, environ)
@@ -94,22 +90,4 @@ func main() {
 	operators.Register(grpcServer, environ)
 
 	grpcServer.Serve(lis)
-}
-
-
-
-func clientInterceptor(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
-	fmt.Println("Client Interceptor")
-	fmt.Println(method)
-
-	span := trace.FromContext(ctx).NewChild(method + "-REQUEST")
-	defer span.Finish()
-
-	md := metadata.Pairs(
-		"x-cloud-trace-context", fmt.Sprintf("%s/%d;o=1", span.TraceID(), 0),
-	)
-
-	ctx = metadata.NewContext(ctx, md)
-
-	return streamer(ctx, desc, cc, method, opts...)
 }
