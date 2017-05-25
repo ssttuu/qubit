@@ -11,6 +11,12 @@ import (
 	"time"
 	"google.golang.org/grpc"
 	"github.com/golang/protobuf/ptypes/empty"
+	"fmt"
+	"github.com/stupschwartz/qubit/core/params"
+	"os"
+	"encoding/json"
+	"github.com/stupschwartz/qubit/core/image"
+	"github.com/golang/protobuf/proto"
 )
 
 const OrganizationKind string = "Organization"
@@ -118,6 +124,59 @@ func (s *Server) Delete(ctx context.Context, in *operators_pb.DeleteOperatorRequ
 
 	return &empty.Empty{}, nil
 }
+
+func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequest) (*operators_pb.RenderOperatorResponse, error) {
+	orgKey := datastore.IDKey(OrganizationKind, in.OrganizationId, nil)
+	sceneKey := datastore.IDKey(SceneKind, in.SceneId, orgKey)
+	operatorKey := datastore.IDKey(OperatorKind, in.OperatorId, sceneKey)
+
+	// TODO: make gRPC request for the operator?
+	var theOperator operator.Operator
+	if err := s.env.DatastoreClient.Get(ctx, operatorKey, &theOperator); err != nil {
+		return nil, errors.Wrapf(err, "Failed to get operator to be rendered, %v", operatorKey)
+	}
+
+	// TODO: make gRPC request for the parameters?
+	var theParams params.Parameters
+	bucket := s.env.StorageClient.Bucket(os.Getenv("STORAGE_BUCKET"))
+	// TODO: create bucket per Organization
+	// TODO: hash OrgId, SceneId, and OperatorId to get bucket path
+	paramsObjectPath := fmt.Sprintf("organizations/%d/scenes/%d/operators/%d/params.json", in.OrganizationId, in.SceneId, in.OperatorId)
+	paramsObj := bucket.Object(paramsObjectPath)
+
+	reader, err := paramsObj.NewReader(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to create Reader, %v", paramsObjectPath)
+	}
+
+	decoder := json.NewDecoder(reader)
+	if err := decoder.Decode(&theParams); err != nil {
+		return nil, errors.Wrapf(err, "Failed to decode params, %v", paramsObjectPath)
+	}
+	reader.Close()
+
+	op := operator.GetOperation(theOperator.Type)
+	imagePlane := op.Process([]image.Plane{}, theParams, in.BoundingBox.StartX, in.BoundingBox.StartY, in.BoundingBox.EndX, in.BoundingBox.EndY)
+
+	// TODO: create bucket per Organization
+	// TODO: hash OrgId, SceneId, and OperatorId to get bucket path
+	imageProtoObjectPath := fmt.Sprintf("organizations/%d/scenes/%d/operators/%d/images/%d/image.bytes", in.OrganizationId, in.SceneId, in.OperatorId, in.Frame)
+	imagePngObjectPath := fmt.Sprintf("organizations/%d/scenes/%d/operators/%d/images/%d/image.png", in.OrganizationId, in.SceneId, in.OperatorId, in.Frame)
+
+	imageProtoObject := bucket.Object(imageProtoObjectPath)
+	writer := imageProtoObject.NewWriter(ctx)
+
+	image_bytes, err := proto.Marshal(imagePlane.ToProto())
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to marshal imagePlane proto, %v", imagePlane)
+	}
+	writer.Write(image_bytes)
+	writer.Close()
+
+
+	return &operators_pb.RenderOperatorResponse{ResultUrl:imagePngObjectPath, ResultType: operator.IMAGE }, nil
+}
+
 
 func newServer(e *env.Env) *Server {
 	return &Server{

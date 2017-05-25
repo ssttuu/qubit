@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package images;
+
+message Frame {
+    string name = 1;
+    int32 width = 2;
+    int32 height = 3;
+    map<string, string> labels = 4;
+    repeated Plane planes = 5;
+}
+
+message Plane {
+    string name = 1;
+    int32 width = 2;
+    int32 height = 3;
+    map<string, string> labels = 4;
+    repeated Channel channels = 5;
+}
+
+message Channel {
+    string name = 1;
+    repeated Row rows = 2;
+}
+
+message Row {
+    repeated double data = 1 [packed=true];
+}
