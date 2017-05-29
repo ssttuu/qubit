@@ -6,6 +6,7 @@ import (
 	"cloud.google.com/go/datastore"
 	"golang.org/x/net/context"
 	"github.com/pkg/errors"
+	_ "github.com/stupschwartz/qubit/core/operators"
 	operators_pb "github.com/stupschwartz/qubit/server/protos/operators"
 	"math/rand"
 	"time"

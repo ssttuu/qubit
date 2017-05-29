@@ -3,8 +3,8 @@ syntax = "proto3";
 package geometry;
 
 message BoundingBox2D {
-    int64 start_x = 1;
-    int64 start_y = 2;
-    int64 end_x = 3;
-    int64 end_y = 4;
+    int32 start_x = 1;
+    int32 start_y = 2;
+    int32 end_x = 3;
+    int32 end_y = 4;
 }

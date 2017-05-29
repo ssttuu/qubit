@@ -12,19 +12,19 @@ type CheckerBoard struct {
 
 }
 
-func (c *CheckerBoard) Process(inputs []image.Plane, p params.Parameters, startX int64, startY int64, endX int64, endY int64) image.Plane {
+func (c *CheckerBoard) Process(inputs []image.Plane, p params.Parameters, startX int32, startY int32, endX int32, endY int32) image.Plane {
 	sizeParam := p.GetByName("Size")
-	sizeValue := int64(sizeParam.GetValue(0))
+	sizeValue := int32(sizeParam.GetValue(0))
 
 	width := endX - startX
 	height := endY - startY
 
-	redComponent := image.Component{Rows: make([]*image.Row, height)}
-	greenComponent := image.Component{Rows: make([]*image.Row, height)}
-	blueComponent := image.Component{Rows: make([]*image.Row, height)}
+	redChannel := image.Channel{Rows: make([]*image.Row, height)}
+	greenChannel := image.Channel{Rows: make([]*image.Row, height)}
+	blueChannel := image.Channel{Rows: make([]*image.Row, height)}
 
 	// TODO: each row should be a goroutine
-	var row, col int64
+	var row, col int32
 	for row = 0; row < height; row++ {
 		rowData := make([]float64, width)
 		for col = 0; col < width; col++ {
@@ -39,12 +39,12 @@ func (c *CheckerBoard) Process(inputs []image.Plane, p params.Parameters, startX
 			rowData[col] = value
 		}
 
-		redComponent.Rows[row] = &image.Row{Data: rowData}
-		greenComponent.Rows[row] = &image.Row{Data: rowData}
-		blueComponent.Rows[row] = &image.Row{Data: rowData}
+		redChannel.Rows[row] = &image.Row{Data: rowData}
+		greenChannel.Rows[row] = &image.Row{Data: rowData}
+		blueChannel.Rows[row] = &image.Row{Data: rowData}
 	}
 
-	return image.NewRGBPlane(width, height, []image.Component{redComponent, greenComponent, blueComponent})
+	return image.NewPlane(width, height, []image.Channel{redChannel, greenChannel, blueChannel})
 }
 
 var Params params.Parameters = params.Parameters{
@@ -52,5 +52,5 @@ var Params params.Parameters = params.Parameters{
 }
 
 func init() {
-	operator.RegisterOperation(Name, CheckerBoard{}, Params)
+	operator.RegisterOperation(Name, &CheckerBoard{}, Params)
 }
