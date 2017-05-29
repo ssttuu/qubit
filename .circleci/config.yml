@@ -131,7 +131,7 @@ jobs:
             - run:
                 name: Run Tests
                 command: |
-                    ./run-tests.integration.sh
+                    sh run-tests.integration.sh
 
             - store_artifacts:
                 path: ./tests/integrations/test-results/
