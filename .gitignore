@@ -27,3 +27,5 @@ _testmain.go
 
 /credentials
 node_modules/
+test-results/
+jest_*/

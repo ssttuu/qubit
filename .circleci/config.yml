@@ -114,6 +114,34 @@ jobs:
 
             # TRIGGER NEXT STEP
             - run:
+                name: Trigger Containers Testing
+                command: |
+                    curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=test_integration --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
+
+    test_integration:
+        docker:
+            - image: tmaier/docker-compose
+
+        working_directory: /workspace
+
+        steps:
+            - checkout
+            - setup_remote_docker
+
+            - run:
+                name: Run Tests
+                command: |
+                    ./run-tests.integration.sh
+
+            - store_artifacts:
+                path: ./tests/integrations/test-results/
+                destination: raw-test-output
+
+            - store_test_results:
+                path: ./tests/integrations/test-results/
+
+            # TRIGGER NEXT STEP
+            - run:
                 name: Trigger Containers Deployment
                 command: |
                     curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=deploy_containers --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
