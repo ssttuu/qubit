@@ -24,11 +24,11 @@ type Operator struct {
 }
 
 func (o *Operator) ToProto() (*pb.Operator, error) {
-	return &pb.Operator{Id: o.Id}, nil
+	return &pb.Operator{Id: o.Id, Name: o.Name}, nil
 }
 
 func NewOperatorFromProto(pb_op *pb.Operator) Operator {
-	return Operator{Id: fmt.Sprint(pb_op.Id)}
+	return Operator{Id: fmt.Sprint(pb_op.Id), Name: pb_op.Name}
 }
 
 type Operators []*Operator

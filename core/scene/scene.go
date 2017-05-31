@@ -13,11 +13,11 @@ type Scene struct {
 }
 
 func (s *Scene) ToProto() (*pb.Scene, error) {
-	return &pb.Scene{Id: s.Id}, nil
+	return &pb.Scene{Id: s.Id, Name: s.Name}, nil
 }
 
 func NewSceneFromProto(pbscene *pb.Scene) Scene {
-	return Scene{Id: fmt.Sprint(pbscene.Id)}
+	return Scene{Id: fmt.Sprint(pbscene.Id), Name: pbscene.Name}
 }
 
 type Scenes []*Scene

@@ -1,7 +1,8 @@
 const grpc = require('grpc');
 
-const organizations_pb = require('./protos/organizations_pb');
-const organizations_grpc_pb = require('./protos/organizations_grpc_pb');
+const organizations_pb = require('./protos/organizations/organizations_pb');
+const organizations_grpc_pb = require('./protos/organizations/organizations_grpc_pb');
+
 
 let SERVER = process.env.SERVER_HOST + ':' + process.env.SERVER_PORT;
 
@@ -24,12 +25,12 @@ let checkDatastore = () => {
     });
 };
 
-describe('Testing', () => {
+describe('Organizations', () => {
     beforeAll(() => {
         return checkDatastore();
     });
 
-    it('Create', () => {
+    test('Create', () => {
         let client = new organizations_grpc_pb.OrganizationsClient(SERVER, grpc.credentials.createInsecure());
 
         let createRequest = new organizations_pb.CreateOrganizationRequest();
@@ -46,7 +47,7 @@ describe('Testing', () => {
         });
     });
 
-    it('Get', () => {
+    test('Get', () => {
         let client = new organizations_grpc_pb.OrganizationsClient(SERVER, grpc.credentials.createInsecure());
 
         let createRequest = new organizations_pb.CreateOrganizationRequest();
@@ -74,7 +75,7 @@ describe('Testing', () => {
         })
     });
 
-    it('List', () => {
+    test('List', () => {
         let client = new organizations_grpc_pb.OrganizationsClient(SERVER, grpc.credentials.createInsecure());
 
         let listRequest = new organizations_pb.ListOrganizationsRequest();
@@ -88,7 +89,7 @@ describe('Testing', () => {
         });
     });
 
-    it('Update', () => {
+    test('Update', () => {
         let client = new organizations_grpc_pb.OrganizationsClient(SERVER, grpc.credentials.createInsecure());
 
         let createRequest = new organizations_pb.CreateOrganizationRequest();
@@ -120,7 +121,7 @@ describe('Testing', () => {
         });
     });
 
-    it('Delete', () => {
+    test('Delete', () => {
         let client = new organizations_grpc_pb.OrganizationsClient(SERVER, grpc.credentials.createInsecure());
 
         let createRequest = new organizations_pb.CreateOrganizationRequest();
