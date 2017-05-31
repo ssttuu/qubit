@@ -68,7 +68,9 @@ proto.operators.Operator.prototype.toObject = function(opt_includeInstance) {
 proto.operators.Operator.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    name: jspb.Message.getFieldWithDefault(msg, 2, "")
+    name: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    context: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    type: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -112,6 +114,14 @@ proto.operators.Operator.deserializeBinaryFromReader = function(msg, reader) {
     case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.setName(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setContext(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setType(value);
       break;
     default:
       reader.skipField();
@@ -165,6 +175,20 @@ proto.operators.Operator.prototype.serializeBinaryToWriter = function (writer) {
       f
     );
   }
+  f = this.getContext();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+  f = this.getType();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
 };
 
 
@@ -195,6 +219,36 @@ proto.operators.Operator.prototype.getName = function() {
 /** @param {string} value */
 proto.operators.Operator.prototype.setName = function(value) {
   jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional string context = 3;
+ * @return {string}
+ */
+proto.operators.Operator.prototype.getContext = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.operators.Operator.prototype.setContext = function(value) {
+  jspb.Message.setField(this, 3, value);
+};
+
+
+/**
+ * optional string type = 4;
+ * @return {string}
+ */
+proto.operators.Operator.prototype.getType = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.operators.Operator.prototype.setType = function(value) {
+  jspb.Message.setField(this, 4, value);
 };
 
 

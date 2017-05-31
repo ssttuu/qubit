@@ -17,18 +17,18 @@ const (
 type Operator struct {
 	Id      string `json:"id" datastore:"id"`
 	Name    string `json:"name" datastore:"name"`
-	Context string `json:"kind" datastore:"kind"`
+	Context string `json:"context" datastore:"context"`
 	Type    string `json:"type" datastore:"type"`
 	Inputs  []string `json:"inputs" datastore:"inputs"`
 	Outputs []string `json:"outputs" datastore:"outputs"`
 }
 
 func (o *Operator) ToProto() (*pb.Operator, error) {
-	return &pb.Operator{Id: o.Id, Name: o.Name}, nil
+	return &pb.Operator{Id: o.Id, Name: o.Name, Context: o.Context, Type: o.Type}, nil
 }
 
 func NewOperatorFromProto(pb_op *pb.Operator) Operator {
-	return Operator{Id: fmt.Sprint(pb_op.Id), Name: pb_op.Name}
+	return Operator{Id: fmt.Sprint(pb_op.Id), Name: pb_op.Name, Context: pb_op.Context, Type: pb_op.Type}
 }
 
 type Operators []*Operator

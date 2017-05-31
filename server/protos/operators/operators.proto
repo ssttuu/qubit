@@ -47,6 +47,8 @@ service Operators {
 message Operator {
     string id = 1;
     string name = 2;
+    string context = 3;
+    string type = 4;
 }
 
 message ListOperatorsRequest {

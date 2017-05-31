@@ -140,6 +140,7 @@ func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequ
 	// TODO: make gRPC request for the parameters?
 	var theParams params.Parameters = params.Parameters{}
 	bucket := s.env.StorageClient.Bucket(os.Getenv("STORAGE_BUCKET"))
+
 	// TODO: create bucket per Organization
 	// TODO: hash OrgId, SceneId, and OperatorId to get bucket path
 	//paramsObjectPath := fmt.Sprintf("organizations/%d/scenes/%d/operators/%d/params.json", in.OrganizationId, in.SceneId, in.OperatorId)

@@ -9,6 +9,8 @@ const scenes_grpc_pb = require('./protos/scenes/scenes_grpc_pb');
 const operators_pb = require('./protos/operators/operators_pb');
 const operators_grpc_pb = require('./protos/operators/operators_grpc_pb');
 
+const geometry_pb = require('./protos/geometry/geometry_pb');
+
 let SERVER = process.env.SERVER_HOST + ':' + process.env.SERVER_PORT;
 
 let checkDatastore = () => {
@@ -213,5 +215,48 @@ describe('Operators', () => {
                 })
             });
         })
+    });
+
+    test('Render', () => {
+        let client = new operators_grpc_pb.OperatorsClient(SERVER, grpc.credentials.createInsecure());
+
+        let createRequest = new operators_pb.CreateOperatorRequest();
+        createRequest.setOrganizationId(ORG_ID);
+        createRequest.setSceneId(SCENE_ID);
+
+        let operator = new operators_pb.Operator();
+        operator.setName("Test CheckerBoard");
+        operator.setContext("image");
+        operator.setType("CheckerBoard");
+        createRequest.setOperator(operator);
+
+        return new Promise((resolve, reject) => {
+            client.create(createRequest, (err, response) => {
+                expect(err).toEqual(null);
+                expect(response.getName()).toEqual("Test CheckerBoard");
+                resolve(response.getId())
+            })
+        }).then((operatorId) => {
+            let renderRequest = new operators_pb.RenderOperatorRequest();
+            renderRequest.setOrganizationId(ORG_ID);
+            renderRequest.setSceneId(SCENE_ID);
+            renderRequest.setOperatorId(operatorId);
+            renderRequest.setFrame(1);
+
+            let bbox = new geometry_pb.BoundingBox2D();
+            bbox.setStartX(0);
+            bbox.setStartY(0);
+            bbox.setEndX(200);
+            bbox.setEndY(100);
+            renderRequest.setBoundingBox(bbox);
+
+            return new Promise((resolve, reject) => {
+                client.render(renderRequest, (err, response) => {
+                    expect(err).toEqual(null);
+                    expect(response.getName()).toEqual("New Name");
+                    resolve()
+                })
+            });
+        });
     });
 });
