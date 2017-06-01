@@ -13,11 +13,11 @@ import (
 	"google.golang.org/grpc"
 	"github.com/golang/protobuf/ptypes/empty"
 	"fmt"
-	"github.com/stupschwartz/qubit/core/params"
 	"os"
 	"github.com/stupschwartz/qubit/core/image"
 	"github.com/golang/protobuf/proto"
 	"image/png"
+	"github.com/stupschwartz/qubit/core/parameter"
 )
 
 const OrganizationKind string = "Organization"
@@ -138,7 +138,7 @@ func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequ
 	}
 
 	// TODO: make gRPC request for the parameters?
-	var theParams params.Parameters = params.Parameters{}
+	var theParams parameter.Parameters = parameter.Parameters{}
 	bucket := s.env.StorageClient.Bucket(os.Getenv("STORAGE_BUCKET"))
 
 	// TODO: create bucket per Organization

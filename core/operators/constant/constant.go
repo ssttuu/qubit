@@ -2,7 +2,7 @@ package constant
 
 import (
 	"github.com/stupschwartz/qubit/core/image"
-	"github.com/stupschwartz/qubit/core/params"
+	"github.com/stupschwartz/qubit/core/parameter"
 	"github.com/stupschwartz/qubit/core/operator"
 )
 
@@ -10,12 +10,12 @@ const Name string = "Constant"
 
 type Constant struct {}
 
-func (c *Constant) Process(inputs []image.Plane, p params.Parameters, startX int32, startY int32, endX int32, endY int32) image.Plane {
-	colorParam := p.GetByName("Color")
+func (c *Constant) Process(inputs []image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) image.Plane {
+	colorParam := p.GetById("Color")
 
-	redValue := colorParam.GetComponentValueByLabel("Red")
-	greenValue := colorParam.GetComponentValueByLabel("Green")
-	blueValue := colorParam.GetComponentValueByLabel("Blue")
+	redValue := colorParam.GetValueById("Red")
+	greenValue := colorParam.GetValueById("Green")
+	blueValue := colorParam.GetValueById("Blue")
 
 	width := endX - startX
 	height := endY - startY
@@ -38,8 +38,8 @@ func (c *Constant) Process(inputs []image.Plane, p params.Parameters, startX int
 
 }
 
-var Params params.Parameters = params.Parameters{
-	params.NewColorParameter("Color"),
+var Params parameter.Parameters = parameter.Parameters{
+	parameter.NewColorParameter("Color"),
 }
 
 func init() {

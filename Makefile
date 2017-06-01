@@ -33,7 +33,12 @@ server-operators-protos:
 	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,Mgeometry/geometry.proto=github.com/stupschwartz/qubit/server/protos/geometry,plugins=grpc:./server/protos/ ./server/protos/operators/operators.proto
 	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --js_out=import_style=commonjs,binary:./tests/integration/protos/ --plugin=protoc-gen-grpc=/usr/lib/node_modules/grpc-tools/bin/grpc_node_plugin --grpc_out=./tests/integration/protos/ ./server/protos/operators/operators.proto
 
-server-protos: server-geometry-protos server-images-protos server-health-protos server-organizations-protos server-scenes-protos server-operators-protos
+server-parameters-protos:
+	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --include_imports --include_source_info ./server/protos/parameters/parameters.proto --descriptor_set_out ./server/protos/parameters/parameters.pb
+	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,Mgeometry/geometry.proto=github.com/stupschwartz/qubit/server/protos/geometry,plugins=grpc:./server/protos/ ./server/protos/parameters/parameters.proto
+	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --js_out=import_style=commonjs,binary:./tests/integration/protos/ --plugin=protoc-gen-grpc=/usr/lib/node_modules/grpc-tools/bin/grpc_node_plugin --grpc_out=./tests/integration/protos/ ./server/protos/parameters/parameters.proto
+
+server-protos: server-geometry-protos server-images-protos server-health-protos server-organizations-protos server-scenes-protos server-operators-protos server-parameters-protos
 	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/server/ -I ./server/protos/ --include_imports --include_source_info ./server/protos/server/server.proto --descriptor_set_out ./server/protos/server/server.pb
 
 protos: proto-deps compute-protos server-protos

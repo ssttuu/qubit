@@ -2,7 +2,7 @@ package checkerboard
 
 import (
 	"github.com/stupschwartz/qubit/core/image"
-	"github.com/stupschwartz/qubit/core/params"
+	"github.com/stupschwartz/qubit/core/parameter"
 	"github.com/stupschwartz/qubit/core/operator"
 )
 
@@ -12,9 +12,9 @@ type CheckerBoard struct {
 
 }
 
-func (c *CheckerBoard) Process(inputs []image.Plane, p params.Parameters, startX int32, startY int32, endX int32, endY int32) image.Plane {
-	sizeParam := p.GetByName("Size")
-	sizeValue := int32(sizeParam.GetValue(0))
+func (c *CheckerBoard) Process(inputs []image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) image.Plane {
+	sizeParam := p.GetById("Size")
+	sizeValue := int32(sizeParam.GetValueByIndex(0))
 
 	width := endX - startX
 	height := endY - startY
@@ -47,8 +47,8 @@ func (c *CheckerBoard) Process(inputs []image.Plane, p params.Parameters, startX
 	return image.NewPlane(width, height, []image.Channel{redChannel, greenChannel, blueChannel})
 }
 
-var Params params.Parameters = params.Parameters{
-	params.NewFloatParameter("Size"),
+var Params parameter.Parameters = parameter.Parameters{
+	parameter.NewFloatParameter("Size"),
 }
 
 func init() {

@@ -4,7 +4,7 @@ import (
 	pb "github.com/stupschwartz/qubit/server/protos/operators"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/stupschwartz/qubit/core/params"
+	"github.com/stupschwartz/qubit/core/parameter"
 	"github.com/stupschwartz/qubit/core/image"
 )
 
@@ -47,13 +47,13 @@ func (o *Operators) ToProto() ([]*pb.Operator, error) {
 }
 
 type Operable interface {
-	Process(inputs []image.Plane, p params.Parameters, startX int32, startY int32, endX int32, endY int32) image.Plane
+	Process(inputs []image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) image.Plane
 }
 
 var OperatorsRegistry = make(map[string]Operable)
-var ParametersRegistry = make(map[string]params.Parameters)
+var ParametersRegistry = make(map[string]parameter.Parameters)
 
-func RegisterOperation(opType string, operation Operable, parameters params.Parameters) {
+func RegisterOperation(opType string, operation Operable, parameters parameter.Parameters) {
 	OperatorsRegistry[opType] = operation
 	ParametersRegistry[opType] = parameters
 }
@@ -65,7 +65,7 @@ func GetOperation(opType string) (Operable, error) {
 	return nil, errors.Errorf("Operation does not exist, %v", opType)
 }
 
-func GetParameters(opType string) (params.Parameters, error) {
+func GetParameters(opType string) (parameter.Parameters, error) {
 	if parameters, ok := ParametersRegistry[opType]; ok {
 		return parameters, nil
 	}

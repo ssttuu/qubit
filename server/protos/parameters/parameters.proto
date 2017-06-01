@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package parameters;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+
+service Parameters {
+    rpc List (ListParametersRequest) returns (ListParametersResponse) {
+        option (google.api.http) = {
+            get: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters"
+        };
+    }
+    rpc Get (GetParameterRequest) returns (Parameter) {
+        option (google.api.http) = {
+            get: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
+        };
+    }
+    rpc Create (CreateParameterRequest) returns (Parameter) {
+        option (google.api.http) = {
+            post: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters"
+            body: "parameter"
+        };
+    }
+    rpc Update (UpdateParameterRequest) returns (Parameter) {
+        option (google.api.http) = {
+            put: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
+            body: "parameter"
+        };
+    }
+    rpc Delete (DeleteParameterRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
+        };
+    }
+}
+
+message Component {
+    string id = 1;
+    // TODO: use oneof
+    double value = 2;
+}
+
+message Parameter {
+    string id = 1;
+    map<string, string> labels = 2;
+    repeated Component components = 3;
+}
+
+message ListParametersRequest {
+    string organization_id = 1;
+    string scene_id = 2;
+    string operator_id = 3;
+    int32 page_size = 4;
+    string page_token = 5;
+}
+
+message ListParametersResponse {
+    repeated Parameter parameters = 1;
+    string next_page_token = 2;
+}
+
+message GetParameterRequest {
+    string organization_id = 1;
+    string scene_id = 2;
+    string operator_id = 3;
+    string parameter_id = 4;
+}
+
+message CreateParameterRequest {
+    string organization_id = 1;
+    string scene_id = 2;
+    string operator_id = 3;
+    Parameter parameter = 4;
+}
+
+message UpdateParameterRequest {
+    string organization_id = 1;
+    string scene_id = 2;
+    string operator_id = 3;
+    string parameter_id = 4;
+    Parameter parameter = 5;
+}
+
+message DeleteParameterRequest {
+    string organization_id = 1;
+    string scene_id = 2;
+    string operator_id = 3;
+    string parameter_id = 4;
+}

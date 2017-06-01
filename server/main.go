@@ -20,12 +20,13 @@ import (
 	"github.com/stupschwartz/qubit/server/api/organizations"
 	"github.com/stupschwartz/qubit/server/api/scenes"
 	"github.com/stupschwartz/qubit/server/api/operators"
+	"github.com/stupschwartz/qubit/server/api/parameters"
 	"net"
 )
 
 type Credentials struct {
-    Cid string `json:"cid"`
-    Csecret string `json:"csecret"`
+	Cid     string `json:"cid"`
+	Csecret string `json:"csecret"`
 }
 
 func init() {
@@ -88,6 +89,7 @@ func main() {
 	organizations.Register(grpcServer, environ)
 	scenes.Register(grpcServer, environ)
 	operators.Register(grpcServer, environ)
+	parameters.Register(grpcServer, environ)
 
 	grpcServer.Serve(lis)
 }
