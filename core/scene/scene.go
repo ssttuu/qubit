@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const Kind string = "String"
+const Kind string = "Scene"
 
 type Scene struct {
 	Id   string `json:"id" datastore:"id"`

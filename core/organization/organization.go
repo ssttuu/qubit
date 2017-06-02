@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const Kind string = "Operator"
+const Kind string = "Organization"
 
 type Organization struct {
 	Id   string `json:"id" datastore:"id"`
