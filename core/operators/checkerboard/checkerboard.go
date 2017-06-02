@@ -12,7 +12,7 @@ type CheckerBoard struct {
 
 }
 
-func (c *CheckerBoard) Process(inputs []image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) image.Plane {
+func (c *CheckerBoard) Process(inputs []*image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) (*image.Plane, error) {
 	sizeParam := p.GetById("Size")
 	sizeValue := int32(sizeParam.GetValueByIndex(0))
 
@@ -44,7 +44,7 @@ func (c *CheckerBoard) Process(inputs []image.Plane, p parameter.Parameters, sta
 		blueChannel.Rows[row] = &image.Row{Data: rowData}
 	}
 
-	return image.NewPlane(width, height, []image.Channel{redChannel, greenChannel, blueChannel})
+	return image.NewPlane(width, height, []image.Channel{redChannel, greenChannel, blueChannel}), nil
 }
 
 var Params parameter.Parameters = parameter.Parameters{

@@ -10,7 +10,7 @@ const Name string = "Constant"
 
 type Constant struct {}
 
-func (c *Constant) Process(inputs []image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) image.Plane {
+func (c *Constant) Process(inputs []*image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) (*image.Plane, error) {
 	colorParam := p.GetById("Color")
 
 	redValue := colorParam.GetValueById("Red")
@@ -34,7 +34,7 @@ func (c *Constant) Process(inputs []image.Plane, p parameter.Parameters, startX 
 		}
 	}
 
-	return image.NewPlane(width, height, []image.Channel{redComponent, greenComponent, blueComponent})
+	return image.NewPlane(width, height, []image.Channel{redComponent, greenComponent, blueComponent}), nil
 
 }
 

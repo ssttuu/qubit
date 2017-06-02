@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"image/png"
 	"math/rand"
 	"time"
 
@@ -15,6 +16,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/api/option"
+	"github.com/golang/protobuf/proto"
+	"cloud.google.com/go/storage"
 
 	"github.com/stupschwartz/qubit/core/image"
 	"github.com/stupschwartz/qubit/core/operator"
@@ -37,6 +40,7 @@ func init() {
 // Server implements `service Health`.
 type Server struct {
 	DatastoreClient *datastore.Client
+	StorageClient *storage.Client
 	ParametersClient parameters_pb.ParametersClient
 }
 
@@ -161,36 +165,37 @@ func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequ
 		return nil, errors.Wrapf(err, "Failed to get Operation for rendering, %v", theOperator.Type)
 	}
 
-	op.Process([]image.Plane{}, params, in.BoundingBox.StartX, in.BoundingBox.StartY, in.BoundingBox.EndX, in.BoundingBox.EndY)
+	imagePlane, err := op.Process([]*image.Plane{}, params, in.BoundingBox.StartX, in.BoundingBox.StartY, in.BoundingBox.EndX, in.BoundingBox.EndY)
 	//
 	//// TODO: create bucket per Organization
 	//// TODO: hash OrgId, SceneId, and OperatorId to get bucket path
-	//imageProtoObjectPath := fmt.Sprintf("organizations/%d/scenes/%d/operators/%d/images/%d/image.bytes", in.OrganizationId, in.SceneId, in.OperatorId, in.Frame)
+	imageProtoObjectPath := fmt.Sprintf("organizations/%d/scenes/%d/operators/%d/images/%d/image.bytes", in.OrganizationId, in.SceneId, in.OperatorId, in.Frame)
 	imagePngObjectPath := fmt.Sprintf("organizations/%d/scenes/%d/operators/%d/images/%d/image.png", in.OrganizationId, in.SceneId, in.OperatorId, in.Frame)
-	//
-	//imageProtoObject := bucket.Object(imageProtoObjectPath)
-	//
-	//// PROTO
-	//protoWriter := imageProtoObject.NewWriter(ctx)
-	//protoWriter.ContentType = "application/octet-stream"
-	//
-	//image_bytes, err := proto.Marshal(imagePlane.ToProto())
-	//if err != nil {
-	//	return nil, errors.Wrapf(err, "Failed to marshal imagePlane proto, %v", imagePlane)
-	//}
-	//
-	//protoWriter.Write(image_bytes)
-	//protoWriter.Close()
-	//
-	//// PNG
-	//pngWriter := imageProtoObject.NewWriter(ctx)
-	//pngWriter.ContentType = "image/png"
-	//
-	//if err := png.Encode(pngWriter, imagePlane.ToNRGBA()); err != nil {
-	//	return nil, errors.Wrap(err, "Failed to encode png")
-	//}
-	//
-	//pngWriter.Close()
+
+	bucket := s.StorageClient.Bucket("qubit-dev-161916")
+	imageProtoObject := bucket.Object(imageProtoObjectPath)
+
+	// PROTO
+	protoWriter := imageProtoObject.NewWriter(ctx)
+	protoWriter.ContentType = "application/octet-stream"
+
+	image_bytes, err := proto.Marshal(imagePlane.ToProto())
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to marshal imagePlane proto, %v", imagePlane)
+	}
+
+	protoWriter.Write(image_bytes)
+	protoWriter.Close()
+
+	// PNG
+	pngWriter := imageProtoObject.NewWriter(ctx)
+	pngWriter.ContentType = "image/png"
+
+	if err := png.Encode(pngWriter, imagePlane.ToNRGBA()); err != nil {
+		return nil, errors.Wrap(err, "Failed to encode png")
+	}
+
+	pngWriter.Close()
 
 	return &operators_pb.RenderOperatorResponse{ResultUrl:imagePngObjectPath, ResultType: operator.IMAGE }, nil
 }
@@ -211,6 +216,13 @@ func main() {
 		log.Printf("Could not create datastore client: %v\n", err)
 		time.Sleep(100 * time.Millisecond)
 		datastoreClient, err = datastore.NewClient(ctx, projID, serviceCredentials)
+	}
+
+	storageClient, err := storage.NewClient(ctx, serviceCredentials)
+	for err != nil {
+		log.Printf("Could not create storage client: %v\n", err)
+		time.Sleep(100 * time.Millisecond)
+		storageClient, err = storage.NewClient(ctx, serviceCredentials)
 	}
 
 	conn, err := grpc.Dial("parameters:9000", grpc.WithInsecure())
@@ -238,6 +250,7 @@ func main() {
 
 	operators_pb.RegisterOperatorsServer(grpcServer, &Server{
 		DatastoreClient: datastoreClient,
+		StorageClient: storageClient,
 		ParametersClient: parametersClient,
 	})
 

@@ -49,7 +49,7 @@ func (o *Operators) ToProto() ([]*pb.Operator, error) {
 }
 
 type Operable interface {
-	Process(inputs []image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) image.Plane
+	Process(inputs []*image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) (*image.Plane, error)
 }
 
 var OperatorsRegistry = make(map[string]Operable)

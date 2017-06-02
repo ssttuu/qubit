@@ -2,6 +2,39 @@ syntax = "proto3";
 
 package images;
 
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service Images {
+    rpc List (ListImagesRequest) returns (ListImagesResponse) {
+        option (google.api.http) = {
+            get: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/images"
+        };
+    }
+    rpc Get (GetImageRequest) returns (Frame) {
+        option (google.api.http) = {
+            get: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/images/{image_id}"
+        };
+    }
+    rpc Create (CreateImageRequest) returns (Frame) {
+        option (google.api.http) = {
+            post: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/images"
+            body: "image"
+        };
+    }
+    rpc Update (UpdateImageRequest) returns (Frame) {
+        option (google.api.http) = {
+            put: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/images/{image_id}"
+            body: "image"
+        };
+    }
+    rpc Delete (DeleteImageRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/images/{image_id}"
+        };
+    }
+}
+
 message Frame {
     string name = 1;
     int32 width = 2;
@@ -24,5 +57,49 @@ message Channel {
 }
 
 message Row {
-    repeated double data = 1 [packed=true];
+    repeated double data = 1 [packed = true];
+}
+
+
+message ListImagesRequest {
+    string organization_id = 1;
+    string scene_id = 2;
+    string operator_id = 3;
+    int32 page_size = 4;
+    string page_token = 5;
+}
+
+message ListImagesResponse {
+    repeated Frame images = 1;
+    string next_page_token = 2;
+}
+
+message GetImageRequest {
+    string organization_id = 1;
+    string scene_id = 2;
+    string operator_id = 3;
+    string image_id = 4;
+}
+
+message CreateImageRequest {
+    string organization_id = 1;
+    string scene_id = 2;
+    string operator_id = 3;
+    string image_id = 4;
+    Frame image = 5;
+}
+
+message UpdateImageRequest {
+    string organization_id = 1;
+    string scene_id = 2;
+    string operator_id = 3;
+    string image_id = 4;
+    Frame image = 5;
+}
+
+message DeleteImageRequest {
+    string organization_id = 1;
+    string scene_id = 2;
+    string operator_id = 3;
+    string image_id = 4;
 }

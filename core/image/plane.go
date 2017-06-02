@@ -21,11 +21,11 @@ func (p *Plane) Merge(otherPlane *Plane, startX int32, startY int32) {
 	}
 }
 
-func NewPlane(width int32, height int32, channels []Channel) Plane {
-	return Plane{Width:width, Height:height, Channels: channels}
+func NewPlane(width int32, height int32, channels []Channel) *Plane {
+	return &Plane{Width:width, Height:height, Channels: channels}
 }
 
-func NewRGBZeroPlane(width int32, height int32) Plane {
+func NewRGBZeroPlane(width int32, height int32) *Plane {
 	channels := []Channel{}
 	for i := 0; i < 3; i++ {
 		c := Channel{}
@@ -36,8 +36,8 @@ func NewRGBZeroPlane(width int32, height int32) Plane {
 	return NewPlane(width, height, channels)
 }
 
-func NewPlaneFromProto(pb_plane *pb.Plane) Plane {
-	return Plane{Labels: pb_plane.GetLabels(), Channels: NewChannelsFromProtos(pb_plane.GetChannels())}
+func NewPlaneFromProto(pb_plane *pb.Plane) *Plane {
+	return &Plane{Labels: pb_plane.GetLabels(), Channels: NewChannelsFromProtos(pb_plane.GetChannels())}
 }
 
 func (p *Plane) ToNRGBA() *image.NRGBA {
