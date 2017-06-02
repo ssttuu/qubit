@@ -1,10 +1,12 @@
 package scene
 
 import (
-	pb "github.com/stupschwartz/qubit/server/protos/scenes"
+	pb "github.com/stupschwartz/qubit/proto-gen/go/scenes"
 	"fmt"
 	"github.com/pkg/errors"
 )
+
+const Kind string = "String"
 
 type Scene struct {
 	Id   string `json:"id" datastore:"id"`

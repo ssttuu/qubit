@@ -1,10 +1,12 @@
 package organization
 
 import (
-	pb "github.com/stupschwartz/qubit/server/protos/organizations"
+	pb "github.com/stupschwartz/qubit/proto-gen/go/organizations"
 	"fmt"
 	"github.com/pkg/errors"
 )
+
+const Kind string = "Operator"
 
 type Organization struct {
 	Id   string `json:"id" datastore:"id"`

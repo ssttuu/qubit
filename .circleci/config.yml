@@ -50,95 +50,130 @@ jobs:
                 name: Authenticate GCloud
                 command: scripts/auth-gcloud.sh
 
-            # BUILD COMPUTE
-#            - run:
-#                name: Compute - Start Go Build
-#                command: |
-#                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/compute --name go-compute-build-volumes alpine:3.4 /bin/true
-#
-#            - run:
-#                name: Compute - Copy Source to Container
-#                command: |
-#                    docker cp ./ go-compute-build-volumes:/go/src/github.com/stupschwartz/qubit
-#
-#            - run:
-#                name: Compute - Build Go Code
-#                command: |
-#                    docker run --volumes-from go-compute-build-volumes -w /go/src/github.com/stupschwartz/qubit/compute golang:1.8 bash -c "go get ./...; go build"
-#
-#            - run:
-#                name: Compute - Copy Back Artifacts
-#                command: |
-#                    docker cp go-compute-build-volumes:/go/src/github.com/stupschwartz/qubit/compute/compute `pwd`/compute/compute
-#
-#            - run:
-#                name: Compute - Build Container
-#                command: |
-#                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1} ./compute/
-#
-#            - run:
-#                name: Compute - Push Container
-#                command: |
-#                    gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-compute:${CIRCLE_SHA1}
-
-            # BUILD SERVER
+            # Build Organizations
             - run:
-                name: Server - Start Go Build
+                name: Organizations - Start Go Build
                 command: |
-                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/server --name go-server-build-volumes alpine:3.4 /bin/true
+                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/services/organizations --name go-organizations-build-volumes alpine:3.4 /bin/true
 
             - run:
-                name: Server - Copy Source to Container
+                name: Organizations - Copy Source to Container
                 command: |
-                    docker cp ./ go-server-build-volumes:/go/src/github.com/stupschwartz/qubit
+                    docker cp ./ go-organizations-build-volumes:/go/src/github.com/stupschwartz/qubit
 
             - run:
-                name: Server - Build Go Code
+                name: Organizations - Build Go Code
                 command: |
-                    docker run --volumes-from go-server-build-volumes -w /go/src/github.com/stupschwartz/qubit/server golang:1.8 bash -c "go get ./...; go build"
+                    docker run --volumes-from go-organizations-build-volumes -w /go/src/github.com/stupschwartz/qubit/services/organizations golang:1.8 bash -c "go get ./...; go build -o run"
 
             - run:
-                name: Server - Copy Back Artifacts
+                name: Organizations - Copy Back Artifacts
                 command: |
-                    docker cp go-server-build-volumes:/go/src/github.com/stupschwartz/qubit/server/server `pwd`/server/server
+                    docker cp go-organizations-build-volumes:/go/src/github.com/stupschwartz/qubit/services/organizations/run `pwd`/services/organizations/run
 
             - run:
-                name: Server - Build Container
+                name: Organizations - Build Container
                 command: |
-                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1} ./server/
+                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/organizations:${CIRCLE_SHA1} ./services/organizations
 
             - run:
-                name: Server - Push Container
+                name: Organizations - Push Container
                 command: |
-                    gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/qubit-server:${CIRCLE_SHA1}
+                    gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/organizations:${CIRCLE_SHA1}
 
-            # TRIGGER NEXT STEP
+
+            # Build Scenes
             - run:
-                name: Trigger Containers Testing
+                name: Scenes - Start Go Build
                 command: |
-                    curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=test_integration --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
-
-    test_integration:
-        docker:
-            - image: tmaier/docker-compose
-
-        working_directory: /workspace
-
-        steps:
-            - checkout
-            - setup_remote_docker
+                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/services/scenes --name go-scenes-build-volumes alpine:3.4 /bin/true
 
             - run:
-                name: Run Tests
+                name: Scenes - Copy Source to Container
                 command: |
-                    sh run-tests.integration.sh
+                    docker cp ./ go-scenes-build-volumes:/go/src/github.com/stupschwartz/qubit
 
-            - store_artifacts:
-                path: ./tests/integrations/test-results/
-                destination: raw-test-output
+            - run:
+                name: Scenes - Build Go Code
+                command: |
+                    docker run --volumes-from go-scenes-build-volumes -w /go/src/github.com/stupschwartz/qubit/services/scenes golang:1.8 bash -c "go get ./...; go build -o run"
 
-            - store_test_results:
-                path: ./tests/integrations/test-results/
+            - run:
+                name: Scenes - Copy Back Artifacts
+                command: |
+                    docker cp go-scenes-build-volumes:/go/src/github.com/stupschwartz/qubit/services/scenes/run `pwd`/services/scenes/run
+
+            - run:
+                name: Scenes - Build Container
+                command: |
+                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/scenes:${CIRCLE_SHA1} ./services/scenes
+
+            - run:
+                name: Scenes - Push Container
+                command: |
+                    gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/scenes:${CIRCLE_SHA1}
+
+            # Build Operators
+            - run:
+                name: Operators - Start Go Build
+                command: |
+                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/services/operators --name go-operators-build-volumes alpine:3.4 /bin/true
+
+            - run:
+                name: Operators - Copy Source to Container
+                command: |
+                    docker cp ./ go-operators-build-volumes:/go/src/github.com/stupschwartz/qubit
+
+            - run:
+                name: Operators - Build Go Code
+                command: |
+                    docker run --volumes-from go-operators-build-volumes -w /go/src/github.com/stupschwartz/qubit/services/operators golang:1.8 bash -c "go get ./...; go build -o run"
+
+            - run:
+                name: Operators - Copy Back Artifacts
+                command: |
+                    docker cp go-operators-build-volumes:/go/src/github.com/stupschwartz/qubit/services/operators/run `pwd`/services/operators/run
+
+            - run:
+                name: Operators - Build Container
+                command: |
+                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/operators:${CIRCLE_SHA1} ./services/operators
+
+            - run:
+                name: Operators - Push Container
+                command: |
+                    gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/operators:${CIRCLE_SHA1}
+
+            # Build Parameters
+            - run:
+                name: Parameters - Start Go Build
+                command: |
+                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/services/parameters --name go-parameters-build-volumes alpine:3.4 /bin/true
+
+            - run:
+                name: Parameters - Copy Source to Container
+                command: |
+                    docker cp ./ go-parameters-build-volumes:/go/src/github.com/stupschwartz/qubit
+
+            - run:
+                name: Parameters - Build Go Code
+                command: |
+                    docker run --volumes-from go-parameters-build-volumes -w /go/src/github.com/stupschwartz/qubit/services/parameters golang:1.8 bash -c "go get ./...; go build -o run"
+
+            - run:
+                name: Parameters - Copy Back Artifacts
+                command: |
+                    docker cp go-parameters-build-volumes:/go/src/github.com/stupschwartz/qubit/services/parameters/run `pwd`/services/parameters/run
+
+            - run:
+                name: Parameters - Build Container
+                command: |
+                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/parameters:${CIRCLE_SHA1} ./services/parameters
+
+            - run:
+                name: Parameters - Push Container
+                command: |
+                    gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/parameters:${CIRCLE_SHA1}
 
             # TRIGGER NEXT STEP
             - run:

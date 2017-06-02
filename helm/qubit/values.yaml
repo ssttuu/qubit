@@ -38,24 +38,51 @@ GoogleProjectId: qubit-161916
 Githash:
 DatastoreDataset: qubit
 
-Compute:
-    ApiName: compute.endpoints.qubit-161916.cloud.goog
+
+Organizations:
+    ApiName: organizations.endpoints.qubit-161916.cloud.goog
     ApiId:
-    AppName: compute
+    AppName: organizations
+    ImageName: us.gcr.io/qubit-161916/organizations
     StorageBucket: qubit-dev-161916
-    ExternalHttpPort: 9000
+    InternalPort: 9000
+    ExternalHttpPort: 9005
     ExternalHttp2Port: 9010
-    InternalPort: 8000
     Replicas: 1
     MaxSurge: 2
 
-Server:
-    ApiName: server.endpoints.qubit-161916.cloud.goog
+Scenes:
+    ApiName: scenes.endpoints.qubit-161916.cloud.goog
     ApiId:
-    AppName: server
+    AppName: scenes
+    ImageName: us.gcr.io/qubit-161916/scenes
     StorageBucket: qubit-dev-161916
-    ExternalHttpPort: 9000
+    InternalPort: 9000
+    ExternalHttpPort: 9005
     ExternalHttp2Port: 9010
-    InternalPort: 8001
+    Replicas: 1
+    MaxSurge: 2
+
+Operators:
+    ApiName: operators.endpoints.qubit-161916.cloud.goog
+    ApiId:
+    AppName: operators
+    ImageName: us.gcr.io/qubit-161916/operators
+    StorageBucket: qubit-dev-161916
+    InternalPort: 9000
+    ExternalHttpPort: 9005
+    ExternalHttp2Port: 9010
+    Replicas: 1
+    MaxSurge: 2
+
+Parameters:
+    ApiName: parameters.endpoints.qubit-161916.cloud.goog
+    ApiId:
+    AppName: parameters
+    ImageName: us.gcr.io/qubit-161916/parameters
+    StorageBucket: qubit-dev-161916
+    InternalPort: 9000
+    ExternalHttpPort: 9005
+    ExternalHttp2Port: 9010
     Replicas: 1
     MaxSurge: 2

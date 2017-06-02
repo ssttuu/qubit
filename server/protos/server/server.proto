@@ -1,6 +1,0 @@
-syntax = "proto3";
-
-import public "health/health.proto";
-import public "organizations/organizations.proto";
-import public "scenes/scenes.proto";
-import public "operators/operators.proto";

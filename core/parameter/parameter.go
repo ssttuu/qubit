@@ -1,10 +1,10 @@
 package parameter
 
 import (
-	pb "github.com/stupschwartz/qubit/server/protos/parameters"
+	pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
 )
 
-
+const Kind string = "Parameter"
 
 type Parameter struct {
 	Id       string `json:"id"`
@@ -89,6 +89,13 @@ func (p *Parameters) ToProto() []*pb.Parameter {
 	for _, param := range *p {
 		pb_params = append(pb_params, param.ToProto())
 	}
-
 	return pb_params
+}
+
+func NewParametersFromProto(pb_params []*pb.Parameter) Parameters {
+	var params Parameters
+	for _, pb_param := range pb_params {
+		params = append(params, NewParameterFromProto(pb_param))
+	}
+	return params
 }

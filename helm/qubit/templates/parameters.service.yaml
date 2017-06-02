@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.Parameters.AppName }}
+  labels:
+    chart: '{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}'
+    version: {{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    revision: {{ .Release.Revision | quote }}
+    githash: {{ .Values.Githash }}
+spec:
+  ports:
+  # Port that accepts gRPC and JSON/HTTP2 requests over HTTP.
+  - port: {{ .Values.Parameters.ExternalHttp2Port }}
+    targetPort: {{ .Values.Parameters.ExternalHttp2Port }}
+    protocol: TCP
+    name: http2
+  - port: {{ .Values.Parameters.ExternalHttpPort }}
+    targetPort: {{ .Values.Parameters.ExternalHttpPort }}
+    protocol: TCP
+    name: http
+  selector:
+    app: {{ .Values.Parameters.AppName }}
+  type: LoadBalancer

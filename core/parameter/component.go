@@ -1,6 +1,6 @@
 package parameter
 
-import pb "github.com/stupschwartz/qubit/server/protos/parameters"
+import pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
 
 type Component struct {
 	Id    string `json:"id"`

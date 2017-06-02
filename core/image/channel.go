@@ -1,7 +1,7 @@
 package image
 
 import (
-	pb "github.com/stupschwartz/qubit/server/protos/images"
+	pb "github.com/stupschwartz/qubit/proto-gen/go/images"
 )
 
 type Channel struct {

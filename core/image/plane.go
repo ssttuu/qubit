@@ -1,9 +1,10 @@
 package image
 
 import (
-	pb "github.com/stupschwartz/qubit/server/protos/images"
 	"image"
 	"image/color"
+
+	pb "github.com/stupschwartz/qubit/proto-gen/go/images"
 )
 
 type Plane struct {

@@ -1,61 +1,20 @@
-proto-deps:
-	docker run --rm -v ${PWD}:/workspace --entrypoint bash stupschwartz/protoman -c 'protoc -I/protobuf -I/googleapis -I/googleapis/google/api/ --js_out=import_style=commonjs,binary:./tests/integration/protos/ /googleapis/google/api/*.proto'
+proto:
+	bash ./gen-proto.sh
 
-compute-protos:
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./compute/protos/compute/ -I ./server/protos/ --include_imports --include_source_info ./compute/protos/compute/compute.proto --descriptor_set_out ./compute/protos/compute/compute.pb
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./compute/protos/compute/ -I ./server/protos/ --go_out=plugins=grpc:./compute/protos/compute/ ./compute/protos/compute/compute.proto
+build-organizations-go:
+	cd services/organizations && go get ./... && go build -o run && cd ../..
 
-server-geometry-protos:
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --include_imports --include_source_info ./server/protos/geometry/geometry.proto --descriptor_set_out ./server/protos/geometry/geometry.pb
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,plugins=grpc:./server/protos/ ./server/protos/geometry/geometry.proto
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --js_out=import_style=commonjs,binary:./tests/integration/protos/ --plugin=protoc-gen-grpc=/usr/lib/node_modules/grpc-tools/bin/grpc_node_plugin --grpc_out=./tests/integration/protos/ ./server/protos/geometry/geometry.proto
+build-scenes-go:
+	cd services/scenes && go get ./... && go build -o run && cd ../..
 
-server-images-protos:
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --include_imports --include_source_info ./server/protos/images/images.proto --descriptor_set_out ./server/protos/images/images.pb
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,Mgeometry/geometry.proto=github.com/stupschwartz/qubit/server/protos/geometry,plugins=grpc:./server/protos/ ./server/protos/images/images.proto
+build-operators-go:
+	cd services/operators && go get ./... && go build -o run && cd ../..
 
-server-health-protos:
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --include_imports --include_source_info ./server/protos/health/health.proto --descriptor_set_out ./server/protos/health/health.pb
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,plugins=grpc:./server/protos/ ./server/protos/health/health.proto
+build-parameters-go:
+	cd services/parameters && go get ./... && go build -o run && cd ../..
 
-server-organizations-protos:
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --include_imports --include_source_info ./server/protos/organizations/organizations.proto --descriptor_set_out ./server/protos/organizations/organizations.pb
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,plugins=grpc:./server/protos/ ./server/protos/organizations/organizations.proto
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --js_out=import_style=commonjs,binary:./tests/integration/protos/ --plugin=protoc-gen-grpc=/usr/lib/node_modules/grpc-tools/bin/grpc_node_plugin --grpc_out=./tests/integration/protos/ ./server/protos/organizations/organizations.proto
+build-go: build-organizations-go build-scenes-go build-operators-go build-parameters-go
 
-server-scenes-protos:
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --include_imports --include_source_info ./server/protos/scenes/scenes.proto --descriptor_set_out ./server/protos/scenes/scenes.pb
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,plugins=grpc:./server/protos/ ./server/protos/scenes/scenes.proto
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --js_out=import_style=commonjs,binary:./tests/integration/protos/ --plugin=protoc-gen-grpc=/usr/lib/node_modules/grpc-tools/bin/grpc_node_plugin --grpc_out=./tests/integration/protos/ ./server/protos/scenes/scenes.proto
-
-server-operators-protos:
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --include_imports --include_source_info ./server/protos/operators/operators.proto --descriptor_set_out ./server/protos/operators/operators.pb
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,Mgeometry/geometry.proto=github.com/stupschwartz/qubit/server/protos/geometry,plugins=grpc:./server/protos/ ./server/protos/operators/operators.proto
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --js_out=import_style=commonjs,binary:./tests/integration/protos/ --plugin=protoc-gen-grpc=/usr/lib/node_modules/grpc-tools/bin/grpc_node_plugin --grpc_out=./tests/integration/protos/ ./server/protos/operators/operators.proto
-
-server-parameters-protos:
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --include_imports --include_source_info ./server/protos/parameters/parameters.proto --descriptor_set_out ./server/protos/parameters/parameters.pb
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,Mgeometry/geometry.proto=github.com/stupschwartz/qubit/server/protos/geometry,plugins=grpc:./server/protos/ ./server/protos/parameters/parameters.proto
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/ --js_out=import_style=commonjs,binary:./tests/integration/protos/ --plugin=protoc-gen-grpc=/usr/lib/node_modules/grpc-tools/bin/grpc_node_plugin --grpc_out=./tests/integration/protos/ ./server/protos/parameters/parameters.proto
-
-server-protos: server-geometry-protos server-images-protos server-health-protos server-organizations-protos server-scenes-protos server-operators-protos server-parameters-protos
-	docker run --rm -v ${PWD}:/workspace stupschwartz/protoman -I ./server/protos/server/ -I ./server/protos/ --include_imports --include_source_info ./server/protos/server/server.proto --descriptor_set_out ./server/protos/server/server.pb
-
-protos: proto-deps compute-protos server-protos
-
-
-build-compute-go:
-	cd compute && go get ./... && go build && cd ..
-
-build-server-go:
-	cd server && go get ./... && go build && cd ..
-
-build-go: build-compute-go build-server-go
-
-
-docker-build-go:
-	docker run -it -v `pwd`:/go/src/github.com/stupschwartz/qubit -w /go/src/github.com/stupschwartz/qubit/compute golang:1.8 bash -c "go get ./...; go build; chmod 777 ./compute"
-	docker run -it -v `pwd`:/go/src/github.com/stupschwartz/qubit -w /go/src/github.com/stupschwartz/qubit/server golang:1.8 bash -c "go get ./...; go build; chmod 777 ./server"
 
 vendor:
 	cd server && govendor update +external && govendor update +vendor && cd ..

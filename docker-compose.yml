@@ -1,8 +1,8 @@
 version: '2'
 services:
-  server:
-    image: us.gcr.io/qubit-161916/qubit-server
-    build: ./server
+  organizations:
+    image: us.gcr.io/qubit-161916/organizations
+    build: ./services/organizations
     environment:
       - GOOGLE_PROJECT_ID=qubit-161916
       - DATASTORE_PROJECT_ID=qubit-161916
@@ -11,14 +11,62 @@ services:
       - DATASTORE_HOST=datastore:8380
       - STORAGE_BUCKET=qubit-dev-161916
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
-      - PORT=8001
-    ports:
-      - 8002:8001
+      - PORT=9000
     volumes:
       - ./credentials:/opt/etc/credentials
     depends_on:
       - datastore
-      - pubsub
+
+  scenes:
+    image: us.gcr.io/qubit-161916/scenes
+    build: ./services/scenes
+    environment:
+      - GOOGLE_PROJECT_ID=qubit-161916
+      - DATASTORE_PROJECT_ID=qubit-161916
+      - DATASTORE_DATASET=qubit
+      - DATASTORE_EMULATOR_HOST=datastore:8380
+      - DATASTORE_HOST=datastore:8380
+      - STORAGE_BUCKET=qubit-dev-161916
+      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
+      - PORT=9000
+    volumes:
+      - ./credentials:/opt/etc/credentials
+    depends_on:
+      - datastore
+
+  operators:
+    image: us.gcr.io/qubit-161916/operators
+    build: ./services/operators
+    environment:
+      - GOOGLE_PROJECT_ID=qubit-161916
+      - DATASTORE_PROJECT_ID=qubit-161916
+      - DATASTORE_DATASET=qubit
+      - DATASTORE_EMULATOR_HOST=datastore:8380
+      - DATASTORE_HOST=datastore:8380
+      - STORAGE_BUCKET=qubit-dev-161916
+      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
+      - PORT=9000
+    volumes:
+      - ./credentials:/opt/etc/credentials
+    depends_on:
+      - datastore
+
+  parameters:
+    image: us.gcr.io/qubit-161916/parameters
+    build: ./services/parameters
+    environment:
+      - GOOGLE_PROJECT_ID=qubit-161916
+      - DATASTORE_PROJECT_ID=qubit-161916
+      - DATASTORE_DATASET=qubit
+      - DATASTORE_EMULATOR_HOST=datastore:8380
+      - DATASTORE_HOST=datastore:8380
+      - STORAGE_BUCKET=qubit-dev-161916
+      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
+      - PORT=9000
+    volumes:
+      - ./credentials:/opt/etc/credentials
+    depends_on:
+      - datastore
 
   datastore:
     image: google/cloud-sdk
@@ -27,11 +75,3 @@ services:
     command: gcloud beta emulators datastore start --no-legacy --host-port 0.0.0.0:8380
     ports:
       - 8380:8380
-
-  pubsub:
-    image: google/cloud-sdk
-    environment:
-      - CLOUDSDK_CORE_PROJECT=compositor
-    command: gcloud beta emulators pubsub start --host-port 0.0.0.0:8538
-    ports:
-      - 8538:8538

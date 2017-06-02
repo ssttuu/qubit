@@ -1,13 +1,15 @@
 package operator
 
 import (
-	pb "github.com/stupschwartz/qubit/server/protos/operators"
+	pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/stupschwartz/qubit/core/parameter"
 	"github.com/stupschwartz/qubit/core/image"
 )
 
+
+const Kind string = "Operator"
 
 const (
 	IMAGE string = "image"

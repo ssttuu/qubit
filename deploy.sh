@@ -9,16 +9,23 @@ set -eo pipefail
 #compute_service_id=$(echo ${compute_service_response} | jq -r '.serviceConfig.id')
 #compute_service_name=$(echo ${compute_service_response} | jq -r '.serviceConfig.name')
 
-echo "Deploying Server to Google Endpoints"
-server_service_response=$(gcloud service-management deploy server/api_config.yaml server/protos/server/server.pb --format json)
+deployService() {
+    echo $(gcloud service-management deploy services/${1}/api_config.yaml proto-gen/services/${1}.pb --format json) | jq -r '.serviceConfig.id'
+}
 
-server_service_id=$(echo ${server_service_response} | jq -r '.serviceConfig.id')
-server_service_name=$(echo ${server_service_response} | jq -r '.serviceConfig.name')
+organizations_id=$(deployService "organizations")
+scenes_id=$(deployService "scenes")
+operators_id=$(deployService "operators")
+parameters_id=$(deployService "parameters")
 
 helm init --client-only
 
 echo "Dry Run"
-helm upgrade --install --dry-run --debug --recreate-pods --reset-values --wait --set Server.ApiId=${server_service_id},Githash=${CIRCLE_SHA1} qubit ./helm/qubit/
+helm upgrade --install --dry-run --debug --recreate-pods --reset-values --wait \
+    --set Organizations.ApiId=${organizations_id},Scenes.ApiId=${scenes_id},Operators.ApiId=${operators_id},Parameters.ApiId=${parameters_id},Githash=${CIRCLE_SHA1} \
+    qubit ./helm/qubit/
 
 echo "Deploying"
-helm upgrade --install --debug --recreate-pods --reset-values --wait --set Server.ApiId=${server_service_id},Githash=${CIRCLE_SHA1} qubit ./helm/qubit/
+helm upgrade --install --debug --recreate-pods --reset-values --wait \
+    --set Organizations.ApiId=${organizations_id},Scenes.ApiId=${scenes_id},Operators.ApiId=${operators_id},Parameters.ApiId=${parameters_id},Githash=${CIRCLE_SHA1} \
+    qubit ./helm/qubit/
