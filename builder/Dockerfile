@@ -27,3 +27,9 @@ RUN mv protoc3/bin/* /usr/bin/
 RUN mv protoc3/include/* /usr/local/include/
 
 RUN curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+
+# migrate
+RUN curl -L https://packagecloud.io/mattes/migrate/gpgkey | apt-key add -
+RUN echo "deb https://packagecloud.io/mattes/migrate/ubuntu/ xenial main" > /etc/apt/sources.list.d/migrate.list
+RUN apt-get update -y
+RUN apt-get install -y migrate

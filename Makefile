@@ -33,3 +33,6 @@ up: build
 
 test:
 	bash ./run-tests.integration.sh
+
+migrate-cockroachdb:
+	migrate -database
