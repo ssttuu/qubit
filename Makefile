@@ -13,7 +13,10 @@ build-operators-go:
 build-parameters-go:
 	cd services/parameters && go get ./... && go build -o run && cd ../..
 
-build-go: build-organizations-go build-scenes-go build-operators-go build-parameters-go
+build-api-go:
+	cd services/api && go get ./... && go build -o run && cd ../..
+
+build-go: build-api-go
 
 
 vendor:

@@ -1,8 +1,8 @@
 version: '2'
 services:
-  organizations:
-    image: us.gcr.io/qubit-161916/organizations
-    build: ./services/organizations
+  api:
+    image: us.gcr.io/qubit-161916/api
+    build: ./services/api
     environment:
       - GOOGLE_PROJECT_ID=qubit-161916
       - DATASTORE_PROJECT_ID=qubit-161916
@@ -12,57 +12,7 @@ services:
       - STORAGE_BUCKET=qubit-dev-161916
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
       - PORT=9000
-    volumes:
-      - ./credentials:/opt/etc/credentials
-    depends_on:
-      - datastore
-
-  scenes:
-    image: us.gcr.io/qubit-161916/scenes
-    build: ./services/scenes
-    environment:
-      - GOOGLE_PROJECT_ID=qubit-161916
-      - DATASTORE_PROJECT_ID=qubit-161916
-      - DATASTORE_DATASET=qubit
-      - DATASTORE_EMULATOR_HOST=datastore:8380
-      - DATASTORE_HOST=datastore:8380
-      - STORAGE_BUCKET=qubit-dev-161916
-      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
-      - PORT=9000
-    volumes:
-      - ./credentials:/opt/etc/credentials
-    depends_on:
-      - datastore
-
-  operators:
-    image: us.gcr.io/qubit-161916/operators
-    build: ./services/operators
-    environment:
-      - GOOGLE_PROJECT_ID=qubit-161916
-      - DATASTORE_PROJECT_ID=qubit-161916
-      - DATASTORE_DATASET=qubit
-      - DATASTORE_EMULATOR_HOST=datastore:8380
-      - DATASTORE_HOST=datastore:8380
-      - STORAGE_BUCKET=qubit-dev-161916
-      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
-      - PORT=9000
-    volumes:
-      - ./credentials:/opt/etc/credentials
-    depends_on:
-      - datastore
-
-  parameters:
-    image: us.gcr.io/qubit-161916/parameters
-    build: ./services/parameters
-    environment:
-      - GOOGLE_PROJECT_ID=qubit-161916
-      - DATASTORE_PROJECT_ID=qubit-161916
-      - DATASTORE_DATASET=qubit
-      - DATASTORE_EMULATOR_HOST=datastore:8380
-      - DATASTORE_HOST=datastore:8380
-      - STORAGE_BUCKET=qubit-dev-161916
-      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
-      - PORT=9000
+      - API_SERVER_ADDRESS=api:9000
     volumes:
       - ./credentials:/opt/etc/credentials
     depends_on:

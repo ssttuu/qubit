@@ -9,26 +9,26 @@ import "google/protobuf/empty.proto";
 service Organizations {
     rpc List (ListOrganizationsRequest) returns (ListOrganizationsResponse) {
         option (google.api.http) = {
-            get: "/v1/organizations"
+            get: "/organizations"
             additional_bindings {
-                get: "/v1/orgs"
+                get: "/orgs"
             }
         };
     }
     rpc Get (GetOrganizationRequest) returns (Organization) {
         option (google.api.http) = {
-            get: "/v1/organizations/{organization_id}"
+            get: "/organizations/{organization_id}"
             additional_bindings {
-                get: "/v1/orgs/{organization_id}"
+                get: "/orgs/{organization_id}"
             }
         };
     }
     rpc Create (CreateOrganizationRequest) returns (Organization) {
         option (google.api.http) = {
-            post: "/v1/organizations"
+            post: "/organizations"
             body: "organization"
             additional_bindings {
-                post: "/v1/orgs"
+                post: "/orgs"
                 body: "organization"
 
             }
@@ -36,19 +36,19 @@ service Organizations {
     }
     rpc Update (UpdateOrganizationRequest) returns (Organization) {
         option (google.api.http) = {
-            put: "/v1/organizations/{organization_id}"
+            put: "/organizations/{organization_id}"
             body: "organization"
             additional_bindings {
-                put: "/v1/orgs/{organization_id}"
+                put: "/orgs/{organization_id}"
                 body: "organization"
             }
         };
     }
     rpc Delete (DeleteOrganizationRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/organizations/{organization_id}"
+            delete: "/organizations/{organization_id}"
             additional_bindings {
-                delete: "/v1/orgs/{organization_id}"
+                delete: "/orgs/{organization_id}"
             }
         };
     }

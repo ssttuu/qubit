@@ -1,0 +1,69 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.Api.AppName }}
+spec:
+  replicas: {{ .Values.Api.Replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+        maxSurge: {{ .Values.Api.MaxSurge }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.Api.AppName }}
+        version: {{ .Chart.Version }}
+        release: {{ .Release.Name }}
+        revision: {{ .Release.Revision | quote }}
+        githash: {{ .Values.Githash }}
+    spec:
+      containers:
+      - name: esp
+        image: gcr.io/endpoints-release/endpoints-runtime:1
+        args: [
+          "--http_port", "{{ .Values.Api.ExternalHttpPort }}",
+          "--http2_port", "{{ .Values.Api.ExternalHttp2Port }}",
+          "-s", "{{ .Values.Api.ApiName }}",
+          "-v", "{{ .Values.Api.ApiId }}",
+          "-a", "grpc://127.0.0.1:{{ .Values.Api.InternalPort }}"
+        ]
+        ports:
+          - containerPort: {{ .Values.Api.ExternalHttpPort }}
+          - containerPort: {{ .Values.Api.ExternalHttp2Port }}
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+      - name: {{ .Values.Api.AppName }}
+        image: {{ .Values.Api.ImageName }}:{{ .Values.Githash }}
+        ports:
+          - containerPort: {{ .Values.Api.InternalPort }}
+        env:
+          - name: GOOGLE_PROJECT_ID
+            value: "{{ .Values.GoogleProjectId }}"
+          - name: DATASTORE_PROJECT_ID
+            value: "{{ .Values.GoogleProjectId }}"
+          - name: DATASTORE_DATASET
+            value: "{{ .Values.DatastoreDataset }}"
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: "/opt/etc/credentials/service-account-key-file.json"
+          - name: STORAGE_BUCKET
+            value: "{{ .Values.Api.StorageBucket }}"
+          - name: PORT
+            value: "{{ .Values.Api.InternalPort }}"
+          - name: API_SERVICE_ADDRESS
+            value: "{{ .Values.Api.AppName }}:{{ .Values.Api.ExternalHttp2Port }}"
+        volumeMounts:
+          - name: google-credentials
+            mountPath: /opt/etc/credentials
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+      volumes:
+        - name: google-credentials
+          secret:
+            secretName: google-service-account

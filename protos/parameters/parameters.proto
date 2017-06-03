@@ -9,29 +9,29 @@ import "google/protobuf/empty.proto";
 service Parameters {
     rpc List (ListParametersRequest) returns (ListParametersResponse) {
         option (google.api.http) = {
-            get: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters"
+            get: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters"
         };
     }
     rpc Get (GetParameterRequest) returns (Parameter) {
         option (google.api.http) = {
-            get: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
+            get: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
         };
     }
     rpc Create (CreateParameterRequest) returns (Parameter) {
         option (google.api.http) = {
-            post: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters"
+            post: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters"
             body: "parameter"
         };
     }
     rpc Update (UpdateParameterRequest) returns (Parameter) {
         option (google.api.http) = {
-            put: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
+            put: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
             body: "parameter"
         };
     }
     rpc Delete (DeleteParameterRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
+            delete: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
         };
     }
 }

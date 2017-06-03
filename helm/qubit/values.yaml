@@ -39,11 +39,11 @@ Githash:
 DatastoreDataset: qubit
 
 
-Organizations:
-    ApiName: organizations.endpoints.qubit-161916.cloud.goog
+Api:
+    ApiName: api.endpoints.qubit-161916.cloud.goog
     ApiId:
-    AppName: organizations
-    ImageName: us.gcr.io/qubit-161916/organizations
+    AppName: api
+    ImageName: us.gcr.io/qubit-161916/api
     StorageBucket: qubit-dev-161916
     InternalPort: 9000
     ExternalHttpPort: 9005
@@ -51,38 +51,66 @@ Organizations:
     Replicas: 1
     MaxSurge: 2
 
-Scenes:
-    ApiName: scenes.endpoints.qubit-161916.cloud.goog
-    ApiId:
-    AppName: scenes
-    ImageName: us.gcr.io/qubit-161916/scenes
-    StorageBucket: qubit-dev-161916
-    InternalPort: 9000
-    ExternalHttpPort: 9005
-    ExternalHttp2Port: 9010
-    Replicas: 1
-    MaxSurge: 2
 
-Operators:
-    ApiName: operators.endpoints.qubit-161916.cloud.goog
-    ApiId:
-    AppName: operators
-    ImageName: us.gcr.io/qubit-161916/operators
-    StorageBucket: qubit-dev-161916
-    InternalPort: 9000
-    ExternalHttpPort: 9005
-    ExternalHttp2Port: 9010
-    Replicas: 1
-    MaxSurge: 2
+# Copied out of incubator/cassandra
+Cassandra:
+    Name: cassandra
 
-Parameters:
-    ApiName: parameters.endpoints.qubit-161916.cloud.goog
-    ApiId:
-    AppName: parameters
-    ImageName: us.gcr.io/qubit-161916/parameters
-    StorageBucket: qubit-dev-161916
-    InternalPort: 9000
-    ExternalHttpPort: 9005
-    ExternalHttp2Port: 9010
-    Replicas: 1
-    MaxSurge: 2
+    ## Cassandra image version
+    ## ref: https://hub.docker.com/r/library/cassandra/
+    Image:
+      Repo: "cassandra"
+      Tag: "3"
+      PullPolicy: IfNotPresent
+
+    ## Specify a service type
+    ## ref: http://kubernetes.io/docs/user-guide/services/
+    Service:
+      Type: ClusterIP
+
+    ## Persist data to a persitent volume
+    Persistence:
+      Enabled: true
+      ## If defined, volume.beta.kubernetes.io/storage-class: <storageClass>
+      ## Default: volume.alpha.kubernetes.io/storage-class: default
+      StorageClass: generic
+      AccessMode: ReadWriteOnce
+      Size: 10Gi
+
+    ## Configure resource requests and limits
+    ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    ## Minimum memory for development is 4GB and 2 CPU cores
+    ## Minimum memory for production is 8GB and 4 CPU cores
+    ## ref: http://docs.datastax.com/en/archived/cassandra/2.0/cassandra/architecture/architecturePlanningHardware_c.html
+    Resources:
+      Requests:
+        Memory: 4Gi
+        CPU: 2
+      Limits:
+        Memory: 4Gi
+        CPU: 2
+
+    ## Change cassandra configuration paramaters below:
+    ## ref: http://docs.datastax.com/en/cassandra/3.0/cassandra/configuration/configCassandra_yaml.html
+    ## Recommended max heap size is 1/2 of system memory
+    ## Recommeneed heap new size is 1/4 of max heap size
+    ## ref: http://docs.datastax.com/en/cassandra/3.0/cassandra/operations/opsTuneJVM.html
+    Config:
+      ClusterName: cassandra
+      ClusterSize: 3
+      SeedSize: 2
+      NumTokens: 256
+      DcName: DC1
+      RackName: RAC1
+      EndpointSnitch: SimpleSnitch
+      MaxHeapSize: 2048M
+      HeapNewSize: 512M
+      Ports:
+        Cql: 9042
+        Thrift: 9160
+
+    ## Configure node selector. Edit code below for adding selector to pods
+    ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+    # selector:
+      # nodeSelector:
+        # cloud.google.com/gke-nodepool: pool-db

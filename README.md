@@ -25,4 +25,7 @@ kubectl create secret generic google-service-account --from-file=./credentials/s
 | CockroachDB | RDBMS | Yes        | No     | No                | Yes        |
 | Postgres    | RDBMS | No         | Yes    | No                | Yes        |
 
+##### Important Factors
+
+1. Abiility separate out services for individual scalability
 

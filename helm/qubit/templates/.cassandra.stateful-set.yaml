@@ -1,0 +1,123 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.Cassandra.Name }}
+  labels:
+    app: {{ .Values.Cassandra.Name }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    chart: '{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}'
+    version: {{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    revision: {{ .Release.Revision | quote }}
+    githash: {{ .Values.Githash }}
+spec:
+  clusterIP: None
+  type: {{ .Values.Cassandra.Service.Type }}
+  ports:
+  - name: intra
+    port: 7000
+    targetPort: 7000
+  - name: tls
+    port: 7001
+    targetPort: 7001
+  - name: jmx
+    port: 7199
+    targetPort: 7199
+  - name: cql
+    port: {{ default 9042 .Values.Cassandra.config.ports.cql }}
+    targetPort: {{ default 9042 .Values.Cassandra.config.ports.cql }}
+  - name: thrift
+    port: {{ default 9160 .Values.Cassandra.config.ports.thrift }}
+    targetPort: {{ default 9160 .Values.Cassandra.config.ports.thrift }}
+  selector:
+    app: {{ .Values.Cassandra.Name }}
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.Cassandra.Name }}
+  labels:
+    app: {{ .Values.Cassandra.Name }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  serviceName: {{ .Values.Cassandra.Name }}
+  replicas: {{ .Values.Cassandra.Config.ClusterSize }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.Cassandra.Name }}
+    spec:
+      containers:
+      - name: {{ .Values.Cassandra.Name }}
+        image: "{{ .Values.Cassandra.Image.Repo }}:{{ .Values.Cassandra.Image.Tag }}"
+        imagePullPolicy: {{ .Values.Cassandra.Image.PullPolicy | quote }}
+        resources:
+          requests:
+            memory: {{ .Values.Cassandra.Resources.Requests.Memory }}
+            cpu: {{ .Values.Cassandra.Resources.Requests.CPU }}
+          limits:
+            memory: {{ .Values.Cassandra.Resources.Limits.Memory }}
+            cpu: {{ .Values.Cassandra.Resources.Limits.CPU }}
+        env:
+        - name: CASSANDRA_SEEDS
+          value: "{{- range $i, $e := until {{ .Values.Cassandra.Config.SeedSize }} }}{{ .Values.Cassandra.Name }}-{{ $i }}.{{ .Values.Cassandra.Name }}.{{ .Release.Namespace }}.svc.cluster.local,{{- end }}"
+        - name: MAX_HEAP_SIZE
+          value: {{ .Values.Cassandra.Config.MaxHeapSize | quote }}
+        - name: HEAP_NEWSIZE
+          value: {{ .Values.Cassandra.Config.HeapNewSize | quote }}
+        - name: CASSANDRA_ENDPOINT_SNITCH
+          value: {{ .Values.Cassandra.Config.EndpointSnitch | quote }}
+        - name: CASSANDRA_CLUSTER_NAME
+          value: {{ .Values.Cassandra.Name }}-cluster
+        - name: CASSANDRA_DC
+          value: {{ default "DC1" .Values.Cassandra.Config.DcName | quote }}
+        - name: CASSANDRA_RACK
+          value: {{ default "RAC1" .Values.Cassandra.Config.RackName | quote }}
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        livenessProbe:
+          exec:
+            command: [ "/bin/sh", "-c", "nodetool status | grep -E \"^UN\\s+${POD_IP}\"" ]
+          initialDelaySeconds: 90
+          periodSeconds: 30
+        readinessProbe:
+          exec:
+            command: [ "/bin/sh", "-c", "nodetool status | grep -E \"^UN\\s+${POD_IP}\"" ]
+          initialDelaySeconds: 90
+          periodSeconds: 30
+        ports:
+        - name: intra
+          containerPort: 7000
+        - name: tls
+          containerPort: 7001
+        - name: jmx
+          containerPort: 7199
+        - name: cql
+          containerPort: {{ default 9042 .Values.Cassandra.Config.Ports.Cql }}
+        - name: thrift
+          containerPort: {{ default 9160 .Values.Cassandra.Config.Ports.Thrift }}
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/cassandra
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      labels:
+        app: {{ .Values.Cassandra.Name }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+        heritage: "{{ .Release.Service }}"
+      annotations:
+        volume.beta.kubernetes.io/storage-class: {{ .Values.Cassandra.Persistence.StorageClass | quote }}
+    spec:
+      accessModes:
+        - {{ .Values.Cassandra.Persistence.AccessMode | quote }}
+      resources:
+        requests:
+          storage: {{ .Values.Cassandra.Persistence.Size | quote }}

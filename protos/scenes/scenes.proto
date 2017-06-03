@@ -9,29 +9,29 @@ import "google/protobuf/empty.proto";
 service Scenes {
     rpc List (ListScenesRequest) returns (ListScenesResponse) {
         option (google.api.http) = {
-            get: "/v1/organizations/{organization_id}/scenes"
+            get: "/organizations/{organization_id}/scenes"
         };
     }
     rpc Get (GetSceneRequest) returns (Scene) {
         option (google.api.http) = {
-            get: "/v1/organizations/{organization_id}/scenes/{scene_id}"
+            get: "/organizations/{organization_id}/scenes/{scene_id}"
         };
     }
     rpc Create (CreateSceneRequest) returns (Scene) {
         option (google.api.http) = {
-            post: "/v1/organizations/{organization_id}/scenes"
+            post: "/organizations/{organization_id}/scenes"
             body: "scene"
         };
     }
     rpc Update (UpdateSceneRequest) returns (Scene) {
         option (google.api.http) = {
-            put: "/v1/organizations/{organization_id}/scenes/{scene_id}"
+            put: "/organizations/{organization_id}/scenes/{scene_id}"
             body: "scene"
         };
     }
     rpc Delete (DeleteSceneRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/organizations/{organization_id}/scenes/{scene_id}"
+            delete: "/organizations/{organization_id}/scenes/{scene_id}"
         };
     }
 }

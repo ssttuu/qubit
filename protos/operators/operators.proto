@@ -11,34 +11,34 @@ import "geometry/geometry.proto";
 service Operators {
     rpc List (ListOperatorsRequest) returns (ListOperatorsResponse) {
         option (google.api.http) = {
-            get: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators"
+            get: "/organizations/{organization_id}/scenes/{scene_id}/operators"
         };
     }
     rpc Get (GetOperatorRequest) returns (Operator) {
         option (google.api.http) = {
-            get: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}"
+            get: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}"
         };
     }
     rpc Create (CreateOperatorRequest) returns (Operator) {
         option (google.api.http) = {
-            post: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators"
+            post: "/organizations/{organization_id}/scenes/{scene_id}/operators"
             body: "operator"
         };
     }
     rpc Update (UpdateOperatorRequest) returns (Operator) {
         option (google.api.http) = {
-            put: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}"
+            put: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}"
             body: "operator"
         };
     }
     rpc Delete (DeleteOperatorRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}"
+            delete: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}"
         };
     }
     rpc Render (RenderOperatorRequest) returns (RenderOperatorResponse) {
         option (google.api.http) = {
-            post: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}:render"
+            post: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}:render"
             body: ""
         };
     }
