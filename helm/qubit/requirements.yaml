@@ -1,0 +1,4 @@
+dependencies:
+    - name: cockroachdb
+      version: 0.2.3
+      repo: https://kubernetes-charts.storage.googleapis.com
