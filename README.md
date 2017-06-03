@@ -14,3 +14,15 @@ kubectl create secret generic google-service-account --from-file=./credentials/s
 ## Important Reads
 [Google API Design Guide](https://cloud.google.com/apis/design/)
 
+## Design Decisions
+
+### RDBMS vs NoSQL
+
+| DB          | Type  | Scales (H) | Hosted | Write Limited     | Migrations | 
+|-------------|-------|------------|--------|-------------------|------------|
+| Datastore   | NoSQL | Yes        | Yes    | Yes (1/sec/group) | No         |
+| Cassandra   | NoSQL | Yes        | No     | No                | Yes        |
+| CockroachDB | RDBMS | Yes        | No     | No                | Yes        |
+| Postgres    | RDBMS | No         | Yes    | No                | Yes        |
+
+
