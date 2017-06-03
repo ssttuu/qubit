@@ -1,7 +1,7 @@
 dependencies:
     - name: cockroachdb
       version: 0.2.3
-      repo: https://kubernetes-charts.storage.googleapis.com
+      repository: https://kubernetes-charts.storage.googleapis.com/
     - name: cassandra
       version: 0.1.0
-      repo: https://kubernetes-charts-incubator.storage.googleapis.com/
+      repository: https://kubernetes-charts-incubator.storage.googleapis.com/

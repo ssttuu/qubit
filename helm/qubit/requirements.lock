@@ -1,0 +1,17 @@
+dependencies:
+- condition: ""
+  enabled: false
+  import-values: null
+  name: cockroachdb
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  tags: null
+  version: 0.2.3
+- condition: ""
+  enabled: false
+  import-values: null
+  name: cassandra
+  repository: https://kubernetes-charts-incubator.storage.googleapis.com/
+  tags: null
+  version: 0.1.0
+digest: sha256:dd89be922579635a577060fbd330a77e4dd17376c32985e154979ded92a9ca36
+generated: 2017-06-03T18:36:41.138759861-04:00
