@@ -13,19 +13,16 @@ deployService() {
     echo $(gcloud service-management deploy services/${1}/api_config.yaml proto-gen/services/${1}.pb --format json) | jq -r '.serviceConfig.id'
 }
 
-organizations_id=$(deployService "organizations")
-scenes_id=$(deployService "scenes")
-operators_id=$(deployService "operators")
-parameters_id=$(deployService "parameters")
+api_id=$(deployService "api")
 
 helm init --client-only
 
 echo "Dry Run"
 helm upgrade --install --dry-run --debug --recreate-pods --reset-values --wait \
-    --set Organizations.ApiId=${organizations_id},Scenes.ApiId=${scenes_id},Operators.ApiId=${operators_id},Parameters.ApiId=${parameters_id},Githash=${CIRCLE_SHA1} \
+    --set Api.ApiId=${api_id},Githash=${CIRCLE_SHA1} \
     qubit ./helm/qubit/
 
 echo "Deploying"
 helm upgrade --install --debug --recreate-pods --reset-values --wait \
-    --set Organizations.ApiId=${organizations_id},Scenes.ApiId=${scenes_id},Operators.ApiId=${operators_id},Parameters.ApiId=${parameters_id},Githash=${CIRCLE_SHA1} \
+    --set Api.ApiId=${api_id},Githash=${CIRCLE_SHA1} \
     qubit ./helm/qubit/
