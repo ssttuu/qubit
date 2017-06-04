@@ -51,66 +51,11 @@ Api:
     Replicas: 1
     MaxSurge: 2
 
+# Sub-Chart
+cassandra:
+    selector:
+        nodeSelector:
+            cloud.google.com/gke-nodepool: cassandra-pool
 
-# Copied out of incubator/cassandra
-Cassandra:
-    Name: cassandra
-
-    ## Cassandra image version
-    ## ref: https://hub.docker.com/r/library/cassandra/
-    Image:
-      Repo: "cassandra"
-      Tag: "3"
-      PullPolicy: IfNotPresent
-
-    ## Specify a service type
-    ## ref: http://kubernetes.io/docs/user-guide/services/
-    Service:
-      Type: ClusterIP
-
-    ## Persist data to a persitent volume
-    Persistence:
-      Enabled: true
-      ## If defined, volume.beta.kubernetes.io/storage-class: <storageClass>
-      ## Default: volume.alpha.kubernetes.io/storage-class: default
-      StorageClass: generic
-      AccessMode: ReadWriteOnce
-      Size: 10Gi
-
-    ## Configure resource requests and limits
-    ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-    ## Minimum memory for development is 4GB and 2 CPU cores
-    ## Minimum memory for production is 8GB and 4 CPU cores
-    ## ref: http://docs.datastax.com/en/archived/cassandra/2.0/cassandra/architecture/architecturePlanningHardware_c.html
-    Resources:
-      Requests:
-        Memory: 4Gi
-        CPU: 2
-      Limits:
-        Memory: 4Gi
-        CPU: 2
-
-    ## Change cassandra configuration paramaters below:
-    ## ref: http://docs.datastax.com/en/cassandra/3.0/cassandra/configuration/configCassandra_yaml.html
-    ## Recommended max heap size is 1/2 of system memory
-    ## Recommeneed heap new size is 1/4 of max heap size
-    ## ref: http://docs.datastax.com/en/cassandra/3.0/cassandra/operations/opsTuneJVM.html
-    Config:
-      ClusterName: cassandra
-      ClusterSize: 3
-      SeedSize: 2
-      NumTokens: 256
-      DcName: DC1
-      RackName: RAC1
-      EndpointSnitch: SimpleSnitch
-      MaxHeapSize: 2048M
-      HeapNewSize: 512M
-      Ports:
-        Cql: 9042
-        Thrift: 9160
-
-    ## Configure node selector. Edit code below for adding selector to pods
-    ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-    # selector:
-      # nodeSelector:
-        # cloud.google.com/gke-nodepool: pool-db
+cockroachdb:
+    Replicas: 1
