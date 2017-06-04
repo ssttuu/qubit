@@ -62,9 +62,9 @@ func main() {
 	servingDone := make(chan bool)
 	go serve(grpcServer, lis, servingDone)
 
-	apiAddress := os.Getenv("API_SERVER_ADDRESS")
+	apiAddress := os.Getenv("API_SERVICE_ADDRESS")
 	if apiAddress == "" {
-		log.Fatal(`You need to set the environment variable "API_SERVER_ADDRESS"`)
+		log.Fatal(`You need to set the environment variable "API_SERVICE_ADDRESS"`)
 	}
 
 	conn, err := grpc.Dial(apiAddress, grpc.WithInsecure())

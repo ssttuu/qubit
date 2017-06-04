@@ -12,7 +12,7 @@ services:
       - STORAGE_BUCKET=qubit-dev-161916
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
       - PORT=9000
-      - API_SERVER_ADDRESS=api:9000
+      - API_SERVICE_ADDRESS=api:9000
     volumes:
       - ./credentials:/opt/etc/credentials
     depends_on:
