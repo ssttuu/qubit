@@ -50,8 +50,9 @@ Api:
     ExternalHttp2Port: 9010
     Replicas: 1
     MaxSurge: 2
+    NodeSelector: default-pool
 
-# Sub-Chart
+# Sub-Charts
 cassandra:
     selector:
         nodeSelector:

@@ -17,6 +17,8 @@ spec:
         revision: {{ .Release.Revision | quote }}
         githash: {{ .Values.Githash }}
     spec:
+      nodeSelector:
+        cloud.google.com/gke-nodepool: {{ .Values.Api.NodeSelector }}
       containers:
       - name: esp
         image: gcr.io/endpoints-release/endpoints-runtime:1
