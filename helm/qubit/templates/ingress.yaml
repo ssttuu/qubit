@@ -8,5 +8,5 @@ spec:
       paths:
       - path: /api/v1
         backend:
-          serviceName: api
-          servicePort: {{ .Values.Api.ExternalHttp2Port }}
+          serviceName: {{ .Values.Api.AppName }}
+          servicePort: {{ .Values.Api.ExternalHttpPort }}

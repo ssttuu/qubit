@@ -11,7 +11,7 @@ const operators_grpc_pb = require('./protos/operators/operators_grpc_pb');
 
 const geometry_pb = require('./protos/geometry/geometry_pb');
 
-let SERVER = process.env.SERVER_HOST + ':' + process.env.SERVER_PORT;
+let SERVER = process.env.API_SERVICE_ADDRESS;
 
 let checkDatastore = () => {
     return new Promise((resolve, reject) => {

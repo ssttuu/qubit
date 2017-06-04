@@ -6,7 +6,7 @@ const organizations_grpc_pb = require('./protos/organizations/organizations_grpc
 const scenes_pb = require('./protos/scenes/scenes_pb');
 const scenes_grpc_pb = require('./protos/scenes/scenes_grpc_pb');
 
-let SERVER = process.env.SERVER_HOST + ':' + process.env.SERVER_PORT;
+let SERVER = process.env.API_SERVICE_ADDRESS;
 
 let checkDatastore = () => {
     return new Promise((resolve, reject) => {

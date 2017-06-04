@@ -3,8 +3,7 @@ services:
   test:
     image: node:7
     environment:
-      - SERVER_HOST=server
-      - SERVER_PORT=8001
+      - API_SERVICE_ADDRESS=api:9000
       - GOOGLE_PROJECT_ID=qubit-161916
       - DATASTORE_DATASET=qubit
       - DATASTORE_EMULATOR_HOST=datastore:8380
@@ -16,11 +15,11 @@ services:
     volumes:
       - .:/workspace
     depends_on:
-      - server
+      - api
 
-  server:
-    image: us.gcr.io/qubit-161916/qubit-server
-    build: ./server
+  api:
+    image: us.gcr.io/qubit-161916/api
+    build: ./services/api
     environment:
       - GOOGLE_PROJECT_ID=qubit-161916
       - DATASTORE_PROJECT_ID=qubit-161916
@@ -29,21 +28,15 @@ services:
       - DATASTORE_HOST=datastore:8380
       - STORAGE_BUCKET=qubit-dev-161916
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
-      - PORT=8001
+      - PORT=9000
+      - API_SERVICE_ADDRESS=api:9000
     volumes:
       - ./credentials:/opt/etc/credentials
     depends_on:
       - datastore
-      - pubsub
 
   datastore:
     image: google/cloud-sdk
     environment:
       - CLOUDSDK_CORE_PROJECT=qubit-161916
     command: gcloud beta emulators datastore start --no-legacy --host-port 0.0.0.0:8380
-
-  pubsub:
-    image: google/cloud-sdk
-    environment:
-      - CLOUDSDK_CORE_PROJECT=qubit-161916
-    command: gcloud beta emulators pubsub start --host-port 0.0.0.0:8538
