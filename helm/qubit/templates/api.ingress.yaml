@@ -6,7 +6,7 @@ spec:
   rules:
   - http:
       paths:
-      - path: /api/v1
+      - path: /api
         backend:
           serviceName: {{ .Values.Api.AppName }}
           servicePort: {{ .Values.Api.ExternalHttpPort }}
