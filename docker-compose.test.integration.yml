@@ -34,6 +34,22 @@ services:
       - ./credentials:/opt/etc/credentials
     depends_on:
       - datastore
+      - compute
+
+  compute:
+    image: us.gcr.io/qubit-161916/compute
+    build: ./services/compute
+    environment:
+      - GOOGLE_PROJECT_ID=qubit-161916
+      - DATASTORE_PROJECT_ID=qubit-161916
+      - DATASTORE_DATASET=qubit
+      - DATASTORE_EMULATOR_HOST=datastore:8380
+      - DATASTORE_HOST=datastore:8380
+      - STORAGE_BUCKET=qubit-dev-161916
+      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
+      - PORT=9000
+    volumes:
+      - ./credentials:/opt/etc/credentials
 
   datastore:
     image: google/cloud-sdk

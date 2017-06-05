@@ -16,8 +16,8 @@ import fmt "fmt"
 import math "math"
 import organizations "organizations"
 import scenes "scenes"
-import operators "operators"
-import parameters "parameters"
+import operators "github.com/stupschwartz/qubit/proto-gen/go/operators"
+import parameters "github.com/stupschwartz/qubit/proto-gen/go/parameters"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal

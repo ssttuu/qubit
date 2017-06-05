@@ -12,6 +12,7 @@ var global = Function('return this')();
 var google_api_annotations_pb = require('../google/api/annotations_pb.js');
 var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js');
 var geometry_geometry_pb = require('../geometry/geometry_pb.js');
+var parameters_parameters_pb = require('../parameters/parameters_pb.js');
 goog.exportSymbol('proto.operators.CreateOperatorRequest', null, global);
 goog.exportSymbol('proto.operators.DeleteOperatorRequest', null, global);
 goog.exportSymbol('proto.operators.GetOperatorRequest', null, global);
@@ -33,12 +34,19 @@ goog.exportSymbol('proto.operators.UpdateOperatorRequest', null, global);
  * @constructor
  */
 proto.operators.Operator = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.operators.Operator.repeatedFields_, null);
 };
 goog.inherits(proto.operators.Operator, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   proto.operators.Operator.displayName = 'proto.operators.Operator';
 }
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.operators.Operator.repeatedFields_ = [5];
+
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -70,7 +78,9 @@ proto.operators.Operator.toObject = function(includeInstance, msg) {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     name: jspb.Message.getFieldWithDefault(msg, 2, ""),
     context: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    type: jspb.Message.getFieldWithDefault(msg, 4, "")
+    type: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    parametersList: jspb.Message.toObjectList(msg.getParametersList(),
+    parameters_parameters_pb.Parameter.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -122,6 +132,11 @@ proto.operators.Operator.deserializeBinaryFromReader = function(msg, reader) {
     case 4:
       var value = /** @type {string} */ (reader.readString());
       msg.setType(value);
+      break;
+    case 5:
+      var value = new parameters_parameters_pb.Parameter;
+      reader.readMessage(value,parameters_parameters_pb.Parameter.deserializeBinaryFromReader);
+      msg.addParameters(value);
       break;
     default:
       reader.skipField();
@@ -189,6 +204,14 @@ proto.operators.Operator.prototype.serializeBinaryToWriter = function (writer) {
       f
     );
   }
+  f = this.getParametersList();
+  if (f.length > 0) {
+    writer.writeRepeatedMessage(
+      5,
+      f,
+      parameters_parameters_pb.Parameter.serializeBinaryToWriter
+    );
+  }
 };
 
 
@@ -249,6 +272,39 @@ proto.operators.Operator.prototype.getType = function() {
 /** @param {string} value */
 proto.operators.Operator.prototype.setType = function(value) {
   jspb.Message.setField(this, 4, value);
+};
+
+
+/**
+ * repeated parameters.Parameter parameters = 5;
+ * If you change this array by adding, removing or replacing elements, or if you
+ * replace the array itself, then you must call the setter to update it.
+ * @return {!Array.<!proto.parameters.Parameter>}
+ */
+proto.operators.Operator.prototype.getParametersList = function() {
+  return /** @type{!Array.<!proto.parameters.Parameter>} */ (
+    jspb.Message.getRepeatedWrapperField(this, parameters_parameters_pb.Parameter, 5));
+};
+
+
+/** @param {!Array.<!proto.parameters.Parameter>} value */
+proto.operators.Operator.prototype.setParametersList = function(value) {
+  jspb.Message.setRepeatedWrapperField(this, 5, value);
+};
+
+
+/**
+ * @param {!proto.parameters.Parameter=} opt_value
+ * @param {number=} opt_index
+ * @return {!proto.parameters.Parameter}
+ */
+proto.operators.Operator.prototype.addParameters = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 5, opt_value, proto.parameters.Parameter, opt_index);
+};
+
+
+proto.operators.Operator.prototype.clearParametersList = function() {
+  this.setParametersList([]);
 };
 
 

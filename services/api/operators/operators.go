@@ -22,6 +22,7 @@ import (
 	"github.com/stupschwartz/qubit/core/organization"
 	"github.com/stupschwartz/qubit/core/scene"
 	parameters_pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
+	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
 )
 
 
@@ -37,6 +38,7 @@ type Server struct {
 	DatastoreClient *datastore.Client
 	StorageClient *storage.Client
 	ParametersClient parameters_pb.ParametersClient
+	ComputeClient compute_pb.ComputeClient
 }
 
 func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest) (*operators_pb.ListOperatorsResponse, error) {
@@ -154,13 +156,14 @@ func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequ
 	params := parameter.NewParametersFromProto(params_pb.Parameters)
 
 
-
 	op, err := operator.GetOperation(theOperator.Type)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to get Operation for rendering, %v", theOperator.Type)
 	}
 
 	imagePlane, err := op.Process([]*image.Plane{}, params, in.BoundingBox.StartX, in.BoundingBox.StartY, in.BoundingBox.EndX, in.BoundingBox.EndY)
+
+
 	//
 	//// TODO: create bucket per Organization
 	//// TODO: hash OrgId, SceneId, and OperatorId to get bucket path
@@ -195,10 +198,11 @@ func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequ
 	return &operators_pb.RenderOperatorResponse{ResultUrl:imagePngObjectPath, ResultType: operator.IMAGE }, nil
 }
 
-func Register(grpcServer *grpc.Server, datastoreClient *datastore.Client, storageClient *storage.Client, parametersClient parameters_pb.ParametersClient) {
+func Register(grpcServer *grpc.Server, datastoreClient *datastore.Client, storageClient *storage.Client, parametersClient parameters_pb.ParametersClient, computeClient compute_pb.ComputeClient) {
 	operators_pb.RegisterOperatorsServer(grpcServer, &Server{
 		DatastoreClient: datastoreClient,
 		StorageClient: storageClient,
 		ParametersClient: parametersClient,
+		ComputeClient: computeClient,
 	})
 }

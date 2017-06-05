@@ -16,14 +16,13 @@ build-parameters-go:
 build-api-go:
 	cd services/api && go get ./... && go build -o run && cd ../..
 
-build-go: build-api-go
+build-compute-go:
+	cd services/compute && go get ./... && go build -o run && cd ../..
+
+build-go: build-api-go build-compute-go
 
 
-vendor:
-	cd server && govendor update +external && govendor update +vendor && cd ..
-	cd compute && govendor update +external && govendor update +vendor && cd ..
-
-build-server:
+build-api:
 	docker-compose build server
 
 build-compute:

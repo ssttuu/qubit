@@ -58,6 +58,8 @@ spec:
             value: "{{ .Values.Api.InternalPort }}"
           - name: API_SERVICE_ADDRESS
             value: "{{ .Values.Api.AppName }}:{{ .Values.Api.ExternalHttp2Port }}"
+          - name: COMPUTE_SERVICE_ADDRESS
+            value: "{{ .Values.Compute.AppName }}:{{ .Values.Compute.ExternalHttp2Port }}"
         volumeMounts:
           - name: google-credentials
             mountPath: /opt/etc/credentials

@@ -6,6 +6,7 @@ var operators_operators_pb = require('../operators/operators_pb.js');
 var google_api_annotations_pb = require('../google/api/annotations_pb.js');
 var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js');
 var geometry_geometry_pb = require('../geometry/geometry_pb.js');
+var parameters_parameters_pb = require('../parameters/parameters_pb.js');
 
 function serialize_google_protobuf_Empty(arg) {
   if (!(arg instanceof google_protobuf_empty_pb.Empty)) {

@@ -49,7 +49,7 @@ jobs:
                 name: Authenticate GCloud
                 command: scripts/auth-gcloud.sh
 
-            # Build Organizations
+            # Build API
             - run:
                 name: API - Start Go Build
                 command: |
@@ -79,6 +79,37 @@ jobs:
                 name: API - Push Container
                 command: |
                     gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/api:${CIRCLE_SHA1}
+
+            # Build Compute
+            - run:
+                name: Compute - Start Go Build
+                command: |
+                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/services/compute --name go-compute-build-volumes alpine:3.4 /bin/true
+
+            - run:
+                name: Compute - Copy Source to Container
+                command: |
+                    docker cp ./ go-compute-build-volumes:/go/src/github.com/stupschwartz/qubit
+
+            - run:
+                name: Compute - Build Go Code
+                command: |
+                    docker run --volumes-from go-compute-build-volumes -w /go/src/github.com/stupschwartz/qubit/services/compute golang:1.8 bash -c "go get ./...; go build -o run"
+
+            - run:
+                name: Compute - Copy Back Artifacts
+                command: |
+                    docker cp go-compute-build-volumes:/go/src/github.com/stupschwartz/qubit/services/compute/run `pwd`/services/compute/run
+
+            - run:
+                name: Compute - Build Container
+                command: |
+                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/compute:${CIRCLE_SHA1} ./services/compute
+
+            - run:
+                name: Compute - Push Container
+                command: |
+                    gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/compute:${CIRCLE_SHA1}
 
             # TRIGGER NEXT STEP
             - run:

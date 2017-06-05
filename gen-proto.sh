@@ -17,7 +17,7 @@ genProto () {
 
 	docker run --rm -v `pwd`:/workspace stupschwartz/protoman \
 	    -I ./protos/ \
-	    --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,Mgeometry/geometry.proto=github.com/stupschwartz/qubit/proto-gen/go/geometry,plugins=grpc:./proto-gen/go/ \
+	    --go_out=Mgoogle/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations,Mgeometry/geometry.proto=github.com/stupschwartz/qubit/proto-gen/go/geometry,Moperators/operators.proto=github.com/stupschwartz/qubit/proto-gen/go/operators,Mparameters/parameters.proto=github.com/stupschwartz/qubit/proto-gen/go/parameters,Mimages/images.proto=github.com/stupschwartz/qubit/proto-gen/go/images,plugins=grpc:./proto-gen/go/ \
 	    ./protos/${1}/${1}.proto
 
 	docker run --rm -v `pwd`:/workspace stupschwartz/protoman \
@@ -43,3 +43,5 @@ genProto "organizations"
 genProto "parameters"
 genProto "scenes"
 genProto "api"
+
+genProto "compute"

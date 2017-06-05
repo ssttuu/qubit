@@ -52,6 +52,19 @@ Api:
     MaxSurge: 2
     NodeSelector: default-pool
 
+Compute:
+    ApiName: compute.endpoints.qubit-161916.cloud.goog
+    ApiId:
+    AppName: compute
+    ImageName: us.gcr.io/qubit-161916/compute
+    StorageBucket: qubit-dev-161916
+    InternalPort: 9000
+    ExternalHttpPort: 9005
+    ExternalHttp2Port: 9010
+    Replicas: 1
+    MaxSurge: 2
+    NodeSelector: default-pool
+
 # Sub-Charts
 cassandra:
     selector:

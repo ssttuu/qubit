@@ -17,6 +17,8 @@ import (
 	"github.com/stupschwartz/qubit/services/api/scenes"
 	"github.com/stupschwartz/qubit/services/api/operators"
 	"github.com/stupschwartz/qubit/services/api/parameters"
+
+	"github.com/stupschwartz/qubit/proto-gen/go/compute"
 )
 
 func serve(server *grpc.Server, listener net.Listener, done chan bool) {
@@ -77,10 +79,25 @@ func main() {
 
 	parametersClient := parameters.NewClient(conn)
 
+	computeAddress := os.Getenv("COMPUTE_SERVICE_ADDRESS")
+	if apiAddress == "" {
+		log.Fatal(`You need to set the environment variable "COMPUTE_SERVICE_ADDRESS"`)
+	}
+
+	computeConn, err := grpc.Dial(computeAddress, grpc.WithInsecure())
+	for err != nil {
+		log.Printf("Could not connect to Compute Service: %v\n", err)
+		time.Sleep(100 * time.Millisecond)
+		conn, err = grpc.Dial(computeAddress, grpc.WithInsecure())
+	}
+	defer conn.Close()
+
+	computeClient := compute.NewComputeClient(computeConn)
+
 	organizations.Register(grpcServer, datastoreClient)
 	scenes.Register(grpcServer, datastoreClient)
 	parameters.Register(grpcServer, datastoreClient)
-	operators.Register(grpcServer, datastoreClient, storageClient, parametersClient)
+	operators.Register(grpcServer, datastoreClient, storageClient, parametersClient, computeClient)
 	//images.Register(grpcServer, datastoreClient, storageClient)
 
 	<-servingDone

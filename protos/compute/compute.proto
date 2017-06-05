@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package compute;
+
+import "geometry/geometry.proto";
+import "images/images.proto";
+import "operators/operators.proto";
+
+service Compute {
+    rpc RenderImage (RenderImageRequest) returns (RenderImageResponse) {}
+//    rpc RenderImageStream (RenderImageRequest) returns (stream RenderImageResponse) {}
+}
+
+message RenderImageRequest {
+    operators.Operator operator = 1;
+    geometry.BoundingBox2D bounding_box = 2;
+}
+
+message RenderImageResponse {
+    images.Plane image_plane = 1;
+}
