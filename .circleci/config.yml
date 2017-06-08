@@ -122,6 +122,10 @@ jobs:
         docker:
             - image: stuschwartz/qubit-builder:latest
 
+        branches:
+            only:
+                - master
+
         working_directory: /go/src/github.com/stupschwartz/qubit
 
         environment:
