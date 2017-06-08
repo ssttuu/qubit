@@ -5,17 +5,21 @@ ENV GRPC_VERSION=1.0.1              \
     SWIFT_PROTOBUF_VERSION=0.9.24   \
     GOPATH=/go
 
-RUN apt-get update -y
-RUN apt-get install -y curl
-RUN apt-get install -y sudo
-RUN apt-get install -y automake
-RUN apt-get install -y autoconf
-RUN apt-get install -y libtool
-RUN apt-get install -y git
-RUN apt-get install -y golang-go
-RUN apt-get install -y python-software-properties
+RUN apt-get update \
+    && apt-get install -y \
+        autoconf \
+        automake \
+        curl \
+        git \
+        golang-go \
+        libtool \
+        python-software-properties \
+        sudo
+
 RUN curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
-RUN apt-get install -y nodejs
+RUN apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
 #RUN curl -L https://github.com/QuentinPerez/docker-alpine-swift-protobuf/releases/download/$SWIFT_PROTOBUF_VERSION/export-lib-056f6f6.tar | tar xv -C /
 RUN curl -L https://github.com/google/protobuf/archive/v${PROTOBUF_VERSION}.tar.gz | tar xvz
 #RUN curl -L https://raw.githubusercontent.com/QuentinPerez/docker-alpine-swift-protobuf/master/ressources/ld_library_path.patch > /ld_library_path.patch

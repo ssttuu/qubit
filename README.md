@@ -27,5 +27,5 @@ kubectl create secret generic google-service-account --from-file=./credentials/s
 
 ##### Important Factors
 
-1. Abiility separate out services for individual scalability
+1. Ability separate out services for individual scalability
 
