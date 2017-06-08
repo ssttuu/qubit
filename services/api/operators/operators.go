@@ -91,31 +91,23 @@ func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequ
 	orgKey := datastore.NameKey(organization.Kind, in.OrganizationId, nil)
 	sceneKey := datastore.NameKey(scene.Kind, in.SceneId, orgKey)
 	operatorKey := datastore.NameKey(operator.Kind, in.OperatorId, sceneKey)
-
 	newOperator := operator.NewOperatorFromProto(in.Operator)
-
 	_, err := s.DatastoreClient.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		var existingOperator operator.Operator
 		if err := tx.Get(operatorKey, &existingOperator); err != nil {
 			return errors.Wrapf(err, "Failed to get operator in tx %v", existingOperator)
 		}
-
 		existingOperator.Name = newOperator.Name
-
 		_, err := tx.Put(operatorKey, &existingOperator)
 		if err != nil {
 			return errors.Wrapf(err, "Failed to put operator in tx %v", existingOperator)
 		}
-
 		newOperator = existingOperator
-
 		return nil
 	})
-
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to update operator")
 	}
-
 	return newOperator.ToProto()
 }
 
