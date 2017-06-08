@@ -1,6 +1,5 @@
 package main
 
-
 import (
 	"log"
 	"net"
@@ -23,7 +22,7 @@ func main() {
 		log.Fatal(`You need to set the environment variable "PORT"`)
 	}
 
-	lis, err := net.Listen("tcp", ":" + port)
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		grpclog.Fatalf("failed to listen: %v", err)
 	}

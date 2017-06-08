@@ -7,10 +7,10 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
-	"github.com/stupschwartz/qubit/core/operator"
 	"github.com/pkg/errors"
+	"github.com/stupschwartz/qubit/core/operator"
 	"github.com/stupschwartz/qubit/core/parameter"
+	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
 )
 
 var r *rand.Rand
@@ -32,10 +32,8 @@ func (s *Server) RenderImage(ctx context.Context, in *compute_pb.RenderImageRequ
 
 	imagePlane, err := op.Process(nil, params, in.BoundingBox.StartX, in.BoundingBox.StartY, in.BoundingBox.EndX, in.BoundingBox.EndY)
 
-
 	return &compute_pb.RenderImageResponse{ImagePlane: imagePlane.ToProto()}, nil
 }
-
 
 func Register(grpcServer *grpc.Server) {
 	compute_pb.RegisterComputeServer(grpcServer, &Server{})

@@ -6,17 +6,17 @@ import (
 	"os"
 	"time"
 
-	"golang.org/x/net/context"
 	"cloud.google.com/go/datastore"
+	"cloud.google.com/go/storage"
+	"golang.org/x/net/context"
+	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
-	"google.golang.org/api/option"
-	"cloud.google.com/go/storage"
 
-	"github.com/stupschwartz/qubit/services/api/organizations"
-	"github.com/stupschwartz/qubit/services/api/scenes"
 	"github.com/stupschwartz/qubit/services/api/operators"
+	"github.com/stupschwartz/qubit/services/api/organizations"
 	"github.com/stupschwartz/qubit/services/api/parameters"
+	"github.com/stupschwartz/qubit/services/api/scenes"
 
 	"github.com/stupschwartz/qubit/proto-gen/go/compute"
 )
@@ -55,7 +55,7 @@ func main() {
 		log.Fatal(`You need to set the environment variable "PORT"`)
 	}
 
-	lis, err := net.Listen("tcp", ":" + port)
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		grpclog.Fatalf("failed to listen: %v", err)
 	}

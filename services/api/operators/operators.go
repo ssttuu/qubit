@@ -6,25 +6,24 @@ import (
 	"math/rand"
 	"time"
 
-	"golang.org/x/net/context"
 	"cloud.google.com/go/datastore"
+	"cloud.google.com/go/storage"
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"github.com/golang/protobuf/proto"
-	"cloud.google.com/go/storage"
 
 	"github.com/stupschwartz/qubit/core/image"
 	"github.com/stupschwartz/qubit/core/operator"
-	operators_pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
 	_ "github.com/stupschwartz/qubit/core/operators"
-	"github.com/stupschwartz/qubit/core/parameter"
 	"github.com/stupschwartz/qubit/core/organization"
+	"github.com/stupschwartz/qubit/core/parameter"
 	"github.com/stupschwartz/qubit/core/scene"
-	parameters_pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
 	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
+	operators_pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
+	parameters_pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
 )
-
 
 var r *rand.Rand
 
@@ -32,13 +31,12 @@ func init() {
 	r = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
-
 // Server implements `service Health`.
 type Server struct {
-	DatastoreClient *datastore.Client
-	StorageClient *storage.Client
+	DatastoreClient  *datastore.Client
+	StorageClient    *storage.Client
 	ParametersClient parameters_pb.ParametersClient
-	ComputeClient compute_pb.ComputeClient
+	ComputeClient    compute_pb.ComputeClient
 }
 
 func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest) (*operators_pb.ListOperatorsResponse, error) {
@@ -56,7 +54,7 @@ func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest
 		return nil, errors.Wrapf(err, "Failed to convert operators to proto, %v", operators_proto)
 	}
 
-	return &operators_pb.ListOperatorsResponse{Operators:operators_proto, NextPageToken:""}, nil
+	return &operators_pb.ListOperatorsResponse{Operators: operators_proto, NextPageToken: ""}, nil
 }
 
 func (s *Server) Get(ctx context.Context, in *operators_pb.GetOperatorRequest) (*operators_pb.Operator, error) {
@@ -136,8 +134,8 @@ func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequ
 
 	listParamsRequest := &parameters_pb.ListParametersRequest{
 		OrganizationId: in.OrganizationId,
-		SceneId: in.SceneId,
-		OperatorId: in.OperatorId,
+		SceneId:        in.SceneId,
+		OperatorId:     in.OperatorId,
 	}
 
 	params_pb, err := s.ParametersClient.List(ctx, listParamsRequest)
@@ -147,14 +145,12 @@ func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequ
 
 	params := parameter.NewParametersFromProto(params_pb.Parameters)
 
-
 	op, err := operator.GetOperation(theOperator.Type)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to get Operation for rendering, %v", theOperator.Type)
 	}
 
 	imagePlane, err := op.Process([]*image.Plane{}, params, in.BoundingBox.StartX, in.BoundingBox.StartY, in.BoundingBox.EndX, in.BoundingBox.EndY)
-
 
 	//
 	//// TODO: create bucket per Organization
@@ -187,14 +183,14 @@ func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequ
 
 	pngWriter.Close()
 
-	return &operators_pb.RenderOperatorResponse{ResultUrl:imagePngObjectPath, ResultType: operator.IMAGE }, nil
+	return &operators_pb.RenderOperatorResponse{ResultUrl: imagePngObjectPath, ResultType: operator.IMAGE}, nil
 }
 
 func Register(grpcServer *grpc.Server, datastoreClient *datastore.Client, storageClient *storage.Client, parametersClient parameters_pb.ParametersClient, computeClient compute_pb.ComputeClient) {
 	operators_pb.RegisterOperatorsServer(grpcServer, &Server{
-		DatastoreClient: datastoreClient,
-		StorageClient: storageClient,
+		DatastoreClient:  datastoreClient,
+		StorageClient:    storageClient,
 		ParametersClient: parametersClient,
-		ComputeClient: computeClient,
+		ComputeClient:    computeClient,
 	})
 }

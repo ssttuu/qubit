@@ -1,26 +1,25 @@
 package main
 
-
 import (
 	"math/rand"
 	"time"
 
-	"golang.org/x/net/context"
 	"cloud.google.com/go/datastore"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	"github.com/stupschwartz/qubit/core/image"
-	images_pb "github.com/stupschwartz/qubit/proto-gen/go/images"
+	"github.com/stupschwartz/qubit/core/operator"
 	"github.com/stupschwartz/qubit/core/organization"
 	"github.com/stupschwartz/qubit/core/scene"
-	"github.com/stupschwartz/qubit/core/operator"
-	"os"
+	images_pb "github.com/stupschwartz/qubit/proto-gen/go/images"
 	"google.golang.org/api/option"
-	"net"
 	"google.golang.org/grpc/grpclog"
 	"log"
+	"net"
+	"os"
 )
 
 var r *rand.Rand
@@ -28,7 +27,6 @@ var r *rand.Rand
 func init() {
 	r = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
-
 
 type Server struct {
 	DatastoreClient *datastore.Client
@@ -45,7 +43,7 @@ func (s *Server) List(ctx context.Context, in *images_pb.ListImagesRequest) (*im
 		return nil, errors.Wrap(err, "Could not get all")
 	}
 
-	return &images_pb.ListImageResponse{Image:images.ToProto(), NextPageToken:""}, nil
+	return &images_pb.ListImageResponse{Image: images.ToProto(), NextPageToken: ""}, nil
 }
 
 func (s *Server) Get(ctx context.Context, in *images_pb.GetParameterRequest) (*images_pb.Parameter, error) {
@@ -123,7 +121,6 @@ func (s *Server) Delete(ctx context.Context, in *images_pb.DeleteParameterReques
 	return &empty.Empty{}, nil
 }
 
-
 func main() {
 	projID := os.Getenv("GOOGLE_PROJECT_ID")
 	if projID == "" {
@@ -141,13 +138,12 @@ func main() {
 		datastoreClient, err = datastore.NewClient(ctx, projID, serviceCredentials)
 	}
 
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		log.Fatal(`You need to set the environment variable "PORT"`)
 	}
 
-	lis, err := net.Listen("tcp", ":" + port)
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		grpclog.Fatalf("failed to listen: %v", err)
 	}

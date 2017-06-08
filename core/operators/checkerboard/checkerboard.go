@@ -8,21 +8,16 @@ import (
 
 const Name string = "CheckerBoard"
 
-type CheckerBoard struct {
-
-}
+type CheckerBoard struct {}
 
 func (c *CheckerBoard) Process(inputs []*image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) (*image.Plane, error) {
 	sizeParam := p.GetById("Size")
 	sizeValue := int32(sizeParam.GetValueByIndex(0))
-
 	width := endX - startX
 	height := endY - startY
-
 	redChannel := image.Channel{Rows: make([]*image.Row, height)}
 	greenChannel := image.Channel{Rows: make([]*image.Row, height)}
 	blueChannel := image.Channel{Rows: make([]*image.Row, height)}
-
 	// TODO: each row should be a goroutine
 	var row, col int32
 	for row = 0; row < height; row++ {
@@ -30,20 +25,16 @@ func (c *CheckerBoard) Process(inputs []*image.Plane, p parameter.Parameters, st
 		for col = 0; col < width; col++ {
 			checkerBoardRow := (row + startY) / sizeValue
 			checkerBoardColumn := (col + startX) / sizeValue
-
 			value := 0.0
 			if ((checkerBoardRow + checkerBoardColumn) % 2) == 0 {
 				value = 1.0
 			}
-
 			rowData[col] = value
 		}
-
 		redChannel.Rows[row] = &image.Row{Data: rowData}
 		greenChannel.Rows[row] = &image.Row{Data: rowData}
 		blueChannel.Rows[row] = &image.Row{Data: rowData}
 	}
-
 	return image.NewPlane(width, height, []image.Channel{redChannel, greenChannel, blueChannel}), nil
 }
 

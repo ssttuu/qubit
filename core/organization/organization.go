@@ -35,6 +35,5 @@ func (o *Organizations) ToProto() ([]*pb.Organization, error) {
 		}
 		pborganizations = append(pborganizations, organization_proto)
 	}
-
 	return pborganizations, nil
 }

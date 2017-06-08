@@ -4,17 +4,17 @@ import (
 	"math/rand"
 	"time"
 
-	"golang.org/x/net/context"
 	"cloud.google.com/go/datastore"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"github.com/stupschwartz/qubit/core/parameter"
-	parameters_pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
-	"github.com/stupschwartz/qubit/core/organization"
-	"github.com/stupschwartz/qubit/core/scene"
 	"github.com/stupschwartz/qubit/core/operator"
+	"github.com/stupschwartz/qubit/core/organization"
+	"github.com/stupschwartz/qubit/core/parameter"
+	"github.com/stupschwartz/qubit/core/scene"
+	parameters_pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
 )
 
 var r *rand.Rand
@@ -22,7 +22,6 @@ var r *rand.Rand
 func init() {
 	r = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
-
 
 type Server struct {
 	DatastoreClient *datastore.Client
@@ -39,7 +38,7 @@ func (s *Server) List(ctx context.Context, in *parameters_pb.ListParametersReque
 		return nil, errors.Wrap(err, "Could not get all")
 	}
 
-	return &parameters_pb.ListParametersResponse{Parameters:parameters.ToProto(), NextPageToken:""}, nil
+	return &parameters_pb.ListParametersResponse{Parameters: parameters.ToProto(), NextPageToken: ""}, nil
 }
 
 func (s *Server) Get(ctx context.Context, in *parameters_pb.GetParameterRequest) (*parameters_pb.Parameter, error) {
