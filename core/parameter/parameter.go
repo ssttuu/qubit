@@ -25,7 +25,6 @@ func (p *Parameter) GetComponentById(id string) *Component {
 			return component
 		}
 	}
-
 	return nil
 }
 
@@ -76,7 +75,6 @@ func (p *Parameters) GetById(id string) *Parameter {
 			return param
 		}
 	}
-
 	return nil
 }
 

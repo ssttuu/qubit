@@ -1,20 +1,19 @@
 package scenes
 
-
 import (
 	"fmt"
 	"math/rand"
 	"time"
 
-	"golang.org/x/net/context"
 	"cloud.google.com/go/datastore"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"github.com/stupschwartz/qubit/core/organization"
 	"github.com/stupschwartz/qubit/core/scene"
 	scenes_pb "github.com/stupschwartz/qubit/proto-gen/go/scenes"
-	"github.com/stupschwartz/qubit/core/organization"
 )
 
 var r *rand.Rand
@@ -22,7 +21,6 @@ var r *rand.Rand
 func init() {
 	r = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
-
 
 type Server struct {
 	DatastoreClient *datastore.Client
@@ -42,7 +40,7 @@ func (s *Server) List(ctx context.Context, in *scenes_pb.ListScenesRequest) (*sc
 		return nil, errors.Wrapf(err, "Failed to convert scenes to proto, %v", scenes)
 	}
 
-	return &scenes_pb.ListScenesResponse{Scenes:scenes_proto, NextPageToken:""}, nil
+	return &scenes_pb.ListScenesResponse{Scenes: scenes_proto, NextPageToken: ""}, nil
 }
 
 func (s *Server) Get(ctx context.Context, in *scenes_pb.GetSceneRequest) (*scenes_pb.Scene, error) {

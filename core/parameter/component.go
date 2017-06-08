@@ -3,7 +3,7 @@ package parameter
 import pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
 
 type Component struct {
-	Id    string `json:"id"`
+	Id    string  `json:"id"`
 	Value float64 `json:"value"`
 }
 
@@ -30,7 +30,6 @@ func (c *Components) ToProto() []*pb.Component {
 	for _, component := range *c {
 		pb_components = append(pb_components, component.ToProto())
 	}
-
 	return pb_components
 }
 

@@ -5,10 +5,10 @@ import (
 	"math/rand"
 	"time"
 
-	"golang.org/x/net/context"
 	"cloud.google.com/go/datastore"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	"github.com/stupschwartz/qubit/core/organization"
@@ -37,7 +37,7 @@ func (s *Server) List(ctx context.Context, in *organizations_pb.ListOrganization
 		return nil, errors.Wrapf(err, "Failed to convert organizations to proto, %v", organizations)
 	}
 
-	return &organizations_pb.ListOrganizationsResponse{Organizations:organizations_proto, NextPageToken:""}, nil
+	return &organizations_pb.ListOrganizationsResponse{Organizations: organizations_proto, NextPageToken: ""}, nil
 }
 
 func (s *Server) Get(ctx context.Context, in *organizations_pb.GetOrganizationRequest) (*organizations_pb.Organization, error) {
