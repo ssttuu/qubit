@@ -36,7 +36,7 @@ up: build
 	docker-compose up server compute
 
 test:
-	bash ./run-tests.integration.sh
+	./run-tests.integration.sh
 
 migrate-cockroachdb:
 	migrate -database
