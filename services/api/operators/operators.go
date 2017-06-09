@@ -18,7 +18,6 @@ import (
 	"github.com/stupschwartz/qubit/core/operator"
 	_ "github.com/stupschwartz/qubit/core/operators"
 	"github.com/stupschwartz/qubit/core/organization"
-	"github.com/stupschwartz/qubit/core/parameter"
 	"github.com/stupschwartz/qubit/core/scene"
 	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
 	operators_pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
@@ -67,7 +66,7 @@ func (s *Server) Get(ctx context.Context, in *operators_pb.GetOperatorRequest) (
 		return nil, errors.Wrap(err, "Could not get datastore entity")
 	}
 
-	return existingOperator.ToProto()
+	return existingOperator.ToProto(), nil
 }
 
 func (s *Server) Create(ctx context.Context, in *operators_pb.CreateOperatorRequest) (*operators_pb.Operator, error) {
@@ -82,7 +81,7 @@ func (s *Server) Create(ctx context.Context, in *operators_pb.CreateOperatorRequ
 		return nil, errors.Wrapf(err, "Failed to put operator %v", newOperator.Id)
 	}
 
-	return newOperator.ToProto()
+	return newOperator.ToProto(), nil
 }
 
 func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequest) (*operators_pb.Operator, error) {
@@ -106,7 +105,7 @@ func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequ
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to update operator")
 	}
-	return newOperator.ToProto()
+	return newOperator.ToProto(), nil
 }
 
 func (s *Server) Delete(ctx context.Context, in *operators_pb.DeleteOperatorRequest) (*empty.Empty, error) {
@@ -143,14 +142,16 @@ func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequ
 		return nil, errors.Wrapf(err, "Failed to list parameters, %v", listParamsRequest)
 	}
 
-	params := parameter.NewParametersFromProto(params_pb.Parameters)
-
-	op, err := operator.GetOperation(theOperator.Type)
+	renderImageRequest := &compute_pb.RenderImageRequest{
+		Operator:   theOperator.ToProto(),
+		Parameters: params_pb.Parameters,
+	}
+	renderImageResponse, err := s.ComputeClient.RenderImage(ctx, renderImageRequest)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to get Operation for rendering, %v", theOperator.Type)
+		return nil, errors.Wrapf(err, "Failed to render operator, %v", theOperator)
 	}
 
-	imagePlane, err := op.Process([]*image.Plane{}, params, in.BoundingBox.StartX, in.BoundingBox.StartY, in.BoundingBox.EndX, in.BoundingBox.EndY)
+	imagePlane := image.NewPlaneFromProto(renderImageResponse.ImagePlane)
 
 	//
 	//// TODO: create bucket per Organization

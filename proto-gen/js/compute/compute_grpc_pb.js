@@ -6,6 +6,7 @@ var compute_compute_pb = require('../compute/compute_pb.js');
 var geometry_geometry_pb = require('../geometry/geometry_pb.js');
 var images_images_pb = require('../images/images_pb.js');
 var operators_operators_pb = require('../operators/operators_pb.js');
+var parameters_parameters_pb = require('../parameters/parameters_pb.js');
 
 function serialize_compute_RenderImageRequest(arg) {
   if (!(arg instanceof compute_compute_pb.RenderImageRequest)) {

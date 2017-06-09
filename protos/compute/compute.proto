@@ -5,6 +5,7 @@ package compute;
 import "geometry/geometry.proto";
 import "images/images.proto";
 import "operators/operators.proto";
+import "parameters/parameters.proto";
 
 service Compute {
     rpc RenderImage (RenderImageRequest) returns (RenderImageResponse) {}
@@ -13,7 +14,8 @@ service Compute {
 
 message RenderImageRequest {
     operators.Operator operator = 1;
-    geometry.BoundingBox2D bounding_box = 2;
+    repeated parameters.Parameter parameters = 2;
+    geometry.BoundingBox2D bounding_box = 3;
 }
 
 message RenderImageResponse {

@@ -28,7 +28,7 @@ func (s *Server) RenderImage(ctx context.Context, in *compute_pb.RenderImageRequ
 		return nil, errors.Wrapf(err, "Failed to get Operation for rendering, %v", in.Operator.Type)
 	}
 
-	params := parameter.NewParametersFromProto(in.Operator.Parameters)
+	params := parameter.NewParametersFromProto(in.Parameters)
 
 	imagePlane, err := op.Process(nil, params, in.BoundingBox.StartX, in.BoundingBox.StartY, in.BoundingBox.EndX, in.BoundingBox.EndY)
 

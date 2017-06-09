@@ -3,7 +3,7 @@ COMPUTE_FILES = $(shell find services/compute -type f -name "*.go")
 IMAGES_FILES = $(shell find services/images -type f -name "*.go")
 
 # First target is default
-build-go: build-api-go build-compute-go build-images-go
+build-go: build-api-go build-compute-go
 
 clean:
 	touch services/api/run && rm services/api/run
@@ -19,10 +19,6 @@ services/compute/run: $(COMPUTE_FILES)
 	gofmt -l -s -w $(COMPUTE_FILES) && cd services/compute && go get ./... && go build -o run
 build-compute-go: services/compute/run
 
-services/images/run: $(IMAGES_FILES)
-	gofmt -l -s -w $(IMAGES_FILES) && cd services/images && go get ./... && go build -o run
-build-images-go: services/images/run
-
 # Docker images
 build-api: build-api-go
 	docker-compose build server
@@ -30,15 +26,21 @@ build-api: build-api-go
 build-compute: build-compute-go
 	docker-compose build compute
 
-build-images: build-images-go
-	docker-compose build images
-
-build: proto build-api build-compute build-images
+build: proto build-api build-compute
 
 # Generate proto code
-$(shell find proto-gen) $(shell find tests/integration/protos): $(shell find protos -type f -name "*.proto")
-	bash ./gen-proto.sh
-proto: $(shell find proto-gen) $(shell find tests/integration/protos)
+proto-gen/services/%.pb: protos/%.proto
+	./scripts/gen-proto.sh service $*
+
+proto-gen/go/%.pb.go: protos/%.proto
+	./scripts/gen-proto.sh go $*
+
+proto-gen/js/%_pb.js proto-gen/js/%_grpc_pb.js: protos/%.proto
+	./scripts/gen-proto.sh js $*
+
+protonames = geometry health images operators organizations parameters scenes api compute
+
+protos: $(foreach protoname,$(protonames),$(subst NAME,$(protoname),proto-gen/services/NAME/NAME.pb proto-gen/go/NAME/NAME.pb.go proto-gen/js/NAME/NAME_pb.js))
 
 # Run containers
 up: build
