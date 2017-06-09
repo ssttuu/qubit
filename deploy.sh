@@ -6,7 +6,7 @@ CIRCLE_SHA1=${CIRCLE_SHA1:-}
 
 deployService() {
     set -euo pipefail
-    echo $(gcloud service-management deploy services/${1}/api_config.yaml proto-gen/services/${1}.pb --format json) | jq -r '.serviceConfig.id'
+    echo $(gcloud service-management deploy services/${1}/api_config.yaml proto-gen/services/${1}/${1}.pb --format json) | jq -r '.serviceConfig.id'
 }
 
 api_id=$(deployService "api")

@@ -6,7 +6,6 @@ import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
 import "geometry/geometry.proto";
-import "parameters/parameters.proto";
 
 
 service Operators {
@@ -50,8 +49,6 @@ message Operator {
     string name = 2;
     string context = 3;
     string type = 4;
-
-    repeated parameters.Parameter parameters = 5;
 }
 
 message ListOperatorsRequest {

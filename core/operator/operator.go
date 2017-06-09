@@ -25,8 +25,8 @@ type Operator struct {
 	Outputs []string `json:"outputs" datastore:"outputs"`
 }
 
-func (o *Operator) ToProto() (*pb.Operator, error) {
-	return &pb.Operator{Id: o.Id, Name: o.Name, Context: o.Context, Type: o.Type}, nil
+func (o *Operator) ToProto() *pb.Operator {
+	return &pb.Operator{Id: o.Id, Name: o.Name, Context: o.Context, Type: o.Type}
 }
 
 func NewOperatorFromProto(pb_op *pb.Operator) Operator {
@@ -38,11 +38,7 @@ type Operators []*Operator
 func (o *Operators) ToProto() ([]*pb.Operator, error) {
 	var pb_ops []*pb.Operator
 	for _, operator := range *o {
-		operator_proto, err := operator.ToProto()
-		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to convert operator to proto, %v", operator)
-		}
-		pb_ops = append(pb_ops, operator_proto)
+		pb_ops = append(pb_ops, operator.ToProto())
 	}
 
 	return pb_ops, nil
