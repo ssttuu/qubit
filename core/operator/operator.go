@@ -1,47 +1,60 @@
 package operator
 
 import (
-	pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
-	"fmt"
 	"github.com/pkg/errors"
-	"github.com/stupschwartz/qubit/core/parameter"
+
 	"github.com/stupschwartz/qubit/core/image"
+	"github.com/stupschwartz/qubit/core/parameter"
+	pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
 )
 
-
-const Kind string = "Operator"
-
 const (
-	IMAGE string = "image"
+	IMAGE    string = "image"
 	GEOMETRY string = "geometry"
 )
 
 type Operator struct {
-	Id      string `json:"id" datastore:"id"`
-	Name    string `json:"name" datastore:"name"`
-	Context string `json:"context" datastore:"context"`
-	Type    string `json:"type" datastore:"type"`
-	Inputs  []string `json:"inputs" datastore:"inputs"`
-	Outputs []string `json:"outputs" datastore:"outputs"`
+	Id      int64  `json:"id" db:"id"`
+	SceneId int64  `json:"scene_id" db:"scene_id"`
+	Type    string `json:"type" db:"type"`
+	Name    string `json:"name" db:"name"`
+	// TODO: What is context? Is it the range of images within the scene
+	// TODO: to which the operator applies?
+	Context string `json:"context" db:"context"`
+	// TODO: Should inputs/outputs be arrays of IDs of other operators?
+	// TODO: Do we need both? Is it normalized in the DB?
+	Inputs  []string `json:"inputs" db:"inputs"`
+	Outputs []string `json:"outputs" db:"outputs"`
 }
 
 func (o *Operator) ToProto() *pb.Operator {
-	return &pb.Operator{Id: o.Id, Name: o.Name, Context: o.Context, Type: o.Type}
+	return &pb.Operator{
+		Id:      o.Id,
+		SceneId: o.SceneId,
+		Type:    o.Type,
+		Name:    o.Name,
+		Context: o.Context,
+	}
 }
 
 func NewOperatorFromProto(pb_op *pb.Operator) Operator {
-	return Operator{Id: fmt.Sprint(pb_op.Id), Name: pb_op.Name, Context: pb_op.Context, Type: pb_op.Type}
+	return Operator{
+		Id:      pb_op.Id,
+		SceneId: pb_op.SceneId,
+		Type:    pb_op.Type,
+		Name:    pb_op.Name,
+		Context: pb_op.Context,
+	}
 }
 
 type Operators []*Operator
 
-func (o *Operators) ToProto() ([]*pb.Operator, error) {
+func (o *Operators) ToProto() []*pb.Operator {
 	var pb_ops []*pb.Operator
 	for _, operator := range *o {
 		pb_ops = append(pb_ops, operator.ToProto())
 	}
-
-	return pb_ops, nil
+	return pb_ops
 }
 
 type Operable interface {

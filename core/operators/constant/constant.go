@@ -2,19 +2,19 @@ package constant
 
 import (
 	"github.com/stupschwartz/qubit/core/image"
-	"github.com/stupschwartz/qubit/core/parameter"
 	"github.com/stupschwartz/qubit/core/operator"
+	"github.com/stupschwartz/qubit/core/parameter"
 )
 
 const Name string = "Constant"
 
-type Constant struct {}
+type Constant struct{}
 
 func (c *Constant) Process(inputs []*image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) (*image.Plane, error) {
-	colorParam := p.GetById("Color")
-	redValue := colorParam.GetValueById("Red")
-	greenValue := colorParam.GetValueById("Green")
-	blueValue := colorParam.GetValueById("Blue")
+	colorParam := p.GetByName("Color")
+	redValue := colorParam.GetValueByName("Red")
+	greenValue := colorParam.GetValueByName("Green")
+	blueValue := colorParam.GetValueByName("Blue")
 	width := endX - startX
 	height := endY - startY
 	redComponent := image.Channel{Rows: make([]*image.Row, height)}

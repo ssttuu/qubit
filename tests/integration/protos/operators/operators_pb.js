@@ -67,10 +67,11 @@ proto.operators.Operator.prototype.toObject = function(opt_includeInstance) {
  */
 proto.operators.Operator.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    name: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    context: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    type: jspb.Message.getFieldWithDefault(msg, 4, "")
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    sceneId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    type: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    name: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    context: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
   if (includeInstance) {
@@ -108,20 +109,24 @@ proto.operators.Operator.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
+      var value = /** @type {number} */ (reader.readInt64());
       msg.setId(value);
       break;
     case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setName(value);
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setSceneId(value);
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
-      msg.setContext(value);
+      msg.setType(value);
       break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
-      msg.setType(value);
+      msg.setName(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setContext(value);
       break;
     default:
       reader.skipField();
@@ -162,30 +167,37 @@ proto.operators.Operator.prototype.serializeBinary = function() {
 proto.operators.Operator.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f.length > 0) {
-    writer.writeString(
+  if (f !== 0) {
+    writer.writeInt64(
       1,
       f
     );
   }
-  f = this.getName();
-  if (f.length > 0) {
-    writer.writeString(
+  f = this.getSceneId();
+  if (f !== 0) {
+    writer.writeInt64(
       2,
-      f
-    );
-  }
-  f = this.getContext();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
       f
     );
   }
   f = this.getType();
   if (f.length > 0) {
     writer.writeString(
+      3,
+      f
+    );
+  }
+  f = this.getName();
+  if (f.length > 0) {
+    writer.writeString(
       4,
+      f
+    );
+  }
+  f = this.getContext();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
       f
     );
   }
@@ -193,62 +205,77 @@ proto.operators.Operator.prototype.serializeBinaryToWriter = function (writer) {
 
 
 /**
- * optional string id = 1;
- * @return {string}
+ * optional int64 id = 1;
+ * @return {number}
  */
 proto.operators.Operator.prototype.getId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {string} value */
+/** @param {number} value */
 proto.operators.Operator.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional string name = 2;
- * @return {string}
+ * optional int64 scene_id = 2;
+ * @return {number}
  */
-proto.operators.Operator.prototype.getName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+proto.operators.Operator.prototype.getSceneId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
-/** @param {string} value */
-proto.operators.Operator.prototype.setName = function(value) {
+/** @param {number} value */
+proto.operators.Operator.prototype.setSceneId = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * optional string context = 3;
+ * optional string type = 3;
  * @return {string}
  */
-proto.operators.Operator.prototype.getContext = function() {
+proto.operators.Operator.prototype.getType = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
-proto.operators.Operator.prototype.setContext = function(value) {
+proto.operators.Operator.prototype.setType = function(value) {
   jspb.Message.setField(this, 3, value);
 };
 
 
 /**
- * optional string type = 4;
+ * optional string name = 4;
  * @return {string}
  */
-proto.operators.Operator.prototype.getType = function() {
+proto.operators.Operator.prototype.getName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.operators.Operator.prototype.setType = function(value) {
+proto.operators.Operator.prototype.setName = function(value) {
   jspb.Message.setField(this, 4, value);
+};
+
+
+/**
+ * optional string context = 5;
+ * @return {string}
+ */
+proto.operators.Operator.prototype.getContext = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.operators.Operator.prototype.setContext = function(value) {
+  jspb.Message.setField(this, 5, value);
 };
 
 
@@ -298,10 +325,8 @@ proto.operators.ListOperatorsRequest.prototype.toObject = function(opt_includeIn
  */
 proto.operators.ListOperatorsRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    pageSize: jspb.Message.getFieldWithDefault(msg, 3, 0),
-    pageToken: jspb.Message.getFieldWithDefault(msg, 4, "")
+    pageSize: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    pageToken: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -339,18 +364,10 @@ proto.operators.ListOperatorsRequest.deserializeBinaryFromReader = function(msg,
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setPageSize(value);
       break;
-    case 4:
+    case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.setPageToken(value);
       break;
@@ -392,31 +409,17 @@ proto.operators.ListOperatorsRequest.prototype.serializeBinary = function() {
  */
 proto.operators.ListOperatorsRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
-      1,
-      f
-    );
-  }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
   f = this.getPageSize();
   if (f !== 0) {
     writer.writeInt32(
-      3,
+      1,
       f
     );
   }
   f = this.getPageToken();
   if (f.length > 0) {
     writer.writeString(
-      4,
+      2,
       f
     );
   }
@@ -424,62 +427,32 @@ proto.operators.ListOperatorsRequest.prototype.serializeBinaryToWriter = functio
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
- */
-proto.operators.ListOperatorsRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.ListOperatorsRequest.prototype.setOrganizationId = function(value) {
-  jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.operators.ListOperatorsRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.ListOperatorsRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional int32 page_size = 3;
+ * optional int32 page_size = 1;
  * @return {number}
  */
 proto.operators.ListOperatorsRequest.prototype.getPageSize = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
 /** @param {number} value */
 proto.operators.ListOperatorsRequest.prototype.setPageSize = function(value) {
-  jspb.Message.setField(this, 3, value);
+  jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional string page_token = 4;
+ * optional string page_token = 2;
  * @return {string}
  */
 proto.operators.ListOperatorsRequest.prototype.getPageToken = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
 proto.operators.ListOperatorsRequest.prototype.setPageToken = function(value) {
-  jspb.Message.setField(this, 4, value);
+  jspb.Message.setField(this, 2, value);
 };
 
 
@@ -734,9 +707,7 @@ proto.operators.GetOperatorRequest.prototype.toObject = function(opt_includeInst
  */
 proto.operators.GetOperatorRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, "")
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
   };
 
   if (includeInstance) {
@@ -774,16 +745,8 @@ proto.operators.GetOperatorRequest.deserializeBinaryFromReader = function(msg, r
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setId(value);
       break;
     default:
       reader.skipField();
@@ -823,72 +786,28 @@ proto.operators.GetOperatorRequest.prototype.serializeBinary = function() {
  */
 proto.operators.GetOperatorRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
+  f = this.getId();
+  if (f !== 0) {
+    writer.writeInt64(
       1,
       f
     );
   }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
 };
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
+ * optional int64 id = 1;
+ * @return {number}
  */
-proto.operators.GetOperatorRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.operators.GetOperatorRequest.prototype.getId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {string} value */
-proto.operators.GetOperatorRequest.prototype.setOrganizationId = function(value) {
+/** @param {number} value */
+proto.operators.GetOperatorRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.operators.GetOperatorRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.GetOperatorRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.operators.GetOperatorRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.GetOperatorRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
 };
 
 
@@ -938,8 +857,6 @@ proto.operators.CreateOperatorRequest.prototype.toObject = function(opt_includeI
  */
 proto.operators.CreateOperatorRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
     operator: (f = msg.getOperator()) && proto.operators.Operator.toObject(includeInstance, f)
   };
 
@@ -978,14 +895,6 @@ proto.operators.CreateOperatorRequest.deserializeBinaryFromReader = function(msg
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
       var value = new proto.operators.Operator;
       reader.readMessage(value,proto.operators.Operator.deserializeBinaryFromReader);
       msg.setOperator(value);
@@ -1028,24 +937,10 @@ proto.operators.CreateOperatorRequest.prototype.serializeBinary = function() {
  */
 proto.operators.CreateOperatorRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
-      1,
-      f
-    );
-  }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
   f = this.getOperator();
   if (f != null) {
     writer.writeMessage(
-      3,
+      1,
       f,
       proto.operators.Operator.serializeBinaryToWriter
     );
@@ -1054,48 +949,18 @@ proto.operators.CreateOperatorRequest.prototype.serializeBinaryToWriter = functi
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
- */
-proto.operators.CreateOperatorRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.CreateOperatorRequest.prototype.setOrganizationId = function(value) {
-  jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.operators.CreateOperatorRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.CreateOperatorRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional Operator operator = 3;
+ * optional Operator operator = 1;
  * @return {?proto.operators.Operator}
  */
 proto.operators.CreateOperatorRequest.prototype.getOperator = function() {
   return /** @type{?proto.operators.Operator} */ (
-    jspb.Message.getWrapperField(this, proto.operators.Operator, 3));
+    jspb.Message.getWrapperField(this, proto.operators.Operator, 1));
 };
 
 
 /** @param {?proto.operators.Operator|undefined} value */
 proto.operators.CreateOperatorRequest.prototype.setOperator = function(value) {
-  jspb.Message.setWrapperField(this, 3, value);
+  jspb.Message.setWrapperField(this, 1, value);
 };
 
 
@@ -1109,7 +974,7 @@ proto.operators.CreateOperatorRequest.prototype.clearOperator = function() {
  * @return {!boolean}
  */
 proto.operators.CreateOperatorRequest.prototype.hasOperator = function() {
-  return jspb.Message.getField(this, 3) != null;
+  return jspb.Message.getField(this, 1) != null;
 };
 
 
@@ -1159,9 +1024,7 @@ proto.operators.UpdateOperatorRequest.prototype.toObject = function(opt_includeI
  */
 proto.operators.UpdateOperatorRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
     operator: (f = msg.getOperator()) && proto.operators.Operator.toObject(includeInstance, f)
   };
 
@@ -1200,18 +1063,10 @@ proto.operators.UpdateOperatorRequest.deserializeBinaryFromReader = function(msg
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setId(value);
       break;
     case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
-      break;
-    case 4:
       var value = new proto.operators.Operator;
       reader.readMessage(value,proto.operators.Operator.deserializeBinaryFromReader);
       msg.setOperator(value);
@@ -1254,31 +1109,17 @@ proto.operators.UpdateOperatorRequest.prototype.serializeBinary = function() {
  */
 proto.operators.UpdateOperatorRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
+  f = this.getId();
+  if (f !== 0) {
+    writer.writeInt64(
       1,
-      f
-    );
-  }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
       f
     );
   }
   f = this.getOperator();
   if (f != null) {
     writer.writeMessage(
-      4,
+      2,
       f,
       proto.operators.Operator.serializeBinaryToWriter
     );
@@ -1287,63 +1128,33 @@ proto.operators.UpdateOperatorRequest.prototype.serializeBinaryToWriter = functi
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
+ * optional int64 id = 1;
+ * @return {number}
  */
-proto.operators.UpdateOperatorRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.operators.UpdateOperatorRequest.prototype.getId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {string} value */
-proto.operators.UpdateOperatorRequest.prototype.setOrganizationId = function(value) {
+/** @param {number} value */
+proto.operators.UpdateOperatorRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.operators.UpdateOperatorRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.UpdateOperatorRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.operators.UpdateOperatorRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.UpdateOperatorRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * optional Operator operator = 4;
+ * optional Operator operator = 2;
  * @return {?proto.operators.Operator}
  */
 proto.operators.UpdateOperatorRequest.prototype.getOperator = function() {
   return /** @type{?proto.operators.Operator} */ (
-    jspb.Message.getWrapperField(this, proto.operators.Operator, 4));
+    jspb.Message.getWrapperField(this, proto.operators.Operator, 2));
 };
 
 
 /** @param {?proto.operators.Operator|undefined} value */
 proto.operators.UpdateOperatorRequest.prototype.setOperator = function(value) {
-  jspb.Message.setWrapperField(this, 4, value);
+  jspb.Message.setWrapperField(this, 2, value);
 };
 
 
@@ -1357,7 +1168,7 @@ proto.operators.UpdateOperatorRequest.prototype.clearOperator = function() {
  * @return {!boolean}
  */
 proto.operators.UpdateOperatorRequest.prototype.hasOperator = function() {
-  return jspb.Message.getField(this, 4) != null;
+  return jspb.Message.getField(this, 2) != null;
 };
 
 
@@ -1407,9 +1218,7 @@ proto.operators.DeleteOperatorRequest.prototype.toObject = function(opt_includeI
  */
 proto.operators.DeleteOperatorRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, "")
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
   };
 
   if (includeInstance) {
@@ -1447,16 +1256,8 @@ proto.operators.DeleteOperatorRequest.deserializeBinaryFromReader = function(msg
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setId(value);
       break;
     default:
       reader.skipField();
@@ -1496,72 +1297,28 @@ proto.operators.DeleteOperatorRequest.prototype.serializeBinary = function() {
  */
 proto.operators.DeleteOperatorRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
+  f = this.getId();
+  if (f !== 0) {
+    writer.writeInt64(
       1,
       f
     );
   }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
 };
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
+ * optional int64 id = 1;
+ * @return {number}
  */
-proto.operators.DeleteOperatorRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.operators.DeleteOperatorRequest.prototype.getId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {string} value */
-proto.operators.DeleteOperatorRequest.prototype.setOrganizationId = function(value) {
+/** @param {number} value */
+proto.operators.DeleteOperatorRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.operators.DeleteOperatorRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.DeleteOperatorRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.operators.DeleteOperatorRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.DeleteOperatorRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
 };
 
 
@@ -1611,10 +1368,8 @@ proto.operators.RenderOperatorRequest.prototype.toObject = function(opt_includeI
  */
 proto.operators.RenderOperatorRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    frame: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    frame: jspb.Message.getFieldWithDefault(msg, 2, 0),
     boundingBox: (f = msg.getBoundingBox()) && geometry_geometry_pb.BoundingBox2D.toObject(includeInstance, f)
   };
 
@@ -1653,22 +1408,14 @@ proto.operators.RenderOperatorRequest.deserializeBinaryFromReader = function(msg
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setId(value);
       break;
     case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
-      break;
-    case 4:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setFrame(value);
       break;
-    case 5:
+    case 3:
       var value = new geometry_geometry_pb.BoundingBox2D;
       reader.readMessage(value,geometry_geometry_pb.BoundingBox2D.deserializeBinaryFromReader);
       msg.setBoundingBox(value);
@@ -1711,38 +1458,24 @@ proto.operators.RenderOperatorRequest.prototype.serializeBinary = function() {
  */
 proto.operators.RenderOperatorRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
+  f = this.getId();
+  if (f !== 0) {
+    writer.writeInt64(
       1,
-      f
-    );
-  }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
       f
     );
   }
   f = this.getFrame();
   if (f !== 0) {
     writer.writeInt32(
-      4,
+      2,
       f
     );
   }
   f = this.getBoundingBox();
   if (f != null) {
     writer.writeMessage(
-      5,
+      3,
       f,
       geometry_geometry_pb.BoundingBox2D.serializeBinaryToWriter
     );
@@ -1751,78 +1484,48 @@ proto.operators.RenderOperatorRequest.prototype.serializeBinaryToWriter = functi
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
+ * optional int64 id = 1;
+ * @return {number}
  */
-proto.operators.RenderOperatorRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.operators.RenderOperatorRequest.prototype.getId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {string} value */
-proto.operators.RenderOperatorRequest.prototype.setOrganizationId = function(value) {
+/** @param {number} value */
+proto.operators.RenderOperatorRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.operators.RenderOperatorRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.RenderOperatorRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.operators.RenderOperatorRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.RenderOperatorRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * optional int32 frame = 4;
+ * optional int32 frame = 2;
  * @return {number}
  */
 proto.operators.RenderOperatorRequest.prototype.getFrame = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {number} value */
 proto.operators.RenderOperatorRequest.prototype.setFrame = function(value) {
-  jspb.Message.setField(this, 4, value);
+  jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * optional geometry.BoundingBox2D bounding_box = 5;
+ * optional geometry.BoundingBox2D bounding_box = 3;
  * @return {?proto.geometry.BoundingBox2D}
  */
 proto.operators.RenderOperatorRequest.prototype.getBoundingBox = function() {
   return /** @type{?proto.geometry.BoundingBox2D} */ (
-    jspb.Message.getWrapperField(this, geometry_geometry_pb.BoundingBox2D, 5));
+    jspb.Message.getWrapperField(this, geometry_geometry_pb.BoundingBox2D, 3));
 };
 
 
 /** @param {?proto.geometry.BoundingBox2D|undefined} value */
 proto.operators.RenderOperatorRequest.prototype.setBoundingBox = function(value) {
-  jspb.Message.setWrapperField(this, 5, value);
+  jspb.Message.setWrapperField(this, 3, value);
 };
 
 
@@ -1836,7 +1539,7 @@ proto.operators.RenderOperatorRequest.prototype.clearBoundingBox = function() {
  * @return {!boolean}
  */
 proto.operators.RenderOperatorRequest.prototype.hasBoundingBox = function() {
-  return jspb.Message.getField(this, 5) != null;
+  return jspb.Message.getField(this, 3) != null;
 };
 
 

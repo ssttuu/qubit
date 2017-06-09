@@ -65,7 +65,7 @@ proto.parameters.Component.prototype.toObject = function(opt_includeInstance) {
  */
 proto.parameters.Component.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    name: jspb.Message.getFieldWithDefault(msg, 1, ""),
     value: +jspb.Message.getFieldWithDefault(msg, 2, 0.0)
   };
 
@@ -105,7 +105,7 @@ proto.parameters.Component.deserializeBinaryFromReader = function(msg, reader) {
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setId(value);
+      msg.setName(value);
       break;
     case 2:
       var value = /** @type {number} */ (reader.readDouble());
@@ -149,7 +149,7 @@ proto.parameters.Component.prototype.serializeBinary = function() {
  */
 proto.parameters.Component.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getId();
+  f = this.getName();
   if (f.length > 0) {
     writer.writeString(
       1,
@@ -167,16 +167,16 @@ proto.parameters.Component.prototype.serializeBinaryToWriter = function (writer)
 
 
 /**
- * optional string id = 1;
+ * optional string name = 1;
  * @return {string}
  */
-proto.parameters.Component.prototype.getId = function() {
+proto.parameters.Component.prototype.getName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.parameters.Component.prototype.setId = function(value) {
+proto.parameters.Component.prototype.setName = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
@@ -219,7 +219,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<number>}
  * @const
  */
-proto.parameters.Parameter.repeatedFields_ = [3];
+proto.parameters.Parameter.repeatedFields_ = [4];
 
 
 
@@ -249,7 +249,8 @@ proto.parameters.Parameter.prototype.toObject = function(opt_includeInstance) {
  */
 proto.parameters.Parameter.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    name: jspb.Message.getFieldWithDefault(msg, 2, ""),
     labelsMap: (f = msg.getLabelsMap()) ? f.toArray() : [],
     componentsList: jspb.Message.toObjectList(msg.getComponentsList(),
     proto.parameters.Component.toObject, includeInstance)
@@ -290,16 +291,20 @@ proto.parameters.Parameter.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
+      var value = /** @type {number} */ (reader.readInt64());
       msg.setId(value);
       break;
     case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setName(value);
+      break;
+    case 3:
       var value = msg.getLabelsMap();
       reader.readMessage(value, function(message, reader) {
         jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readString);
          });
       break;
-    case 3:
+    case 4:
       var value = new proto.parameters.Component;
       reader.readMessage(value,proto.parameters.Component.deserializeBinaryFromReader);
       msg.addComponents(value);
@@ -343,20 +348,27 @@ proto.parameters.Parameter.prototype.serializeBinary = function() {
 proto.parameters.Parameter.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
+  if (f !== 0) {
+    writer.writeInt64(
+      1,
+      f
+    );
+  }
+  f = this.getName();
   if (f.length > 0) {
     writer.writeString(
-      1,
+      2,
       f
     );
   }
   f = this.getLabelsMap(true);
   if (f && f.getLength() > 0) {
-    f.serializeBinary(2, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeString);
+    f.serializeBinary(3, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeString);
   }
   f = this.getComponentsList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
-      3,
+      4,
       f,
       proto.parameters.Component.serializeBinaryToWriter
     );
@@ -365,29 +377,44 @@ proto.parameters.Parameter.prototype.serializeBinaryToWriter = function (writer)
 
 
 /**
- * optional string id = 1;
- * @return {string}
+ * optional int64 id = 1;
+ * @return {number}
  */
 proto.parameters.Parameter.prototype.getId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {string} value */
+/** @param {number} value */
 proto.parameters.Parameter.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * map<string, string> labels = 2;
+ * optional string name = 2;
+ * @return {string}
+ */
+proto.parameters.Parameter.prototype.getName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.parameters.Parameter.prototype.setName = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * map<string, string> labels = 3;
  * @param {boolean=} opt_noLazyCreate Do not create the map if
  * empty, instead returning `undefined`
  * @return {!jspb.Map<string,string>}
  */
 proto.parameters.Parameter.prototype.getLabelsMap = function(opt_noLazyCreate) {
   return /** @type {!jspb.Map<string,string>} */ (
-      jspb.Message.getMapField(this, 2, opt_noLazyCreate,
+      jspb.Message.getMapField(this, 3, opt_noLazyCreate,
       null));
 };
 
@@ -398,20 +425,20 @@ proto.parameters.Parameter.prototype.clearLabelsMap = function() {
 
 
 /**
- * repeated Component components = 3;
+ * repeated Component components = 4;
  * If you change this array by adding, removing or replacing elements, or if you
  * replace the array itself, then you must call the setter to update it.
  * @return {!Array.<!proto.parameters.Component>}
  */
 proto.parameters.Parameter.prototype.getComponentsList = function() {
   return /** @type{!Array.<!proto.parameters.Component>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.parameters.Component, 3));
+    jspb.Message.getRepeatedWrapperField(this, proto.parameters.Component, 4));
 };
 
 
 /** @param {!Array.<!proto.parameters.Component>} value */
 proto.parameters.Parameter.prototype.setComponentsList = function(value) {
-  jspb.Message.setRepeatedWrapperField(this, 3, value);
+  jspb.Message.setRepeatedWrapperField(this, 4, value);
 };
 
 
@@ -421,7 +448,7 @@ proto.parameters.Parameter.prototype.setComponentsList = function(value) {
  * @return {!proto.parameters.Component}
  */
 proto.parameters.Parameter.prototype.addComponents = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 3, opt_value, proto.parameters.Component, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.parameters.Component, opt_index);
 };
 
 
@@ -476,11 +503,8 @@ proto.parameters.ListParametersRequest.prototype.toObject = function(opt_include
  */
 proto.parameters.ListParametersRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    pageSize: jspb.Message.getFieldWithDefault(msg, 4, 0),
-    pageToken: jspb.Message.getFieldWithDefault(msg, 5, "")
+    pageSize: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    pageToken: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -518,22 +542,10 @@ proto.parameters.ListParametersRequest.deserializeBinaryFromReader = function(ms
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
-      break;
-    case 4:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setPageSize(value);
       break;
-    case 5:
+    case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.setPageToken(value);
       break;
@@ -575,38 +587,17 @@ proto.parameters.ListParametersRequest.prototype.serializeBinary = function() {
  */
 proto.parameters.ListParametersRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
-      1,
-      f
-    );
-  }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
   f = this.getPageSize();
   if (f !== 0) {
     writer.writeInt32(
-      4,
+      1,
       f
     );
   }
   f = this.getPageToken();
   if (f.length > 0) {
     writer.writeString(
-      5,
+      2,
       f
     );
   }
@@ -614,77 +605,32 @@ proto.parameters.ListParametersRequest.prototype.serializeBinaryToWriter = funct
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
- */
-proto.parameters.ListParametersRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.ListParametersRequest.prototype.setOrganizationId = function(value) {
-  jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.parameters.ListParametersRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.ListParametersRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.parameters.ListParametersRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.ListParametersRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * optional int32 page_size = 4;
+ * optional int32 page_size = 1;
  * @return {number}
  */
 proto.parameters.ListParametersRequest.prototype.getPageSize = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
 /** @param {number} value */
 proto.parameters.ListParametersRequest.prototype.setPageSize = function(value) {
-  jspb.Message.setField(this, 4, value);
+  jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional string page_token = 5;
+ * optional string page_token = 2;
  * @return {string}
  */
 proto.parameters.ListParametersRequest.prototype.getPageToken = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
 proto.parameters.ListParametersRequest.prototype.setPageToken = function(value) {
-  jspb.Message.setField(this, 5, value);
+  jspb.Message.setField(this, 2, value);
 };
 
 
@@ -939,10 +885,7 @@ proto.parameters.GetParameterRequest.prototype.toObject = function(opt_includeIn
  */
 proto.parameters.GetParameterRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    parameterId: jspb.Message.getFieldWithDefault(msg, 4, "")
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
   };
 
   if (includeInstance) {
@@ -980,20 +923,8 @@ proto.parameters.GetParameterRequest.deserializeBinaryFromReader = function(msg,
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
-      break;
-    case 4:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setParameterId(value);
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setId(value);
       break;
     default:
       reader.skipField();
@@ -1033,94 +964,28 @@ proto.parameters.GetParameterRequest.prototype.serializeBinary = function() {
  */
 proto.parameters.GetParameterRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
+  f = this.getId();
+  if (f !== 0) {
+    writer.writeInt64(
       1,
       f
     );
   }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
-  f = this.getParameterId();
-  if (f.length > 0) {
-    writer.writeString(
-      4,
-      f
-    );
-  }
 };
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
+ * optional int64 id = 1;
+ * @return {number}
  */
-proto.parameters.GetParameterRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.parameters.GetParameterRequest.prototype.getId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {string} value */
-proto.parameters.GetParameterRequest.prototype.setOrganizationId = function(value) {
+/** @param {number} value */
+proto.parameters.GetParameterRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.parameters.GetParameterRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.GetParameterRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.parameters.GetParameterRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.GetParameterRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * optional string parameter_id = 4;
- * @return {string}
- */
-proto.parameters.GetParameterRequest.prototype.getParameterId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.GetParameterRequest.prototype.setParameterId = function(value) {
-  jspb.Message.setField(this, 4, value);
 };
 
 
@@ -1170,9 +1035,6 @@ proto.parameters.CreateParameterRequest.prototype.toObject = function(opt_includ
  */
 proto.parameters.CreateParameterRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, ""),
     parameter: (f = msg.getParameter()) && proto.parameters.Parameter.toObject(includeInstance, f)
   };
 
@@ -1211,18 +1073,6 @@ proto.parameters.CreateParameterRequest.deserializeBinaryFromReader = function(m
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
-      break;
-    case 4:
       var value = new proto.parameters.Parameter;
       reader.readMessage(value,proto.parameters.Parameter.deserializeBinaryFromReader);
       msg.setParameter(value);
@@ -1265,31 +1115,10 @@ proto.parameters.CreateParameterRequest.prototype.serializeBinary = function() {
  */
 proto.parameters.CreateParameterRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
-      1,
-      f
-    );
-  }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
   f = this.getParameter();
   if (f != null) {
     writer.writeMessage(
-      4,
+      1,
       f,
       proto.parameters.Parameter.serializeBinaryToWriter
     );
@@ -1298,63 +1127,18 @@ proto.parameters.CreateParameterRequest.prototype.serializeBinaryToWriter = func
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
- */
-proto.parameters.CreateParameterRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.CreateParameterRequest.prototype.setOrganizationId = function(value) {
-  jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.parameters.CreateParameterRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.CreateParameterRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.parameters.CreateParameterRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.CreateParameterRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * optional Parameter parameter = 4;
+ * optional Parameter parameter = 1;
  * @return {?proto.parameters.Parameter}
  */
 proto.parameters.CreateParameterRequest.prototype.getParameter = function() {
   return /** @type{?proto.parameters.Parameter} */ (
-    jspb.Message.getWrapperField(this, proto.parameters.Parameter, 4));
+    jspb.Message.getWrapperField(this, proto.parameters.Parameter, 1));
 };
 
 
 /** @param {?proto.parameters.Parameter|undefined} value */
 proto.parameters.CreateParameterRequest.prototype.setParameter = function(value) {
-  jspb.Message.setWrapperField(this, 4, value);
+  jspb.Message.setWrapperField(this, 1, value);
 };
 
 
@@ -1368,7 +1152,7 @@ proto.parameters.CreateParameterRequest.prototype.clearParameter = function() {
  * @return {!boolean}
  */
 proto.parameters.CreateParameterRequest.prototype.hasParameter = function() {
-  return jspb.Message.getField(this, 4) != null;
+  return jspb.Message.getField(this, 1) != null;
 };
 
 
@@ -1418,10 +1202,7 @@ proto.parameters.UpdateParameterRequest.prototype.toObject = function(opt_includ
  */
 proto.parameters.UpdateParameterRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    parameterId: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
     parameter: (f = msg.getParameter()) && proto.parameters.Parameter.toObject(includeInstance, f)
   };
 
@@ -1460,22 +1241,10 @@ proto.parameters.UpdateParameterRequest.deserializeBinaryFromReader = function(m
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setId(value);
       break;
     case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
-      break;
-    case 4:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setParameterId(value);
-      break;
-    case 5:
       var value = new proto.parameters.Parameter;
       reader.readMessage(value,proto.parameters.Parameter.deserializeBinaryFromReader);
       msg.setParameter(value);
@@ -1518,38 +1287,17 @@ proto.parameters.UpdateParameterRequest.prototype.serializeBinary = function() {
  */
 proto.parameters.UpdateParameterRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
+  f = this.getId();
+  if (f !== 0) {
+    writer.writeInt64(
       1,
-      f
-    );
-  }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
-  f = this.getParameterId();
-  if (f.length > 0) {
-    writer.writeString(
-      4,
       f
     );
   }
   f = this.getParameter();
   if (f != null) {
     writer.writeMessage(
-      5,
+      2,
       f,
       proto.parameters.Parameter.serializeBinaryToWriter
     );
@@ -1558,78 +1306,33 @@ proto.parameters.UpdateParameterRequest.prototype.serializeBinaryToWriter = func
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
+ * optional int64 id = 1;
+ * @return {number}
  */
-proto.parameters.UpdateParameterRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.parameters.UpdateParameterRequest.prototype.getId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {string} value */
-proto.parameters.UpdateParameterRequest.prototype.setOrganizationId = function(value) {
+/** @param {number} value */
+proto.parameters.UpdateParameterRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.parameters.UpdateParameterRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.UpdateParameterRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.parameters.UpdateParameterRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.UpdateParameterRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * optional string parameter_id = 4;
- * @return {string}
- */
-proto.parameters.UpdateParameterRequest.prototype.getParameterId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.UpdateParameterRequest.prototype.setParameterId = function(value) {
-  jspb.Message.setField(this, 4, value);
-};
-
-
-/**
- * optional Parameter parameter = 5;
+ * optional Parameter parameter = 2;
  * @return {?proto.parameters.Parameter}
  */
 proto.parameters.UpdateParameterRequest.prototype.getParameter = function() {
   return /** @type{?proto.parameters.Parameter} */ (
-    jspb.Message.getWrapperField(this, proto.parameters.Parameter, 5));
+    jspb.Message.getWrapperField(this, proto.parameters.Parameter, 2));
 };
 
 
 /** @param {?proto.parameters.Parameter|undefined} value */
 proto.parameters.UpdateParameterRequest.prototype.setParameter = function(value) {
-  jspb.Message.setWrapperField(this, 5, value);
+  jspb.Message.setWrapperField(this, 2, value);
 };
 
 
@@ -1643,7 +1346,7 @@ proto.parameters.UpdateParameterRequest.prototype.clearParameter = function() {
  * @return {!boolean}
  */
 proto.parameters.UpdateParameterRequest.prototype.hasParameter = function() {
-  return jspb.Message.getField(this, 5) != null;
+  return jspb.Message.getField(this, 2) != null;
 };
 
 
@@ -1693,10 +1396,7 @@ proto.parameters.DeleteParameterRequest.prototype.toObject = function(opt_includ
  */
 proto.parameters.DeleteParameterRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    parameterId: jspb.Message.getFieldWithDefault(msg, 4, "")
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
   };
 
   if (includeInstance) {
@@ -1734,20 +1434,8 @@ proto.parameters.DeleteParameterRequest.deserializeBinaryFromReader = function(m
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
-      break;
-    case 4:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setParameterId(value);
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setId(value);
       break;
     default:
       reader.skipField();
@@ -1787,94 +1475,28 @@ proto.parameters.DeleteParameterRequest.prototype.serializeBinary = function() {
  */
 proto.parameters.DeleteParameterRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
+  f = this.getId();
+  if (f !== 0) {
+    writer.writeInt64(
       1,
       f
     );
   }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
-  f = this.getParameterId();
-  if (f.length > 0) {
-    writer.writeString(
-      4,
-      f
-    );
-  }
 };
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
+ * optional int64 id = 1;
+ * @return {number}
  */
-proto.parameters.DeleteParameterRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.parameters.DeleteParameterRequest.prototype.getId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {string} value */
-proto.parameters.DeleteParameterRequest.prototype.setOrganizationId = function(value) {
+/** @param {number} value */
+proto.parameters.DeleteParameterRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.parameters.DeleteParameterRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.DeleteParameterRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.parameters.DeleteParameterRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.DeleteParameterRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * optional string parameter_id = 4;
- * @return {string}
- */
-proto.parameters.DeleteParameterRequest.prototype.getParameterId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/** @param {string} value */
-proto.parameters.DeleteParameterRequest.prototype.setParameterId = function(value) {
-  jspb.Message.setField(this, 4, value);
 };
 
 

@@ -39,17 +39,6 @@ function deserialize_images_DeleteImageRequest(buffer_arg) {
   return images_images_pb.DeleteImageRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_images_Frame(arg) {
-  if (!(arg instanceof images_images_pb.Frame)) {
-    throw new Error('Expected argument of type images.Frame');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_images_Frame(buffer_arg) {
-  return images_images_pb.Frame.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_images_GetImageRequest(arg) {
   if (!(arg instanceof images_images_pb.GetImageRequest)) {
     throw new Error('Expected argument of type images.GetImageRequest');
@@ -59,6 +48,17 @@ function serialize_images_GetImageRequest(arg) {
 
 function deserialize_images_GetImageRequest(buffer_arg) {
   return images_images_pb.GetImageRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_images_Image(arg) {
+  if (!(arg instanceof images_images_pb.Image)) {
+    throw new Error('Expected argument of type images.Image');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_images_Image(buffer_arg) {
+  return images_images_pb.Image.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_images_ListImagesRequest(arg) {
@@ -112,33 +112,33 @@ var ImagesService = exports.ImagesService = {
     requestStream: false,
     responseStream: false,
     requestType: images_images_pb.GetImageRequest,
-    responseType: images_images_pb.Frame,
+    responseType: images_images_pb.Image,
     requestSerialize: serialize_images_GetImageRequest,
     requestDeserialize: deserialize_images_GetImageRequest,
-    responseSerialize: serialize_images_Frame,
-    responseDeserialize: deserialize_images_Frame,
+    responseSerialize: serialize_images_Image,
+    responseDeserialize: deserialize_images_Image,
   },
   create: {
     path: '/images.Images/Create',
     requestStream: false,
     responseStream: false,
     requestType: images_images_pb.CreateImageRequest,
-    responseType: images_images_pb.Frame,
+    responseType: images_images_pb.Image,
     requestSerialize: serialize_images_CreateImageRequest,
     requestDeserialize: deserialize_images_CreateImageRequest,
-    responseSerialize: serialize_images_Frame,
-    responseDeserialize: deserialize_images_Frame,
+    responseSerialize: serialize_images_Image,
+    responseDeserialize: deserialize_images_Image,
   },
   update: {
     path: '/images.Images/Update',
     requestStream: false,
     responseStream: false,
     requestType: images_images_pb.UpdateImageRequest,
-    responseType: images_images_pb.Frame,
+    responseType: images_images_pb.Image,
     requestSerialize: serialize_images_UpdateImageRequest,
     requestDeserialize: deserialize_images_UpdateImageRequest,
-    responseSerialize: serialize_images_Frame,
-    responseDeserialize: deserialize_images_Frame,
+    responseSerialize: serialize_images_Image,
+    responseDeserialize: deserialize_images_Image,
   },
   delete: {
     path: '/images.Images/Delete',

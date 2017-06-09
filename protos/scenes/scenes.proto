@@ -9,42 +9,42 @@ import "google/protobuf/empty.proto";
 service Scenes {
     rpc List (ListScenesRequest) returns (ListScenesResponse) {
         option (google.api.http) = {
-            get: "/organizations/{organization_id}/scenes"
+            get: "/v1/scenes"
         };
     }
     rpc Get (GetSceneRequest) returns (Scene) {
         option (google.api.http) = {
-            get: "/organizations/{organization_id}/scenes/{scene_id}"
+            get: "/v1/scenes/{scene_id}"
         };
     }
     rpc Create (CreateSceneRequest) returns (Scene) {
         option (google.api.http) = {
-            post: "/organizations/{organization_id}/scenes"
+            post: "/v1/scenes"
             body: "scene"
         };
     }
     rpc Update (UpdateSceneRequest) returns (Scene) {
         option (google.api.http) = {
-            put: "/organizations/{organization_id}/scenes/{scene_id}"
+            put: "/v1/scenes/{scene_id}"
             body: "scene"
         };
     }
     rpc Delete (DeleteSceneRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/organizations/{organization_id}/scenes/{scene_id}"
+            delete: "/v1/scenes/{scene_id}"
         };
     }
 }
 
 message Scene {
-    string id = 1;
-    string name = 2;
+    int64 id = 1;
+    int64 project_id = 2;
+    string name = 3;
 }
 
 message ListScenesRequest {
-    string organization_id = 1;
-    int32 page_size = 2;
-    string page_token = 3;
+    int32 page_size = 1;
+    string page_token = 2;
 }
 
 message ListScenesResponse {
@@ -53,22 +53,18 @@ message ListScenesResponse {
 }
 
 message GetSceneRequest {
-    string organization_id = 1;
-    string scene_id = 2;
+    int64 id = 1;
 }
 
 message CreateSceneRequest {
-    string organization_id = 1;
-    Scene scene = 2;
+    Scene scene = 1;
 }
 
 message UpdateSceneRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    Scene scene = 3;
+    int64 id = 1;
+    Scene scene = 2;
 }
 
 message DeleteSceneRequest {
-    string organization_id = 1;
-    string scene_id = 2;
+    int64 id = 1;
 }

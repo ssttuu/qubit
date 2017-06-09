@@ -1,12 +1,8 @@
 package organizations
 
 import (
-	"fmt"
-	"math/rand"
-	"time"
-
-	"cloud.google.com/go/datastore"
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -15,95 +11,97 @@ import (
 	organizations_pb "github.com/stupschwartz/qubit/proto-gen/go/organizations"
 )
 
-var r *rand.Rand
-
-func init() {
-	r = rand.New(rand.NewSource(time.Now().UnixNano()))
-}
-
 type Server struct {
-	DatastoreClient *datastore.Client
+	PostgresClient *sqlx.DB
 }
 
 func (s *Server) List(ctx context.Context, in *organizations_pb.ListOrganizationsRequest) (*organizations_pb.ListOrganizationsResponse, error) {
-	var organizations organization.Organizations
-	_, err := s.DatastoreClient.GetAll(ctx, datastore.NewQuery(organization.Kind), &organizations)
+	// TODO: Permissions
+	var orgs organization.Organizations
+	err := s.PostgresClient.Select(&orgs, "SELECT * FROM organizations")
 	if err != nil {
-		return nil, errors.Wrap(err, "Could not get all")
+		return nil, errors.Wrap(err, "Could not select organizations")
 	}
-
-	organizations_proto, err := organizations.ToProto()
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to convert organizations to proto, %v", organizations)
-	}
-
-	return &organizations_pb.ListOrganizationsResponse{Organizations: organizations_proto, NextPageToken: ""}, nil
+	return &organizations_pb.ListOrganizationsResponse{Organizations: orgs.ToProto(), NextPageToken: ""}, nil
 }
 
 func (s *Server) Get(ctx context.Context, in *organizations_pb.GetOrganizationRequest) (*organizations_pb.Organization, error) {
-	organizationKey := datastore.NameKey(organization.Kind, in.OrganizationId, nil)
-
-	var existingOrganization organization.Organization
-	if err := s.DatastoreClient.Get(ctx, organizationKey, &existingOrganization); err != nil {
-		return nil, errors.Wrap(err, "Could not get datastore entity")
+	// TODO: Permissions
+	var org organization.Organization
+	err := s.PostgresClient.Get(&org, "SELECT * FROM organizations WHERE id=$1", in.Id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not get organization with ID %v", in.Id)
 	}
-
-	return existingOrganization.ToProto()
+	return org.ToProto(), nil
 }
 
 func (s *Server) Create(ctx context.Context, in *organizations_pb.CreateOrganizationRequest) (*organizations_pb.Organization, error) {
-	in.Organization.Id = fmt.Sprint(r.Int63())
-	organizationKey := datastore.NameKey(organization.Kind, in.Organization.Id, nil)
-
-	newOrganization := organization.NewOrganizationFromProto(in.Organization)
-
-	if _, err := s.DatastoreClient.Put(ctx, organizationKey, &newOrganization); err != nil {
-		return nil, errors.Wrapf(err, "Failed to put organization, %v", newOrganization)
+	// TODO: Validation
+	result, err := s.PostgresClient.NamedExec(
+		`INSERT INTO organizations (name) VALUES (:name)`,
+		map[string]interface{}{
+			"name": in.Organization.Name,
+		},
+	)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to create organization, %s", in.Organization.Name)
 	}
-
-	return newOrganization.ToProto()
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to retrieve new ID")
+	}
+	newOrganization := organization.Organization{
+		Id:   id,
+		Name: in.Organization.Name,
+	}
+	return newOrganization.ToProto(), nil
 }
 
 func (s *Server) Update(ctx context.Context, in *organizations_pb.UpdateOrganizationRequest) (*organizations_pb.Organization, error) {
-	organizationKey := datastore.NameKey(organization.Kind, in.OrganizationId, nil)
-
+	// TODO: Permissions & validation
+	tx, err := s.PostgresClient.Begin()
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to begin transaction for organization with ID %v", in.Id)
+	}
+	txStmt, err := tx.Prepare(`SELECT * FROM organizations WHERE id=? FOR UPDATE`)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to select organization in tx %v", in.Id)
+	}
+	row := txStmt.QueryRow(in.Id)
+	if row == nil {
+		return nil, errors.Wrapf(err, "No organization with ID %v exists", in.Id)
+	}
+	var existingOrganization organization.Organization
+	err = row.Scan(&existingOrganization)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to load organization from row")
+	}
+	// TODO: Make update fields dynamic
 	newOrganization := organization.NewOrganizationFromProto(in.Organization)
-
-	_, err := s.DatastoreClient.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
-		var existingOrganization organization.Organization
-		if err := tx.Get(organizationKey, &existingOrganization); err != nil {
-			return errors.Wrapf(err, "Failed to get organization in tx %v", existingOrganization)
-		}
-
+	if newOrganization.Name != existingOrganization.Name {
 		existingOrganization.Name = newOrganization.Name
-
-		_, err := tx.Put(organizationKey, &existingOrganization)
+		_, err = tx.Exec("UPDATE organizations SET name=? WHERE id=?", newOrganization.Name, in.Id)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to put organization in tx %v", existingOrganization)
+			return nil, errors.Wrapf(err, "Failed to update organization with ID %v", in.Id)
 		}
-
-		newOrganization = existingOrganization
-
-		return nil
-	})
-
+	}
+	err = tx.Commit()
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to update organization")
 	}
-
-	return newOrganization.ToProto()
+	return existingOrganization.ToProto(), nil
 }
 
 func (s *Server) Delete(ctx context.Context, in *organizations_pb.DeleteOrganizationRequest) (*empty.Empty, error) {
-	organizationKey := datastore.NameKey(organization.Kind, in.OrganizationId, nil)
-
-	if err := s.DatastoreClient.Delete(ctx, organizationKey); err != nil {
-		return nil, errors.Wrapf(err, "Failed to deleted organization by id: %v", in.OrganizationId)
+	// TODO: Permissions
+	// TODO: Delete dependent entities with service calls
+	_, err := s.PostgresClient.Queryx("DELETE FROM organizations WHERE id=?", in.Id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to deleted organization by id: %v", in.Id)
 	}
-
 	return &empty.Empty{}, nil
 }
 
-func Register(grpcServer *grpc.Server, datastoreClient *datastore.Client) {
-	organizations_pb.RegisterOrganizationsServer(grpcServer, &Server{DatastoreClient: datastoreClient})
+func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB) {
+	organizations_pb.RegisterOrganizationsServer(grpcServer, &Server{PostgresClient: postgresClient})
 }

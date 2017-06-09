@@ -9,59 +9,41 @@ import "google/protobuf/empty.proto";
 service Organizations {
     rpc List (ListOrganizationsRequest) returns (ListOrganizationsResponse) {
         option (google.api.http) = {
-            get: "/organizations"
-            additional_bindings {
-                get: "/orgs"
-            }
+            get: "/v1/organizations"
         };
     }
     rpc Get (GetOrganizationRequest) returns (Organization) {
         option (google.api.http) = {
-            get: "/organizations/{organization_id}"
-            additional_bindings {
-                get: "/orgs/{organization_id}"
-            }
+            get: "/v1/organizations/{organization_id}"
         };
     }
     rpc Create (CreateOrganizationRequest) returns (Organization) {
         option (google.api.http) = {
-            post: "/organizations"
+            post: "/v1/organizations"
             body: "organization"
-            additional_bindings {
-                post: "/orgs"
-                body: "organization"
-
-            }
         };
     }
     rpc Update (UpdateOrganizationRequest) returns (Organization) {
         option (google.api.http) = {
-            put: "/organizations/{organization_id}"
+            put: "/v1/organizations/{organization_id}"
             body: "organization"
-            additional_bindings {
-                put: "/orgs/{organization_id}"
-                body: "organization"
-            }
         };
     }
     rpc Delete (DeleteOrganizationRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/organizations/{organization_id}"
-            additional_bindings {
-                delete: "/orgs/{organization_id}"
-            }
+            delete: "/v1/organizations/{organization_id}"
         };
     }
 }
 
 message Organization {
-    string id = 1;
+    int64 id = 1;
     string name = 2;
 }
 
 message ListOrganizationsRequest {
-    int32 page_size = 2;
-    string page_token = 3;
+    int32 page_size = 1;
+    string page_token = 2;
 }
 
 message ListOrganizationsResponse {
@@ -70,7 +52,7 @@ message ListOrganizationsResponse {
 }
 
 message GetOrganizationRequest {
-    string organization_id = 1;
+    int64 id = 1;
 }
 
 message CreateOrganizationRequest {
@@ -78,10 +60,10 @@ message CreateOrganizationRequest {
 }
 
 message UpdateOrganizationRequest {
-    string organization_id = 1;
+    int64 id = 1;
     Organization organization = 2;
 }
 
 message DeleteOrganizationRequest {
-    string organization_id = 1;
+    int64 id = 1;
 }

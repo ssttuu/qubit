@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package projects;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+
+service Projects {
+    rpc List (ListProjectsRequest) returns (ListProjectsResponse) {
+        option (google.api.http) = {
+            get: "/v1/projects"
+        };
+    }
+    rpc Get (GetProjectRequest) returns (Project) {
+        option (google.api.http) = {
+            get: "/v1/projects/{project_id}"
+        };
+    }
+    rpc Create (CreateProjectRequest) returns (Project) {
+        option (google.api.http) = {
+            post: "/v1/projects"
+            body: "project"
+        };
+    }
+    rpc Update (UpdateProjectRequest) returns (Project) {
+        option (google.api.http) = {
+            put: "/v1/projects/{project_id}"
+            body: "project"
+        };
+    }
+    rpc Delete (DeleteProjectRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/projects/{project_id}"
+        };
+    }
+}
+
+message Project {
+    int64 id = 1;
+    int64 organization_id = 2;
+    string name = 3;
+}
+
+message ListProjectsRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+}
+
+message ListProjectsResponse {
+    repeated Project projects = 1;
+    string next_page_token = 2;
+}
+
+message GetProjectRequest {
+    int64 id = 1;
+}
+
+message CreateProjectRequest {
+    Project project = 1;
+}
+
+message UpdateProjectRequest {
+    int64 id = 1;
+    Project project = 2;
+}
+
+message DeleteProjectRequest {
+    int64 id = 1;
+}

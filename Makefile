@@ -3,20 +3,23 @@ COMPUTE_FILES = $(shell find services/compute -type f -name "*.go")
 IMAGES_FILES = $(shell find services/images -type f -name "*.go")
 
 # First target is default
-build-go: build-api-go build-compute-go
+build-go: fmt build-api-go build-compute-go
 
 clean:
 	touch services/api/run && rm services/api/run
 	touch services/compute/run && rm services/compute/run
 	touch services/images/run && rm services/images/run
 
+fmt:
+	go fmt ./...
+
 # Go binaries
 services/api/run: $(API_FILES)
-	gofmt -l -s -w $(API_FILES) && cd services/api && go get ./... && go build -o run
+	cd services/api && go get ./... && go build -o run
 build-api-go: services/api/run
 
 services/compute/run: $(COMPUTE_FILES)
-	gofmt -l -s -w $(COMPUTE_FILES) && cd services/compute && go get ./... && go build -o run
+	cd services/compute && go get ./... && go build -o run
 build-compute-go: services/compute/run
 
 # Docker images
@@ -38,7 +41,7 @@ proto-gen/go/%.pb.go: protos/%.proto
 proto-gen/js/%_pb.js proto-gen/js/%_grpc_pb.js: protos/%.proto
 	./scripts/gen-proto.sh js $*
 
-protonames = geometry health images operators organizations parameters scenes api compute
+protonames = $(shell find protos -name "*.proto" | xargs -n1 basename | awk '{split($$0,a,"."); print a[1]}')
 
 protos: $(foreach protoname,$(protonames),$(subst NAME,$(protoname),proto-gen/services/NAME/NAME.pb proto-gen/go/NAME/NAME.pb.go proto-gen/js/NAME/NAME_pb.js))
 

@@ -8,39 +8,41 @@ import "google/protobuf/empty.proto";
 service Images {
     rpc List (ListImagesRequest) returns (ListImagesResponse) {
         option (google.api.http) = {
-            get: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/images"
+            get: "/v1/images"
         };
     }
-    rpc Get (GetImageRequest) returns (Frame) {
+    rpc Get (GetImageRequest) returns (Image) {
         option (google.api.http) = {
-            get: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/images/{image_id}"
+            get: "/v1/images/{image_id}"
         };
     }
-    rpc Create (CreateImageRequest) returns (Frame) {
+    rpc Create (CreateImageRequest) returns (Image) {
         option (google.api.http) = {
-            post: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/images"
+            post: "/v1/images"
             body: "image"
         };
     }
-    rpc Update (UpdateImageRequest) returns (Frame) {
+    rpc Update (UpdateImageRequest) returns (Image) {
         option (google.api.http) = {
-            put: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/images/{image_id}"
+            put: "/v1/images/{image_id}"
             body: "image"
         };
     }
     rpc Delete (DeleteImageRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/images/{image_id}"
+            delete: "/v1/images/{image_id}"
         };
     }
 }
 
-message Frame {
-    string name = 1;
-    int32 width = 2;
-    int32 height = 3;
-    map<string, string> labels = 4;
-    repeated Plane planes = 5;
+message Image {
+    int64 id = 1;
+    int64 scene_id = 2;
+    string name = 3;
+    int32 width = 4;
+    int32 height = 5;
+    map<string, string> labels = 6;
+    repeated Plane planes = 7;
 }
 
 message Plane {
@@ -60,46 +62,29 @@ message Row {
     repeated double data = 1 [packed = true];
 }
 
-
 message ListImagesRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
-    int32 page_size = 4;
-    string page_token = 5;
+    int32 page_size = 1;
+    string page_token = 2;
 }
 
 message ListImagesResponse {
-    repeated Frame images = 1;
+    repeated Image images = 1;
     string next_page_token = 2;
 }
 
 message GetImageRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
-    string image_id = 4;
+    int64 id = 1;
 }
 
 message CreateImageRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
-    string image_id = 4;
-    Frame image = 5;
+    Image image = 1;
 }
 
 message UpdateImageRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
-    string image_id = 4;
-    Frame image = 5;
+    int64 id = 1;
+    Image image = 2;
 }
 
 message DeleteImageRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
-    string image_id = 4;
+    int64 id = 1;
 }

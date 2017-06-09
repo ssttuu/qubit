@@ -3,7 +3,7 @@ package parameter
 import pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
 
 type Component struct {
-	Id    string  `json:"id"`
+	Name  string  `json:"name"`
 	Value float64 `json:"value"`
 }
 
@@ -16,11 +16,17 @@ func (c *Component) SetValue(value float64) {
 }
 
 func (c *Component) ToProto() *pb.Component {
-	return &pb.Component{Id: c.Id, Value: c.Value}
+	return &pb.Component{
+		Name:  c.Name,
+		Value: c.Value,
+	}
 }
 
 func NewComponentFromProto(pb_cp *pb.Component) *Component {
-	return &Component{Id: pb_cp.Id, Value: pb_cp.Value}
+	return &Component{
+		Name:  pb_cp.Name,
+		Value: pb_cp.Value,
+	}
 }
 
 type Components []*Component

@@ -11,51 +11,50 @@ import "geometry/geometry.proto";
 service Operators {
     rpc List (ListOperatorsRequest) returns (ListOperatorsResponse) {
         option (google.api.http) = {
-            get: "/organizations/{organization_id}/scenes/{scene_id}/operators"
+            get: "/v1/operators"
         };
     }
     rpc Get (GetOperatorRequest) returns (Operator) {
         option (google.api.http) = {
-            get: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}"
+            get: "/v1/operators/{operator_id}"
         };
     }
     rpc Create (CreateOperatorRequest) returns (Operator) {
         option (google.api.http) = {
-            post: "/organizations/{organization_id}/scenes/{scene_id}/operators"
+            post: "/v1/operators"
             body: "operator"
         };
     }
     rpc Update (UpdateOperatorRequest) returns (Operator) {
         option (google.api.http) = {
-            put: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}"
+            put: "/v1/operators/{operator_id}"
             body: "operator"
         };
     }
     rpc Delete (DeleteOperatorRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}"
+            delete: "/v1/operators/{operator_id}"
         };
     }
     rpc Render (RenderOperatorRequest) returns (RenderOperatorResponse) {
         option (google.api.http) = {
-            post: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}:render"
+            post: "/v1/operators/{operator_id}/render"
             body: ""
         };
     }
 }
 
 message Operator {
-    string id = 1;
-    string name = 2;
-    string context = 3;
-    string type = 4;
+    int64 id = 1;
+    int64 scene_id = 2;
+    string type = 3;
+    string name = 4;
+    string context = 5;
 }
 
 message ListOperatorsRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    int32 page_size = 3;
-    string page_token = 4;
+    int32 page_size = 1;
+    string page_token = 2;
 }
 
 message ListOperatorsResponse {
@@ -64,38 +63,28 @@ message ListOperatorsResponse {
 }
 
 message GetOperatorRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
+    int64 id = 1;
 }
 
 message CreateOperatorRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    Operator operator = 3;
+    Operator operator = 1;
 }
 
 message UpdateOperatorRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
-    Operator operator = 4;
+    int64 id = 1;
+    Operator operator = 2;
 }
 
 message DeleteOperatorRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
+    int64 id = 1;
 }
 
 message RenderOperatorRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
+    int64 id = 1;
 
     // TODO: use double?
-    int32 frame = 4;
-    geometry.BoundingBox2D bounding_box = 5;
+    int32 frame = 2;
+    geometry.BoundingBox2D bounding_box = 3;
 }
 
 message RenderOperatorResponse {
