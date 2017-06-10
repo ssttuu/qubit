@@ -9,51 +9,49 @@ import "google/protobuf/empty.proto";
 service Parameters {
     rpc List (ListParametersRequest) returns (ListParametersResponse) {
         option (google.api.http) = {
-            get: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters"
+            get: "/v1/operators/{operator_id}/parameters"
         };
     }
     rpc Get (GetParameterRequest) returns (Parameter) {
         option (google.api.http) = {
-            get: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
+            get: "/v1/operators/{operator_id}/parameters/{parameter_id}"
         };
     }
     rpc Create (CreateParameterRequest) returns (Parameter) {
         option (google.api.http) = {
-            post: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters"
+            post: "/v1/operators/{operator_id}/parameters"
             body: "parameter"
         };
     }
     rpc Update (UpdateParameterRequest) returns (Parameter) {
         option (google.api.http) = {
-            put: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
+            put: "/v1/operators/{operator_id}/parameters/{parameter_id}"
             body: "parameter"
         };
     }
     rpc Delete (DeleteParameterRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/organizations/{organization_id}/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
+            delete: "/v1/operators/{operator_id}/parameters/{parameter_id}"
         };
     }
 }
 
 message Component {
-    string id = 1;
+    string name = 1;
     // TODO: use oneof
     double value = 2;
 }
 
 message Parameter {
-    string id = 1;
-    map<string, string> labels = 2;
-    repeated Component components = 3;
+    int64 id = 1;
+    string name = 2;
+    map<string, string> labels = 3;
+    repeated Component components = 4;
 }
 
 message ListParametersRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
-    int32 page_size = 4;
-    string page_token = 5;
+    int32 page_size = 1;
+    string page_token = 2;
 }
 
 message ListParametersResponse {
@@ -62,30 +60,18 @@ message ListParametersResponse {
 }
 
 message GetParameterRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
-    string parameter_id = 4;
+    int64 id = 1;
 }
 
 message CreateParameterRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
-    Parameter parameter = 4;
+    Parameter parameter = 1;
 }
 
 message UpdateParameterRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
-    string parameter_id = 4;
-    Parameter parameter = 5;
+    int64 id = 1;
+    Parameter parameter = 2;
 }
 
 message DeleteParameterRequest {
-    string organization_id = 1;
-    string scene_id = 2;
-    string operator_id = 3;
-    string parameter_id = 4;
+    int64 id = 1;
 }

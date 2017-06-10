@@ -2,37 +2,37 @@ package scene
 
 import (
 	pb "github.com/stupschwartz/qubit/proto-gen/go/scenes"
-	"fmt"
-	"github.com/pkg/errors"
 )
 
-const Kind string = "Scene"
-
 type Scene struct {
-	Id   string `json:"id" datastore:"id"`
-	Name string `json:"name" datastore:"name"`
-	Type string `json:"type" datastore:"type"`
+	Id        int64  `json:"id" db:"id"`
+	ProjectId int64  `json:"project_id" db:"project_id"`
+	Name      string `json:"name" db:"name"`
 }
 
-func (s *Scene) ToProto() (*pb.Scene, error) {
-	return &pb.Scene{Id: s.Id, Name: s.Name}, nil
+func (s *Scene) ToProto() *pb.Scene {
+	return &pb.Scene{
+		Id:        s.Id,
+		ProjectId: s.ProjectId,
+		Name:      s.Name,
+	}
 }
 
 func NewSceneFromProto(pbscene *pb.Scene) Scene {
-	return Scene{Id: fmt.Sprint(pbscene.Id), Name: pbscene.Name}
+	return Scene{
+		Id:        pbscene.Id,
+		ProjectId: pbscene.ProjectId,
+		Name:      pbscene.Name,
+	}
 }
 
 type Scenes []*Scene
 
-func (s *Scenes) ToProto() ([]*pb.Scene, error) {
+func (s *Scenes) ToProto() []*pb.Scene {
 	var pbscenes []*pb.Scene
 	for _, scene := range *s {
-		scene_proto, err := scene.ToProto()
-		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to convert scene to proto, %v", scene)
-		}
+		scene_proto := scene.ToProto()
 		pbscenes = append(pbscenes, scene_proto)
 	}
-
-	return pbscenes, nil
+	return pbscenes
 }

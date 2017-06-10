@@ -8,11 +8,11 @@ import (
 )
 
 type Plane struct {
-	Name       string
-	Width      int32
-	Height     int32
-	Labels     map[string]string
-	Channels   []Channel
+	Name     string
+	Width    int32
+	Height   int32
+	Labels   map[string]string
+	Channels []Channel
 }
 
 func (p *Plane) Merge(otherPlane *Plane, startX int32, startY int32) {
@@ -22,7 +22,7 @@ func (p *Plane) Merge(otherPlane *Plane, startX int32, startY int32) {
 }
 
 func NewPlane(width int32, height int32, channels []Channel) *Plane {
-	return &Plane{Width:width, Height:height, Channels: channels}
+	return &Plane{Width: width, Height: height, Channels: channels}
 }
 
 func NewRGBZeroPlane(width int32, height int32) *Plane {
@@ -32,17 +32,21 @@ func NewRGBZeroPlane(width int32, height int32) *Plane {
 		c.Zero(width, height)
 		channels = append(channels, c)
 	}
-
 	return NewPlane(width, height, channels)
 }
 
 func NewPlaneFromProto(pb_plane *pb.Plane) *Plane {
-	return &Plane{Labels: pb_plane.GetLabels(), Channels: NewChannelsFromProtos(pb_plane.GetChannels())}
+	return &Plane{
+		Name:     pb_plane.GetName(),
+		Width:    pb_plane.GetWidth(),
+		Height:   pb_plane.GetHeight(),
+		Labels:   pb_plane.GetLabels(),
+		Channels: NewChannelsFromProtos(pb_plane.GetChannels()),
+	}
 }
 
 func (p *Plane) ToNRGBA() *image.NRGBA {
 	img := image.NewNRGBA(image.Rect(0, 0, int(p.Width), int(p.Height)))
-
 	var y, x int32
 	for y = 0; y < p.Height; y++ {
 		for x = 0; x < p.Width; x++ {
@@ -54,16 +58,13 @@ func (p *Plane) ToNRGBA() *image.NRGBA {
 			})
 		}
 	}
-
 	return img
 }
 
 func (p *Plane) ToProto() *pb.Plane {
 	pbchannels := make([]*pb.Channel, len(p.Channels))
-
 	for index, channel := range p.Channels {
 		pbchannels[index] = channel.ToProto()
 	}
-
 	return &pb.Plane{Labels: p.Labels, Channels: pbchannels}
 }

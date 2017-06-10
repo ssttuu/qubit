@@ -14,8 +14,8 @@ var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb
 goog.exportSymbol('proto.images.Channel', null, global);
 goog.exportSymbol('proto.images.CreateImageRequest', null, global);
 goog.exportSymbol('proto.images.DeleteImageRequest', null, global);
-goog.exportSymbol('proto.images.Frame', null, global);
 goog.exportSymbol('proto.images.GetImageRequest', null, global);
+goog.exportSymbol('proto.images.Image', null, global);
 goog.exportSymbol('proto.images.ListImagesRequest', null, global);
 goog.exportSymbol('proto.images.ListImagesResponse', null, global);
 goog.exportSymbol('proto.images.Plane', null, global);
@@ -32,19 +32,19 @@ goog.exportSymbol('proto.images.UpdateImageRequest', null, global);
  * @extends {jspb.Message}
  * @constructor
  */
-proto.images.Frame = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.images.Frame.repeatedFields_, null);
+proto.images.Image = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.images.Image.repeatedFields_, null);
 };
-goog.inherits(proto.images.Frame, jspb.Message);
+goog.inherits(proto.images.Image, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
-  proto.images.Frame.displayName = 'proto.images.Frame';
+  proto.images.Image.displayName = 'proto.images.Image';
 }
 /**
  * List of repeated fields within this message type.
  * @private {!Array<number>}
  * @const
  */
-proto.images.Frame.repeatedFields_ = [5];
+proto.images.Image.repeatedFields_ = [7];
 
 
 
@@ -59,8 +59,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.images.Frame.prototype.toObject = function(opt_includeInstance) {
-  return proto.images.Frame.toObject(opt_includeInstance, this);
+proto.images.Image.prototype.toObject = function(opt_includeInstance) {
+  return proto.images.Image.toObject(opt_includeInstance, this);
 };
 
 
@@ -69,14 +69,16 @@ proto.images.Frame.prototype.toObject = function(opt_includeInstance) {
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.images.Frame} msg The msg instance to transform.
+ * @param {!proto.images.Image} msg The msg instance to transform.
  * @return {!Object}
  */
-proto.images.Frame.toObject = function(includeInstance, msg) {
+proto.images.Image.toObject = function(includeInstance, msg) {
   var f, obj = {
-    name: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    width: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    height: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    sceneId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    name: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    width: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    height: jspb.Message.getFieldWithDefault(msg, 5, 0),
     labelsMap: (f = msg.getLabelsMap()) ? f.toArray() : [],
     planesList: jspb.Message.toObjectList(msg.getPlanesList(),
     proto.images.Plane.toObject, includeInstance)
@@ -93,23 +95,23 @@ proto.images.Frame.toObject = function(includeInstance, msg) {
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.images.Frame}
+ * @return {!proto.images.Image}
  */
-proto.images.Frame.deserializeBinary = function(bytes) {
+proto.images.Image.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.images.Frame;
-  return proto.images.Frame.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.images.Image;
+  return proto.images.Image.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.images.Frame} msg The message object to deserialize into.
+ * @param {!proto.images.Image} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.images.Frame}
+ * @return {!proto.images.Image}
  */
-proto.images.Frame.deserializeBinaryFromReader = function(msg, reader) {
+proto.images.Image.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -117,24 +119,32 @@ proto.images.Frame.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setSceneId(value);
+      break;
+    case 3:
       var value = /** @type {string} */ (reader.readString());
       msg.setName(value);
       break;
-    case 2:
+    case 4:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setWidth(value);
       break;
-    case 3:
+    case 5:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setHeight(value);
       break;
-    case 4:
+    case 6:
       var value = msg.getLabelsMap();
       reader.readMessage(value, function(message, reader) {
         jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readString);
          });
       break;
-    case 5:
+    case 7:
       var value = new proto.images.Plane;
       reader.readMessage(value,proto.images.Plane.deserializeBinaryFromReader);
       msg.addPlanes(value);
@@ -151,10 +161,10 @@ proto.images.Frame.deserializeBinaryFromReader = function(msg, reader) {
 /**
  * Class method variant: serializes the given message to binary data
  * (in protobuf wire format), writing to the given BinaryWriter.
- * @param {!proto.images.Frame} message
+ * @param {!proto.images.Image} message
  * @param {!jspb.BinaryWriter} writer
  */
-proto.images.Frame.serializeBinaryToWriter = function(message, writer) {
+proto.images.Image.serializeBinaryToWriter = function(message, writer) {
   message.serializeBinaryToWriter(writer);
 };
 
@@ -163,7 +173,7 @@ proto.images.Frame.serializeBinaryToWriter = function(message, writer) {
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.images.Frame.prototype.serializeBinary = function() {
+proto.images.Image.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
   this.serializeBinaryToWriter(writer);
   return writer.getResultBuffer();
@@ -175,37 +185,51 @@ proto.images.Frame.prototype.serializeBinary = function() {
  * writing to the given BinaryWriter.
  * @param {!jspb.BinaryWriter} writer
  */
-proto.images.Frame.prototype.serializeBinaryToWriter = function (writer) {
+proto.images.Image.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
+  f = this.getId();
+  if (f !== 0) {
+    writer.writeInt64(
+      1,
+      f
+    );
+  }
+  f = this.getSceneId();
+  if (f !== 0) {
+    writer.writeInt64(
+      2,
+      f
+    );
+  }
   f = this.getName();
   if (f.length > 0) {
     writer.writeString(
-      1,
+      3,
       f
     );
   }
   f = this.getWidth();
   if (f !== 0) {
     writer.writeInt32(
-      2,
+      4,
       f
     );
   }
   f = this.getHeight();
   if (f !== 0) {
     writer.writeInt32(
-      3,
+      5,
       f
     );
   }
   f = this.getLabelsMap(true);
   if (f && f.getLength() > 0) {
-    f.serializeBinary(4, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeString);
+    f.serializeBinary(6, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeString);
   }
   f = this.getPlanesList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
-      5,
+      7,
       f,
       proto.images.Plane.serializeBinaryToWriter
     );
@@ -214,83 +238,113 @@ proto.images.Frame.prototype.serializeBinaryToWriter = function (writer) {
 
 
 /**
- * optional string name = 1;
- * @return {string}
+ * optional int64 id = 1;
+ * @return {number}
  */
-proto.images.Frame.prototype.getName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.images.Image.prototype.getId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {string} value */
-proto.images.Frame.prototype.setName = function(value) {
+/** @param {number} value */
+proto.images.Image.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional int32 width = 2;
+ * optional int64 scene_id = 2;
  * @return {number}
  */
-proto.images.Frame.prototype.getWidth = function() {
+proto.images.Image.prototype.getSceneId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {number} value */
-proto.images.Frame.prototype.setWidth = function(value) {
+proto.images.Image.prototype.setSceneId = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * optional int32 height = 3;
- * @return {number}
+ * optional string name = 3;
+ * @return {string}
  */
-proto.images.Frame.prototype.getHeight = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+proto.images.Image.prototype.getName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
-/** @param {number} value */
-proto.images.Frame.prototype.setHeight = function(value) {
+/** @param {string} value */
+proto.images.Image.prototype.setName = function(value) {
   jspb.Message.setField(this, 3, value);
 };
 
 
 /**
- * map<string, string> labels = 4;
+ * optional int32 width = 4;
+ * @return {number}
+ */
+proto.images.Image.prototype.getWidth = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+};
+
+
+/** @param {number} value */
+proto.images.Image.prototype.setWidth = function(value) {
+  jspb.Message.setField(this, 4, value);
+};
+
+
+/**
+ * optional int32 height = 5;
+ * @return {number}
+ */
+proto.images.Image.prototype.getHeight = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
+};
+
+
+/** @param {number} value */
+proto.images.Image.prototype.setHeight = function(value) {
+  jspb.Message.setField(this, 5, value);
+};
+
+
+/**
+ * map<string, string> labels = 6;
  * @param {boolean=} opt_noLazyCreate Do not create the map if
  * empty, instead returning `undefined`
  * @return {!jspb.Map<string,string>}
  */
-proto.images.Frame.prototype.getLabelsMap = function(opt_noLazyCreate) {
+proto.images.Image.prototype.getLabelsMap = function(opt_noLazyCreate) {
   return /** @type {!jspb.Map<string,string>} */ (
-      jspb.Message.getMapField(this, 4, opt_noLazyCreate,
+      jspb.Message.getMapField(this, 6, opt_noLazyCreate,
       null));
 };
 
 
-proto.images.Frame.prototype.clearLabelsMap = function() {
+proto.images.Image.prototype.clearLabelsMap = function() {
   this.getLabelsMap().clear();
 };
 
 
 /**
- * repeated Plane planes = 5;
+ * repeated Plane planes = 7;
  * If you change this array by adding, removing or replacing elements, or if you
  * replace the array itself, then you must call the setter to update it.
  * @return {!Array.<!proto.images.Plane>}
  */
-proto.images.Frame.prototype.getPlanesList = function() {
+proto.images.Image.prototype.getPlanesList = function() {
   return /** @type{!Array.<!proto.images.Plane>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.images.Plane, 5));
+    jspb.Message.getRepeatedWrapperField(this, proto.images.Plane, 7));
 };
 
 
 /** @param {!Array.<!proto.images.Plane>} value */
-proto.images.Frame.prototype.setPlanesList = function(value) {
-  jspb.Message.setRepeatedWrapperField(this, 5, value);
+proto.images.Image.prototype.setPlanesList = function(value) {
+  jspb.Message.setRepeatedWrapperField(this, 7, value);
 };
 
 
@@ -299,12 +353,12 @@ proto.images.Frame.prototype.setPlanesList = function(value) {
  * @param {number=} opt_index
  * @return {!proto.images.Plane}
  */
-proto.images.Frame.prototype.addPlanes = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 5, opt_value, proto.images.Plane, opt_index);
+proto.images.Image.prototype.addPlanes = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 7, opt_value, proto.images.Plane, opt_index);
 };
 
 
-proto.images.Frame.prototype.clearPlanesList = function() {
+proto.images.Image.prototype.clearPlanesList = function() {
   this.setPlanesList([]);
 };
 
@@ -1021,11 +1075,8 @@ proto.images.ListImagesRequest.prototype.toObject = function(opt_includeInstance
  */
 proto.images.ListImagesRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    pageSize: jspb.Message.getFieldWithDefault(msg, 4, 0),
-    pageToken: jspb.Message.getFieldWithDefault(msg, 5, "")
+    pageSize: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    pageToken: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -1063,22 +1114,10 @@ proto.images.ListImagesRequest.deserializeBinaryFromReader = function(msg, reade
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
-      break;
-    case 4:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setPageSize(value);
       break;
-    case 5:
+    case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.setPageToken(value);
       break;
@@ -1120,38 +1159,17 @@ proto.images.ListImagesRequest.prototype.serializeBinary = function() {
  */
 proto.images.ListImagesRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
-      1,
-      f
-    );
-  }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
   f = this.getPageSize();
   if (f !== 0) {
     writer.writeInt32(
-      4,
+      1,
       f
     );
   }
   f = this.getPageToken();
   if (f.length > 0) {
     writer.writeString(
-      5,
+      2,
       f
     );
   }
@@ -1159,77 +1177,32 @@ proto.images.ListImagesRequest.prototype.serializeBinaryToWriter = function (wri
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
- */
-proto.images.ListImagesRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
-};
-
-
-/** @param {string} value */
-proto.images.ListImagesRequest.prototype.setOrganizationId = function(value) {
-  jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.images.ListImagesRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.images.ListImagesRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.images.ListImagesRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.images.ListImagesRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * optional int32 page_size = 4;
+ * optional int32 page_size = 1;
  * @return {number}
  */
 proto.images.ListImagesRequest.prototype.getPageSize = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
 /** @param {number} value */
 proto.images.ListImagesRequest.prototype.setPageSize = function(value) {
-  jspb.Message.setField(this, 4, value);
+  jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional string page_token = 5;
+ * optional string page_token = 2;
  * @return {string}
  */
 proto.images.ListImagesRequest.prototype.getPageToken = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
 proto.images.ListImagesRequest.prototype.setPageToken = function(value) {
-  jspb.Message.setField(this, 5, value);
+  jspb.Message.setField(this, 2, value);
 };
 
 
@@ -1287,7 +1260,7 @@ proto.images.ListImagesResponse.prototype.toObject = function(opt_includeInstanc
 proto.images.ListImagesResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
     imagesList: jspb.Message.toObjectList(msg.getImagesList(),
-    proto.images.Frame.toObject, includeInstance),
+    proto.images.Image.toObject, includeInstance),
     nextPageToken: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
@@ -1326,8 +1299,8 @@ proto.images.ListImagesResponse.deserializeBinaryFromReader = function(msg, read
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = new proto.images.Frame;
-      reader.readMessage(value,proto.images.Frame.deserializeBinaryFromReader);
+      var value = new proto.images.Image;
+      reader.readMessage(value,proto.images.Image.deserializeBinaryFromReader);
       msg.addImages(value);
       break;
     case 2:
@@ -1377,7 +1350,7 @@ proto.images.ListImagesResponse.prototype.serializeBinaryToWriter = function (wr
     writer.writeRepeatedMessage(
       1,
       f,
-      proto.images.Frame.serializeBinaryToWriter
+      proto.images.Image.serializeBinaryToWriter
     );
   }
   f = this.getNextPageToken();
@@ -1391,30 +1364,30 @@ proto.images.ListImagesResponse.prototype.serializeBinaryToWriter = function (wr
 
 
 /**
- * repeated Frame images = 1;
+ * repeated Image images = 1;
  * If you change this array by adding, removing or replacing elements, or if you
  * replace the array itself, then you must call the setter to update it.
- * @return {!Array.<!proto.images.Frame>}
+ * @return {!Array.<!proto.images.Image>}
  */
 proto.images.ListImagesResponse.prototype.getImagesList = function() {
-  return /** @type{!Array.<!proto.images.Frame>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.images.Frame, 1));
+  return /** @type{!Array.<!proto.images.Image>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.images.Image, 1));
 };
 
 
-/** @param {!Array.<!proto.images.Frame>} value */
+/** @param {!Array.<!proto.images.Image>} value */
 proto.images.ListImagesResponse.prototype.setImagesList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 1, value);
 };
 
 
 /**
- * @param {!proto.images.Frame=} opt_value
+ * @param {!proto.images.Image=} opt_value
  * @param {number=} opt_index
- * @return {!proto.images.Frame}
+ * @return {!proto.images.Image}
  */
 proto.images.ListImagesResponse.prototype.addImages = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 1, opt_value, proto.images.Frame, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 1, opt_value, proto.images.Image, opt_index);
 };
 
 
@@ -1484,10 +1457,7 @@ proto.images.GetImageRequest.prototype.toObject = function(opt_includeInstance) 
  */
 proto.images.GetImageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    imageId: jspb.Message.getFieldWithDefault(msg, 4, "")
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
   };
 
   if (includeInstance) {
@@ -1525,20 +1495,8 @@ proto.images.GetImageRequest.deserializeBinaryFromReader = function(msg, reader)
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
-      break;
-    case 4:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setImageId(value);
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setId(value);
       break;
     default:
       reader.skipField();
@@ -1578,94 +1536,28 @@ proto.images.GetImageRequest.prototype.serializeBinary = function() {
  */
 proto.images.GetImageRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
+  f = this.getId();
+  if (f !== 0) {
+    writer.writeInt64(
       1,
       f
     );
   }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
-  f = this.getImageId();
-  if (f.length > 0) {
-    writer.writeString(
-      4,
-      f
-    );
-  }
 };
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
+ * optional int64 id = 1;
+ * @return {number}
  */
-proto.images.GetImageRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.images.GetImageRequest.prototype.getId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {string} value */
-proto.images.GetImageRequest.prototype.setOrganizationId = function(value) {
+/** @param {number} value */
+proto.images.GetImageRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.images.GetImageRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.images.GetImageRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.images.GetImageRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.images.GetImageRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * optional string image_id = 4;
- * @return {string}
- */
-proto.images.GetImageRequest.prototype.getImageId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/** @param {string} value */
-proto.images.GetImageRequest.prototype.setImageId = function(value) {
-  jspb.Message.setField(this, 4, value);
 };
 
 
@@ -1715,11 +1607,7 @@ proto.images.CreateImageRequest.prototype.toObject = function(opt_includeInstanc
  */
 proto.images.CreateImageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    imageId: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    image: (f = msg.getImage()) && proto.images.Frame.toObject(includeInstance, f)
+    image: (f = msg.getImage()) && proto.images.Image.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -1757,24 +1645,8 @@ proto.images.CreateImageRequest.deserializeBinaryFromReader = function(msg, read
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
-      break;
-    case 4:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setImageId(value);
-      break;
-    case 5:
-      var value = new proto.images.Frame;
-      reader.readMessage(value,proto.images.Frame.deserializeBinaryFromReader);
+      var value = new proto.images.Image;
+      reader.readMessage(value,proto.images.Image.deserializeBinaryFromReader);
       msg.setImage(value);
       break;
     default:
@@ -1815,118 +1687,30 @@ proto.images.CreateImageRequest.prototype.serializeBinary = function() {
  */
 proto.images.CreateImageRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
-      1,
-      f
-    );
-  }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
-  f = this.getImageId();
-  if (f.length > 0) {
-    writer.writeString(
-      4,
-      f
-    );
-  }
   f = this.getImage();
   if (f != null) {
     writer.writeMessage(
-      5,
+      1,
       f,
-      proto.images.Frame.serializeBinaryToWriter
+      proto.images.Image.serializeBinaryToWriter
     );
   }
 };
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
- */
-proto.images.CreateImageRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
-};
-
-
-/** @param {string} value */
-proto.images.CreateImageRequest.prototype.setOrganizationId = function(value) {
-  jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.images.CreateImageRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.images.CreateImageRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.images.CreateImageRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.images.CreateImageRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * optional string image_id = 4;
- * @return {string}
- */
-proto.images.CreateImageRequest.prototype.getImageId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/** @param {string} value */
-proto.images.CreateImageRequest.prototype.setImageId = function(value) {
-  jspb.Message.setField(this, 4, value);
-};
-
-
-/**
- * optional Frame image = 5;
- * @return {?proto.images.Frame}
+ * optional Image image = 1;
+ * @return {?proto.images.Image}
  */
 proto.images.CreateImageRequest.prototype.getImage = function() {
-  return /** @type{?proto.images.Frame} */ (
-    jspb.Message.getWrapperField(this, proto.images.Frame, 5));
+  return /** @type{?proto.images.Image} */ (
+    jspb.Message.getWrapperField(this, proto.images.Image, 1));
 };
 
 
-/** @param {?proto.images.Frame|undefined} value */
+/** @param {?proto.images.Image|undefined} value */
 proto.images.CreateImageRequest.prototype.setImage = function(value) {
-  jspb.Message.setWrapperField(this, 5, value);
+  jspb.Message.setWrapperField(this, 1, value);
 };
 
 
@@ -1940,7 +1724,7 @@ proto.images.CreateImageRequest.prototype.clearImage = function() {
  * @return {!boolean}
  */
 proto.images.CreateImageRequest.prototype.hasImage = function() {
-  return jspb.Message.getField(this, 5) != null;
+  return jspb.Message.getField(this, 1) != null;
 };
 
 
@@ -1990,11 +1774,8 @@ proto.images.UpdateImageRequest.prototype.toObject = function(opt_includeInstanc
  */
 proto.images.UpdateImageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    imageId: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    image: (f = msg.getImage()) && proto.images.Frame.toObject(includeInstance, f)
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    image: (f = msg.getImage()) && proto.images.Image.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -2032,24 +1813,12 @@ proto.images.UpdateImageRequest.deserializeBinaryFromReader = function(msg, read
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setId(value);
       break;
     case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
-      break;
-    case 4:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setImageId(value);
-      break;
-    case 5:
-      var value = new proto.images.Frame;
-      reader.readMessage(value,proto.images.Frame.deserializeBinaryFromReader);
+      var value = new proto.images.Image;
+      reader.readMessage(value,proto.images.Image.deserializeBinaryFromReader);
       msg.setImage(value);
       break;
     default:
@@ -2090,118 +1859,52 @@ proto.images.UpdateImageRequest.prototype.serializeBinary = function() {
  */
 proto.images.UpdateImageRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
+  f = this.getId();
+  if (f !== 0) {
+    writer.writeInt64(
       1,
-      f
-    );
-  }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
-  f = this.getImageId();
-  if (f.length > 0) {
-    writer.writeString(
-      4,
       f
     );
   }
   f = this.getImage();
   if (f != null) {
     writer.writeMessage(
-      5,
+      2,
       f,
-      proto.images.Frame.serializeBinaryToWriter
+      proto.images.Image.serializeBinaryToWriter
     );
   }
 };
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
+ * optional int64 id = 1;
+ * @return {number}
  */
-proto.images.UpdateImageRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.images.UpdateImageRequest.prototype.getId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {string} value */
-proto.images.UpdateImageRequest.prototype.setOrganizationId = function(value) {
+/** @param {number} value */
+proto.images.UpdateImageRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.images.UpdateImageRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.images.UpdateImageRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.images.UpdateImageRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.images.UpdateImageRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * optional string image_id = 4;
- * @return {string}
- */
-proto.images.UpdateImageRequest.prototype.getImageId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/** @param {string} value */
-proto.images.UpdateImageRequest.prototype.setImageId = function(value) {
-  jspb.Message.setField(this, 4, value);
-};
-
-
-/**
- * optional Frame image = 5;
- * @return {?proto.images.Frame}
+ * optional Image image = 2;
+ * @return {?proto.images.Image}
  */
 proto.images.UpdateImageRequest.prototype.getImage = function() {
-  return /** @type{?proto.images.Frame} */ (
-    jspb.Message.getWrapperField(this, proto.images.Frame, 5));
+  return /** @type{?proto.images.Image} */ (
+    jspb.Message.getWrapperField(this, proto.images.Image, 2));
 };
 
 
-/** @param {?proto.images.Frame|undefined} value */
+/** @param {?proto.images.Image|undefined} value */
 proto.images.UpdateImageRequest.prototype.setImage = function(value) {
-  jspb.Message.setWrapperField(this, 5, value);
+  jspb.Message.setWrapperField(this, 2, value);
 };
 
 
@@ -2215,7 +1918,7 @@ proto.images.UpdateImageRequest.prototype.clearImage = function() {
  * @return {!boolean}
  */
 proto.images.UpdateImageRequest.prototype.hasImage = function() {
-  return jspb.Message.getField(this, 5) != null;
+  return jspb.Message.getField(this, 2) != null;
 };
 
 
@@ -2265,10 +1968,7 @@ proto.images.DeleteImageRequest.prototype.toObject = function(opt_includeInstanc
  */
 proto.images.DeleteImageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    organizationId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorId: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    imageId: jspb.Message.getFieldWithDefault(msg, 4, "")
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
   };
 
   if (includeInstance) {
@@ -2306,20 +2006,8 @@ proto.images.DeleteImageRequest.deserializeBinaryFromReader = function(msg, read
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrganizationId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSceneId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
-      break;
-    case 4:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setImageId(value);
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setId(value);
       break;
     default:
       reader.skipField();
@@ -2359,94 +2047,28 @@ proto.images.DeleteImageRequest.prototype.serializeBinary = function() {
  */
 proto.images.DeleteImageRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOrganizationId();
-  if (f.length > 0) {
-    writer.writeString(
+  f = this.getId();
+  if (f !== 0) {
+    writer.writeInt64(
       1,
       f
     );
   }
-  f = this.getSceneId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = this.getOperatorId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
-  f = this.getImageId();
-  if (f.length > 0) {
-    writer.writeString(
-      4,
-      f
-    );
-  }
 };
 
 
 /**
- * optional string organization_id = 1;
- * @return {string}
+ * optional int64 id = 1;
+ * @return {number}
  */
-proto.images.DeleteImageRequest.prototype.getOrganizationId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.images.DeleteImageRequest.prototype.getId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {string} value */
-proto.images.DeleteImageRequest.prototype.setOrganizationId = function(value) {
+/** @param {number} value */
+proto.images.DeleteImageRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string scene_id = 2;
- * @return {string}
- */
-proto.images.DeleteImageRequest.prototype.getSceneId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.images.DeleteImageRequest.prototype.setSceneId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string operator_id = 3;
- * @return {string}
- */
-proto.images.DeleteImageRequest.prototype.getOperatorId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.images.DeleteImageRequest.prototype.setOperatorId = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * optional string image_id = 4;
- * @return {string}
- */
-proto.images.DeleteImageRequest.prototype.getImageId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/** @param {string} value */
-proto.images.DeleteImageRequest.prototype.setImageId = function(value) {
-  jspb.Message.setField(this, 4, value);
 };
 
 

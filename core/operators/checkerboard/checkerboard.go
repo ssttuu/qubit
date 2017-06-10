@@ -2,16 +2,16 @@ package checkerboard
 
 import (
 	"github.com/stupschwartz/qubit/core/image"
-	"github.com/stupschwartz/qubit/core/parameter"
 	"github.com/stupschwartz/qubit/core/operator"
+	"github.com/stupschwartz/qubit/core/parameter"
 )
 
 const Name string = "CheckerBoard"
 
-type CheckerBoard struct {}
+type CheckerBoard struct{}
 
 func (c *CheckerBoard) Process(inputs []*image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) (*image.Plane, error) {
-	sizeParam := p.GetById("Size")
+	sizeParam := p.GetByName("Size")
 	sizeValue := int32(sizeParam.GetValueByIndex(0))
 	width := endX - startX
 	height := endY - startY

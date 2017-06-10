@@ -3,11 +3,8 @@ services:
   test:
     image: node:7
     environment:
-      - API_SERVICE_ADDRESS=api:9000
+      - API_SERVICE_ADDRESS=api.qubit.site:9000
       - GOOGLE_PROJECT_ID=qubit-161916
-      - DATASTORE_DATASET=qubit
-      - DATASTORE_EMULATOR_HOST=datastore:8380
-      - DATASTORE_HOST=datastore:8380
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
     entrypoint: npm
     command: test
@@ -22,41 +19,39 @@ services:
     build: ./services/api
     environment:
       - GOOGLE_PROJECT_ID=qubit-161916
-      - DATASTORE_PROJECT_ID=qubit-161916
-      - DATASTORE_DATASET=qubit
-      - DATASTORE_EMULATOR_HOST=datastore:8380
-      - DATASTORE_HOST=datastore:8380
       - STORAGE_BUCKET=qubit-dev-161916
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
       - PORT=9000
-      - API_SERVICE_ADDRESS=api:9000
-    ports:
-      - 9000
+      - API_SERVICE_ADDRESS=api.qubit.site:9000
+      - COMPUTE_SERVICE_ADDRESS=compute.qubit.site:9000
     volumes:
       - ./credentials:/opt/etc/credentials
+    networks:
+      default:
+        aliases:
+          - api.qubit.site
     depends_on:
       - datastore
+      - postgres
       - compute
+  postgres:
+    image: postgres:9.6
+    networks:
+      default:
+        aliases:
+          - postgres.api.qubit.site
 
   compute:
     image: us.gcr.io/qubit-161916/compute
     build: ./services/compute
     environment:
       - GOOGLE_PROJECT_ID=qubit-161916
-      - DATASTORE_PROJECT_ID=qubit-161916
-      - DATASTORE_DATASET=qubit
-      - DATASTORE_EMULATOR_HOST=datastore:8380
-      - DATASTORE_HOST=datastore:8380
       - STORAGE_BUCKET=qubit-dev-161916
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
       - PORT=9000
-    ports:
-      - 9000
     volumes:
       - ./credentials:/opt/etc/credentials
-
-  datastore:
-    image: google/cloud-sdk
-    environment:
-      - CLOUDSDK_CORE_PROJECT=qubit-161916
-    command: gcloud beta emulators datastore start --no-legacy --host-port 0.0.0.0:8380
+    networks:
+      default:
+        aliases:
+          - compute.qubit.site

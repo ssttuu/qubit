@@ -16,6 +16,6 @@ func (r *Row) ToProto() *pb.Row {
 	return &pb.Row{Data: r.Data}
 }
 
-func NewRowFromProto (rp *pb.Row) *Row {
+func NewRowFromProto(rp *pb.Row) *Row {
 	return &Row{Data: rp.GetData()}
 }

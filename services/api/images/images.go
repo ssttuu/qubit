@@ -1,133 +1,121 @@
 package images
 
-//
-//import (
-//	"math/rand"
-//	"time"
-//
-//	"golang.org/x/net/context"
-//	"cloud.google.com/go/datastore"
-//	"github.com/golang/protobuf/ptypes/empty"
-//	"github.com/pkg/errors"
-//	"google.golang.org/grpc"
-//
-//	"github.com/stupschwartz/qubit/core/image"
-//	images_pb "github.com/stupschwartz/qubit/proto-gen/go/images"
-//	"github.com/stupschwartz/qubit/core/organization"
-//	"github.com/stupschwartz/qubit/core/scene"
-//	"github.com/stupschwartz/qubit/core/operator"
-//	"os"
-//	"google.golang.org/api/option"
-//	"net"
-//	"google.golang.org/grpc/grpclog"
-//	"log"
-//	"cloud.google.com/go/storage"
-//)
-//
-//var r *rand.Rand
-//
-//func init() {
-//	r = rand.New(rand.NewSource(time.Now().UnixNano()))
-//}
-//
-//
-//type Server struct {
-//	DatastoreClient *datastore.Client
-//	StorageClient *storage.Client
-//}
-//
-//func (s *Server) List(ctx context.Context, in *images_pb.ListImagesRequest) (*images_pb.ListImagesResponse, error) {
-//	orgKey := datastore.NameKey(organization.Kind, in.OrganizationId, nil)
-//	sceneKey := datastore.NameKey(scene.Kind, in.SceneId, orgKey)
-//	operatorKey := datastore.NameKey(operator.Kind, in.SceneId, sceneKey)
-//
-//	var images image.Frames
-//	_, err := s.DatastoreClient.GetAll(ctx, datastore.NewQuery(image.Kind).Ancestor(operatorKey), &images)
-//	if err != nil {
-//		return nil, errors.Wrap(err, "Could not get all")
-//	}
-//
-//	return &images_pb.ListImageResponse{Image:images.ToProto(), NextPageToken:""}, nil
-//}
-//
-//func (s *Server) Get(ctx context.Context, in *images_pb.GetParameterRequest) (*images_pb.Parameter, error) {
-//	orgKey := datastore.NameKey(organization.Kind, in.OrganizationId, nil)
-//	sceneKey := datastore.NameKey(scene.Kind, in.SceneId, orgKey)
-//	operatorKey := datastore.NameKey(operator.Kind, in.OperatorId, sceneKey)
-//	imageKey := datastore.NameKey(image.Kind, in.ParameterId, operatorKey)
-//
-//	var existingParameter image.Parameter
-//	if err := s.DatastoreClient.Get(ctx, imageKey, &existingParameter); err != nil {
-//		return nil, errors.Wrap(err, "Could not get datastore entity")
-//	}
-//
-//	return existingParameter.ToProto(), nil
-//}
-//
-//func (s *Server) Create(ctx context.Context, in *images_pb.CreateParameterRequest) (*images_pb.Parameter, error) {
-//	orgKey := datastore.NameKey(organization.Kind, in.OrganizationId, nil)
-//	sceneKey := datastore.NameKey(scene.Kind, in.SceneId, orgKey)
-//	operatorKey := datastore.NameKey(operator.Kind, in.OperatorId, sceneKey)
-//	imageKey := datastore.NameKey(image.Kind, in.Parameter.Id, operatorKey)
-//
-//	newParameter := image.NewParameterFromProto(in.Parameter)
-//
-//	if _, err := s.DatastoreClient.Put(ctx, imageKey, &newParameter); err != nil {
-//		return nil, errors.Wrapf(err, "Failed to put operator %v", newParameter.Id)
-//	}
-//
-//	return newParameter.ToProto(), nil
-//}
-//
-//func (s *Server) Update(ctx context.Context, in *images_pb.UpdateParameterRequest) (*images_pb.Parameter, error) {
-//	orgKey := datastore.NameKey(organization.Kind, in.OrganizationId, nil)
-//	sceneKey := datastore.NameKey(scene.Kind, in.SceneId, orgKey)
-//	operatorKey := datastore.NameKey(operator.Kind, in.OperatorId, sceneKey)
-//	imageKey := datastore.NameKey(image.Kind, in.ParameterId, operatorKey)
-//
-//	newParameter := image.NewParameterFromProto(in.Parameter)
-//
-//	_, err := s.DatastoreClient.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
-//		var existingParameter image.Parameter
-//		if err := tx.Get(imageKey, &existingParameter); err != nil {
-//			return errors.Wrapf(err, "Failed to get operator in tx %v", existingParameter)
-//		}
-//
-//		existingParameter.Id = newParameter.Id
-//
-//		_, err := tx.Put(imageKey, &existingParameter)
-//		if err != nil {
-//			return errors.Wrapf(err, "Failed to put operator in tx %v", existingParameter)
-//		}
-//
-//		newParameter = &existingParameter
-//
-//		return nil
-//	})
-//
-//	if err != nil {
-//		return nil, errors.Wrap(err, "Failed to update operator")
-//	}
-//
-//	return newParameter.ToProto(), nil
-//}
-//
-//func (s *Server) Delete(ctx context.Context, in *images_pb.DeleteParameterRequest) (*empty.Empty, error) {
-//	orgKey := datastore.NameKey(organization.Kind, in.OrganizationId, nil)
-//	sceneKey := datastore.NameKey(scene.Kind, in.SceneId, orgKey)
-//	operatorKey := datastore.NameKey(operator.Kind, in.OperatorId, sceneKey)
-//	imageKey := datastore.NameKey(image.Kind, in.ParameterId, operatorKey)
-//
-//	if err := s.DatastoreClient.Delete(ctx, imageKey); err != nil {
-//		return nil, errors.Wrapf(err, "Failed to delete operator by id: %v", in.OperatorId)
-//	}
-//
-//	return &empty.Empty{}, nil
-//}
-//
-//func Register(grpcServer *grpc.Server, datastoreClient *datastore.Client, storageClient *storage.Client) {
-//	images_pb.RegisterImagesServer(grpcServer, &Server{
-//		DatastoreClient: datastoreClient,
-//		StorageClient: storageClient,
-//	})
-//}
+import (
+	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
+
+	"github.com/stupschwartz/qubit/core/image"
+	images_pb "github.com/stupschwartz/qubit/proto-gen/go/images"
+)
+
+type Server struct {
+	PostgresClient *sqlx.DB
+}
+
+func (s *Server) List(ctx context.Context, in *images_pb.ListImagesRequest) (*images_pb.ListImagesResponse, error) {
+	// TODO: Permissions
+	var imageList image.Images
+	err := s.PostgresClient.Select(&imageList, "SELECT * FROM images")
+	if err != nil {
+		return nil, errors.Wrap(err, "Could not select images")
+	}
+	return &images_pb.ListImagesResponse{Images: imageList.ToProto(), NextPageToken: ""}, nil
+}
+
+func (s *Server) Get(ctx context.Context, in *images_pb.GetImageRequest) (*images_pb.Image, error) {
+	// TODO: Permissions
+	var im image.Image
+	err := s.PostgresClient.Get(&im, "SELECT * FROM images WHERE id=$1", in.Id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not get image with ID %v", in.Id)
+	}
+	return im.ToProto(), nil
+}
+
+func (s *Server) Create(ctx context.Context, in *images_pb.CreateImageRequest) (*images_pb.Image, error) {
+	// TODO: Validation
+	result, err := s.PostgresClient.NamedExec(
+		`INSERT INTO images (scene_id, name, width, height, labels, planes)
+			VALUES (:scene_id, :name, :width, :height, :labels, :planes)`,
+		map[string]interface{}{
+			"scene_id": in.Image.SceneId,
+			"name":     in.Image.Name,
+			"width":    in.Image.Width,
+			"height":   in.Image.Height,
+			"labels":   in.Image.Labels,
+			"planes":   in.Image.Planes,
+		},
+	)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to create image, %s", in.Image.Name)
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to retrieve new ID")
+	}
+	newImage := image.Image{
+		Id:   id,
+		Name: in.Image.Name,
+	}
+	return newImage.ToProto(), nil
+}
+
+func (s *Server) Update(ctx context.Context, in *images_pb.UpdateImageRequest) (*images_pb.Image, error) {
+	// TODO: Permissions & validation
+	tx, err := s.PostgresClient.Begin()
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to begin transaction for image with ID %v", in.Id)
+	}
+	txStmt, err := tx.Prepare(`SELECT * FROM images WHERE id=? FOR UPDATE`)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to select image in tx %v", in.Id)
+	}
+	row := txStmt.QueryRow(in.Id)
+	if row == nil {
+		return nil, errors.Wrapf(err, "No image with ID %v exists", in.Id)
+	}
+	var existingImage image.Image
+	err = row.Scan(&existingImage)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to load image from row")
+	}
+	// TODO: Make update fields dynamic
+	newImage := image.NewImageFromProto(in.Image)
+	if newImage.Name != existingImage.Name {
+		existingImage.Name = newImage.Name
+		_, err = tx.Exec(
+			`UPDATE images SET name=?, width=?, height=?, labels=?, planes=? WHERE id=?`,
+			newImage.Name,
+			newImage.Width,
+			newImage.Height,
+			newImage.Labels,
+			newImage.Planes,
+			in.Id,
+		)
+		if err != nil {
+			return nil, errors.Wrapf(err, "Failed to update image with ID %v", in.Id)
+		}
+	}
+	err = tx.Commit()
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to update image")
+	}
+	return existingImage.ToProto(), nil
+}
+
+func (s *Server) Delete(ctx context.Context, in *images_pb.DeleteImageRequest) (*empty.Empty, error) {
+	// TODO: Permissions
+	// TODO: Delete dependent entities with service calls
+	_, err := s.PostgresClient.Queryx("DELETE FROM images WHERE id=?", in.Id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to deleted image by id: %v", in.Id)
+	}
+	return &empty.Empty{}, nil
+}
+
+func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB) {
+	images_pb.RegisterImagesServer(grpcServer, &Server{PostgresClient: postgresClient})
+}
