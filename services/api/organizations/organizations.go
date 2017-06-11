@@ -51,7 +51,7 @@ func (s *Server) Create(ctx context.Context, in *organizations_pb.CreateOrganiza
 		return nil, errors.Wrap(err, "Failed to retrieve new ID")
 	}
 	newOrganization := organization.Organization{
-		Id:   id,
+		Id:   string(id),
 		Name: in.Organization.Name,
 	}
 	return newOrganization.ToProto(), nil

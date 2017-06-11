@@ -14,9 +14,9 @@ import (
 	"google.golang.org/grpc/grpclog"
 
 	"github.com/stupschwartz/qubit/proto-gen/go/compute"
+	"github.com/stupschwartz/qubit/services/api/images"
 	"github.com/stupschwartz/qubit/services/api/operators"
 	"github.com/stupschwartz/qubit/services/api/organizations"
-	"github.com/stupschwartz/qubit/services/api/parameters"
 	"github.com/stupschwartz/qubit/services/api/scenes"
 )
 
@@ -68,7 +68,6 @@ func main() {
 		conn, err = grpc.Dial(apiAddress, grpc.WithInsecure())
 	}
 	defer conn.Close()
-	parametersClient := parameters.NewClient(conn)
 	computeConn, err := grpc.Dial(computeAddress, grpc.WithInsecure())
 	for err != nil {
 		log.Printf("Could not connect to Compute Service: %v\n", err)
@@ -79,8 +78,7 @@ func main() {
 	computeClient := compute.NewComputeClient(computeConn)
 	organizations.Register(grpcServer, postgresClient)
 	scenes.Register(grpcServer, postgresClient)
-	parameters.Register(grpcServer, postgresClient)
-	operators.Register(grpcServer, postgresClient, storageClient, parametersClient, computeClient)
-	//images.Register(grpcServer, postgresClient, storageClient)
+	operators.Register(grpcServer, postgresClient, storageClient, computeClient)
+	images.Register(grpcServer, postgresClient, storageClient)
 	<-servingDone
 }

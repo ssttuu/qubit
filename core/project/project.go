@@ -5,8 +5,8 @@ import (
 )
 
 type Project struct {
-	Id             int64  `json:"id" db:"id"`
-	OrganizationId int64  `json:"organization_id" db:"organization_id"`
+	Id             string `json:"id" db:"id"`
+	OrganizationId string `json:"organization_id" db:"organization_id"`
 	Name           string `json:"name" db:"name"`
 }
 

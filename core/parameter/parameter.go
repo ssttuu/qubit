@@ -5,7 +5,6 @@ import (
 )
 
 type Parameter struct {
-	Id         int64      `json:"id" db:"id"`
 	Name       string     `json:"name" db:"name"`
 	Components Components `json:"components" db:"components"`
 }
@@ -37,14 +36,14 @@ func (p *Parameter) SetValueByName(name string, value float64) {
 
 func (p *Parameter) ToProto() *pb.Parameter {
 	return &pb.Parameter{
-		Id:         p.Id,
+		Name:       p.Name,
 		Components: p.Components.ToProto(),
 	}
 }
 
 func NewParameterFromProto(pb_param *pb.Parameter) *Parameter {
 	return &Parameter{
-		Id:         pb_param.Id,
+		Name:       pb_param.Name,
 		Components: NewComponentsFromProto(pb_param.Components),
 	}
 }
@@ -58,9 +57,9 @@ func NewFloatParameter(name string) *Parameter {
 	}
 }
 
-func NewColorParameter(id int64) *Parameter {
+func NewColorParameter(name string) *Parameter {
 	return &Parameter{
-		Id: id,
+		Name: name,
 		Components: Components{
 			&Component{Name: "Red", Value: 0.0},
 			&Component{Name: "Green", Value: 0.0},
@@ -71,15 +70,6 @@ func NewColorParameter(id int64) *Parameter {
 
 type Parameters []*Parameter
 
-func (p *Parameters) GetById(id int64) *Parameter {
-	for _, param := range *p {
-		if param.Id == id {
-			return param
-		}
-	}
-	return nil
-}
-
 func (p *Parameters) GetByName(name string) *Parameter {
 	for _, param := range *p {
 		if param.Name == name {
@@ -89,8 +79,8 @@ func (p *Parameters) GetByName(name string) *Parameter {
 	return nil
 }
 
-func (p *Parameters) SetById(id int64, component string, value float64) {
-	p.GetById(id).SetValueByName(component, value)
+func (p *Parameters) SetByName(name string, component string, value float64) {
+	p.GetByName(name).SetValueByName(component, value)
 }
 
 func (p *Parameters) ToProto() []*pb.Parameter {

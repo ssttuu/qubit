@@ -14,8 +14,8 @@ const (
 )
 
 type Operator struct {
-	Id      int64  `json:"id" db:"id"`
-	SceneId int64  `json:"scene_id" db:"scene_id"`
+	Id      string `json:"id" db:"id"`
+	SceneId string `json:"scene_id" db:"scene_id"`
 	Type    string `json:"type" db:"type"`
 	Name    string `json:"name" db:"name"`
 	// TODO: What is context? Is it the range of images within the scene
