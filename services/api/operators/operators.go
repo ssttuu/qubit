@@ -10,6 +10,7 @@ import (
 
 	"github.com/stupschwartz/qubit/core/operator"
 	_ "github.com/stupschwartz/qubit/core/operators"
+	"github.com/stupschwartz/qubit/core/parameter"
 	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
 	operators_pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
 )
@@ -59,10 +60,12 @@ func (s *Server) Create(ctx context.Context, in *operators_pb.CreateOperatorRequ
 		return nil, errors.Wrap(err, "Failed to retrieve new ID")
 	}
 	newOp := operator.Operator{
-		Context: in.Operator.Context,
-		Id:      string(id),
-		Name:    in.Operator.Name,
-		Type:    in.Operator.Type,
+		Context:    in.Operator.Context,
+		Id:         string(id),
+		Inputs:     in.Operator.Inputs,
+		Name:       in.Operator.Name,
+		Parameters: parameter.NewParametersFromProto(in.Operator.Parameters),
+		Type:       in.Operator.Type,
 	}
 	return newOp.ToProto(), nil
 }
@@ -89,14 +92,18 @@ func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequ
 	// TODO: Make update fields dynamic
 	newOperator := operator.NewOperatorFromProto(in.Operator)
 	if newOperator.Type != existingOperator.Type || newOperator.Name != existingOperator.Name || newOperator.Context != existingOperator.Context {
-		existingOperator.Type = newOperator.Type
-		existingOperator.Name = newOperator.Name
 		existingOperator.Context = newOperator.Context
+		existingOperator.Inputs = newOperator.Inputs
+		existingOperator.Name = newOperator.Name
+		existingOperator.Parameters = newOperator.Parameters
+		existingOperator.Type = newOperator.Type
 		_, err = tx.Exec(
-			`UPDATE operators SET type=?, name=?, context=? WHERE id=?`,
+			`UPDATE operators SET type=?, name=?, context=?, inputs=?, parameters=? WHERE id=?`,
 			newOperator.Type,
 			newOperator.Name,
 			newOperator.Context,
+			newOperator.Inputs,
+			newOperator.Parameters,
 			in.Id,
 		)
 		if err != nil {

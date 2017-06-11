@@ -1,6 +1,6 @@
 package parameter
 
-import pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
+import pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
 
 type Component struct {
 	Name  string  `json:"name"`

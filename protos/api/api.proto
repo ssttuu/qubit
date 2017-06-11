@@ -5,4 +5,3 @@ package core;
 import public "organizations/organizations.proto";
 import public "scenes/scenes.proto";
 import public "operators/operators.proto";
-import public "parameters/parameters.proto";

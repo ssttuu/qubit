@@ -1,7 +1,7 @@
 package parameter
 
 import (
-	pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
+	pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
 )
 
 type Parameter struct {
