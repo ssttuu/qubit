@@ -52,7 +52,7 @@ func (s *Server) Create(ctx context.Context, in *scenes_pb.CreateSceneRequest) (
 		return nil, errors.Wrap(err, "Failed to retrieve new ID")
 	}
 	newScene := scene.Scene{
-		Id:   id,
+		Id:   string(id),
 		Name: in.Scene.Name,
 	}
 	return newScene.ToProto(), nil

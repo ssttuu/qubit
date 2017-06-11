@@ -14,17 +14,15 @@ const (
 )
 
 type Operator struct {
-	Id      int64  `json:"id" db:"id"`
-	SceneId int64  `json:"scene_id" db:"scene_id"`
+	Id      string `json:"id" db:"id"`
+	SceneId string `json:"scene_id" db:"scene_id"`
 	Type    string `json:"type" db:"type"`
 	Name    string `json:"name" db:"name"`
-	// TODO: What is context? Is it the range of images within the scene
-	// TODO: to which the operator applies?
+	// 2d, 3d, etc.
 	Context string `json:"context" db:"context"`
-	// TODO: Should inputs/outputs be arrays of IDs of other operators?
-	// TODO: Do we need both? Is it normalized in the DB?
-	Inputs  []string `json:"inputs" db:"inputs"`
-	Outputs []string `json:"outputs" db:"outputs"`
+	// Array of IDs of input operators
+	Inputs     []string             `json:"inputs" db:"inputs"`
+	Parameters parameter.Parameters `json:"parameters" db:"parameters"`
 }
 
 func (o *Operator) ToProto() *pb.Operator {

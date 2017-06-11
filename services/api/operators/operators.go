@@ -10,17 +10,16 @@ import (
 
 	"github.com/stupschwartz/qubit/core/operator"
 	_ "github.com/stupschwartz/qubit/core/operators"
+	"github.com/stupschwartz/qubit/core/parameter"
 	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
 	operators_pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
-	parameters_pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
 )
 
 // Server implements `service Health`.
 type Server struct {
-	PostgresClient   *sqlx.DB
-	StorageClient    *storage.Client
-	ParametersClient parameters_pb.ParametersClient
-	ComputeClient    compute_pb.ComputeClient
+	PostgresClient *sqlx.DB
+	StorageClient  *storage.Client
+	ComputeClient  compute_pb.ComputeClient
 }
 
 func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest) (*operators_pb.ListOperatorsResponse, error) {
@@ -61,10 +60,12 @@ func (s *Server) Create(ctx context.Context, in *operators_pb.CreateOperatorRequ
 		return nil, errors.Wrap(err, "Failed to retrieve new ID")
 	}
 	newOp := operator.Operator{
-		Context: in.Operator.Context,
-		Id:      id,
-		Name:    in.Operator.Name,
-		Type:    in.Operator.Type,
+		Context:    in.Operator.Context,
+		Id:         string(id),
+		Inputs:     in.Operator.Inputs,
+		Name:       in.Operator.Name,
+		Parameters: parameter.NewParametersFromProto(in.Operator.Parameters),
+		Type:       in.Operator.Type,
 	}
 	return newOp.ToProto(), nil
 }
@@ -91,14 +92,18 @@ func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequ
 	// TODO: Make update fields dynamic
 	newOperator := operator.NewOperatorFromProto(in.Operator)
 	if newOperator.Type != existingOperator.Type || newOperator.Name != existingOperator.Name || newOperator.Context != existingOperator.Context {
-		existingOperator.Type = newOperator.Type
-		existingOperator.Name = newOperator.Name
 		existingOperator.Context = newOperator.Context
+		existingOperator.Inputs = newOperator.Inputs
+		existingOperator.Name = newOperator.Name
+		existingOperator.Parameters = newOperator.Parameters
+		existingOperator.Type = newOperator.Type
 		_, err = tx.Exec(
-			`UPDATE operators SET type=?, name=?, context=? WHERE id=?`,
+			`UPDATE operators SET type=?, name=?, context=?, inputs=?, parameters=? WHERE id=?`,
 			newOperator.Type,
 			newOperator.Name,
 			newOperator.Context,
+			newOperator.Inputs,
+			newOperator.Parameters,
 			in.Id,
 		)
 		if err != nil {
@@ -190,11 +195,10 @@ func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequ
 	return nil, nil
 }
 
-func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, storageClient *storage.Client, parametersClient parameters_pb.ParametersClient, computeClient compute_pb.ComputeClient) {
+func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, storageClient *storage.Client, computeClient compute_pb.ComputeClient) {
 	operators_pb.RegisterOperatorsServer(grpcServer, &Server{
-		ComputeClient:    computeClient,
-		ParametersClient: parametersClient,
-		PostgresClient:   postgresClient,
-		StorageClient:    storageClient,
+		ComputeClient:  computeClient,
+		PostgresClient: postgresClient,
+		StorageClient:  storageClient,
 	})
 }

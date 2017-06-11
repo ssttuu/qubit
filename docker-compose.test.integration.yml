@@ -31,7 +31,6 @@ services:
         aliases:
           - api.qubit.site
     depends_on:
-      - datastore
       - postgres
       - compute
   postgres:

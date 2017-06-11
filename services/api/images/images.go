@@ -1,6 +1,7 @@
 package images
 
 import (
+	"cloud.google.com/go/storage"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
@@ -13,6 +14,7 @@ import (
 
 type Server struct {
 	PostgresClient *sqlx.DB
+	StorageClient  *storage.Client
 }
 
 func (s *Server) List(ctx context.Context, in *images_pb.ListImagesRequest) (*images_pb.ListImagesResponse, error) {
@@ -38,15 +40,15 @@ func (s *Server) Get(ctx context.Context, in *images_pb.GetImageRequest) (*image
 func (s *Server) Create(ctx context.Context, in *images_pb.CreateImageRequest) (*images_pb.Image, error) {
 	// TODO: Validation
 	result, err := s.PostgresClient.NamedExec(
-		`INSERT INTO images (scene_id, name, width, height, labels, planes)
-			VALUES (:scene_id, :name, :width, :height, :labels, :planes)`,
+		`INSERT INTO images (image_sequence_id, name, width, height, labels, planes)
+			VALUES (:image_sequence_id, :name, :width, :height, :labels, :planes)`,
 		map[string]interface{}{
-			"scene_id": in.Image.SceneId,
-			"name":     in.Image.Name,
-			"width":    in.Image.Width,
-			"height":   in.Image.Height,
-			"labels":   in.Image.Labels,
-			"planes":   in.Image.Planes,
+			"image_sequence_id": in.Image.ImageSequenceId,
+			"name":              in.Image.Name,
+			"width":             in.Image.Width,
+			"height":            in.Image.Height,
+			"labels":            in.Image.Labels,
+			"planes":            in.Image.Planes,
 		},
 	)
 	if err != nil {
@@ -57,7 +59,7 @@ func (s *Server) Create(ctx context.Context, in *images_pb.CreateImageRequest) (
 		return nil, errors.Wrap(err, "Failed to retrieve new ID")
 	}
 	newImage := image.Image{
-		Id:   id,
+		Id:   string(id),
 		Name: in.Image.Name,
 	}
 	return newImage.ToProto(), nil
@@ -116,6 +118,9 @@ func (s *Server) Delete(ctx context.Context, in *images_pb.DeleteImageRequest) (
 	return &empty.Empty{}, nil
 }
 
-func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB) {
-	images_pb.RegisterImagesServer(grpcServer, &Server{PostgresClient: postgresClient})
+func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, storageClient *storage.Client) {
+	images_pb.RegisterImagesServer(grpcServer, &Server{
+		PostgresClient: postgresClient,
+		StorageClient:  storageClient,
+	})
 }

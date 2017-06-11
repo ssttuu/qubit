@@ -64,8 +64,8 @@ proto.projects.Project.prototype.toObject = function(opt_includeInstance) {
  */
 proto.projects.Project.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    organizationId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    organizationId: jspb.Message.getFieldWithDefault(msg, 2, ""),
     name: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
@@ -104,11 +104,11 @@ proto.projects.Project.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setOrganizationId(value);
       break;
     case 3:
@@ -154,15 +154,15 @@ proto.projects.Project.prototype.serializeBinary = function() {
 proto.projects.Project.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
   }
   f = this.getOrganizationId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       2,
       f
     );
@@ -178,30 +178,30 @@ proto.projects.Project.prototype.serializeBinaryToWriter = function (writer) {
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.projects.Project.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.projects.Project.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional int64 organization_id = 2;
- * @return {number}
+ * optional string organization_id = 2;
+ * @return {string}
  */
 proto.projects.Project.prototype.getOrganizationId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.projects.Project.prototype.setOrganizationId = function(value) {
   jspb.Message.setField(this, 2, value);
 };
@@ -650,7 +650,7 @@ proto.projects.GetProjectRequest.prototype.toObject = function(opt_includeInstan
  */
 proto.projects.GetProjectRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    id: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -688,7 +688,7 @@ proto.projects.GetProjectRequest.deserializeBinaryFromReader = function(msg, rea
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     default:
@@ -730,8 +730,8 @@ proto.projects.GetProjectRequest.prototype.serializeBinary = function() {
 proto.projects.GetProjectRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -740,15 +740,15 @@ proto.projects.GetProjectRequest.prototype.serializeBinaryToWriter = function (w
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.projects.GetProjectRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.projects.GetProjectRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
@@ -967,7 +967,7 @@ proto.projects.UpdateProjectRequest.prototype.toObject = function(opt_includeIns
  */
 proto.projects.UpdateProjectRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     project: (f = msg.getProject()) && proto.projects.Project.toObject(includeInstance, f)
   };
 
@@ -1006,7 +1006,7 @@ proto.projects.UpdateProjectRequest.deserializeBinaryFromReader = function(msg, 
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     case 2:
@@ -1053,8 +1053,8 @@ proto.projects.UpdateProjectRequest.prototype.serializeBinary = function() {
 proto.projects.UpdateProjectRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1071,15 +1071,15 @@ proto.projects.UpdateProjectRequest.prototype.serializeBinaryToWriter = function
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.projects.UpdateProjectRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.projects.UpdateProjectRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
@@ -1161,7 +1161,7 @@ proto.projects.DeleteProjectRequest.prototype.toObject = function(opt_includeIns
  */
 proto.projects.DeleteProjectRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    id: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -1199,7 +1199,7 @@ proto.projects.DeleteProjectRequest.deserializeBinaryFromReader = function(msg, 
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     default:
@@ -1241,8 +1241,8 @@ proto.projects.DeleteProjectRequest.prototype.serializeBinary = function() {
 proto.projects.DeleteProjectRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1251,15 +1251,15 @@ proto.projects.DeleteProjectRequest.prototype.serializeBinaryToWriter = function
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.projects.DeleteProjectRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.projects.DeleteProjectRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };

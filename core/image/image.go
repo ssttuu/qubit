@@ -5,13 +5,13 @@ import (
 )
 
 type Image struct {
-	Id      int64             `json:"id" db:"id"`
-	SceneId int64             `json:"scene_id" db:"scene_id"`
-	Name    string            `json:"name" db:"name"`
-	Width   int32             `json:"width" db:"width"`
-	Height  int32             `json:"height" db:"height"`
-	Labels  map[string]string `json:"labels" db:"labels"`
-	Planes  []Plane           `json:"planes" db:"planes"`
+	Id              string            `json:"id" db:"id"`
+	ImageSequenceId string            `json:"image_sequence_id" db:"image_sequence_id"`
+	Name            string            `json:"name" db:"name"`
+	Width           int32             `json:"width" db:"width"`
+	Height          int32             `json:"height" db:"height"`
+	Labels          map[string]string `json:"labels" db:"labels"`
+	Planes          []Plane           `json:"planes" db:"planes"`
 }
 
 func (i *Image) ToProto() *pb.Image {
@@ -20,13 +20,13 @@ func (i *Image) ToProto() *pb.Image {
 		pb_planes[index] = plane.ToProto()
 	}
 	return &pb.Image{
-		Id:      i.Id,
-		SceneId: i.SceneId,
-		Name:    i.Name,
-		Width:   i.Width,
-		Height:  i.Height,
-		Labels:  i.Labels,
-		Planes:  pb_planes,
+		Id:              i.Id,
+		ImageSequenceId: i.ImageSequenceId,
+		Name:            i.Name,
+		Width:           i.Width,
+		Height:          i.Height,
+		Labels:          i.Labels,
+		Planes:          pb_planes,
 	}
 }
 
@@ -36,13 +36,13 @@ func NewImageFromProto(pbimage *pb.Image) Image {
 		planes[index] = *NewPlaneFromProto(plane)
 	}
 	return Image{
-		Id:      pbimage.Id,
-		SceneId: pbimage.SceneId,
-		Name:    pbimage.Name,
-		Width:   pbimage.Width,
-		Height:  pbimage.Height,
-		Labels:  pbimage.Labels,
-		Planes:  planes,
+		Id:              pbimage.Id,
+		ImageSequenceId: pbimage.ImageSequenceId,
+		Name:            pbimage.Name,
+		Width:           pbimage.Width,
+		Height:          pbimage.Height,
+		Labels:          pbimage.Labels,
+		Planes:          planes,
 	}
 }
 

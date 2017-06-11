@@ -1,6 +1,5 @@
 API_FILES = $(shell find services/api -type f -name "*.go")
 COMPUTE_FILES = $(shell find services/compute -type f -name "*.go")
-IMAGES_FILES = $(shell find services/images -type f -name "*.go")
 
 # First target is default
 build-go: fmt build-api-go build-compute-go
@@ -8,18 +7,17 @@ build-go: fmt build-api-go build-compute-go
 clean:
 	touch services/api/run && rm services/api/run
 	touch services/compute/run && rm services/compute/run
-	touch services/images/run && rm services/images/run
 
 fmt:
 	go fmt ./...
 
 # Go binaries
 services/api/run: $(API_FILES)
-	cd services/api && go get ./... && go build -o run
+	cd services/api && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
 build-api-go: services/api/run
 
 services/compute/run: $(COMPUTE_FILES)
-	cd services/compute && go get ./... && go build -o run
+	cd services/compute && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
 build-compute-go: services/compute/run
 
 # Docker images

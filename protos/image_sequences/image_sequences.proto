@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package image_sequences;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service ImageSequences {
+    rpc List (ListImageSequencesRequest) returns (ListImageSequencesResponse) {
+        option (google.api.http) = {
+            get: "/v1/image_sequences"
+        };
+    }
+    rpc Get (GetImageSequenceRequest) returns (ImageSequence) {
+        option (google.api.http) = {
+            get: "/v1/image_sequences/{image_sequence_id}"
+        };
+    }
+    rpc Create (CreateImageSequenceRequest) returns (ImageSequence) {
+        option (google.api.http) = {
+            post: "/v1/image_sequences"
+            body: "image_sequence"
+        };
+    }
+    rpc Update (UpdateImageSequenceRequest) returns (ImageSequence) {
+        option (google.api.http) = {
+            put: "/v1/image_sequences/{image_sequence_id}"
+            body: "image_sequence"
+        };
+    }
+    rpc Delete (DeleteImageSequenceRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/image_sequences/{image_sequence_id}"
+        };
+    }
+}
+
+message ImageSequence {
+    string id = 1;
+    string project_id = 2;
+    string name = 3;
+}
+
+message ListImageSequencesRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+}
+
+message ListImageSequencesResponse {
+    repeated ImageSequence image_sequences = 1;
+    string next_page_token = 2;
+}
+
+message GetImageSequenceRequest {
+    string id = 1;
+}
+
+message CreateImageSequenceRequest {
+    ImageSequence image_sequence = 1;
+}
+
+message UpdateImageSequenceRequest {
+    string id = 1;
+    ImageSequence image_sequence = 2;
+}
+
+message DeleteImageSequenceRequest {
+    string id = 1;
+}

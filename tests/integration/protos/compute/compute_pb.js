@@ -12,7 +12,6 @@ var global = Function('return this')();
 var geometry_geometry_pb = require('../geometry/geometry_pb.js');
 var images_images_pb = require('../images/images_pb.js');
 var operators_operators_pb = require('../operators/operators_pb.js');
-var parameters_parameters_pb = require('../parameters/parameters_pb.js');
 goog.exportSymbol('proto.compute.RenderImageRequest', null, global);
 goog.exportSymbol('proto.compute.RenderImageResponse', null, global);
 
@@ -70,7 +69,7 @@ proto.compute.RenderImageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     operator: (f = msg.getOperator()) && operators_operators_pb.Operator.toObject(includeInstance, f),
     parametersList: jspb.Message.toObjectList(msg.getParametersList(),
-    parameters_parameters_pb.Parameter.toObject, includeInstance),
+    operators_operators_pb.Parameter.toObject, includeInstance),
     boundingBox: (f = msg.getBoundingBox()) && geometry_geometry_pb.BoundingBox2D.toObject(includeInstance, f)
   };
 
@@ -114,8 +113,8 @@ proto.compute.RenderImageRequest.deserializeBinaryFromReader = function(msg, rea
       msg.setOperator(value);
       break;
     case 2:
-      var value = new parameters_parameters_pb.Parameter;
-      reader.readMessage(value,parameters_parameters_pb.Parameter.deserializeBinaryFromReader);
+      var value = new operators_operators_pb.Parameter;
+      reader.readMessage(value,operators_operators_pb.Parameter.deserializeBinaryFromReader);
       msg.addParameters(value);
       break;
     case 3:
@@ -174,7 +173,7 @@ proto.compute.RenderImageRequest.prototype.serializeBinaryToWriter = function (w
     writer.writeRepeatedMessage(
       2,
       f,
-      parameters_parameters_pb.Parameter.serializeBinaryToWriter
+      operators_operators_pb.Parameter.serializeBinaryToWriter
     );
   }
   f = this.getBoundingBox();
@@ -219,30 +218,30 @@ proto.compute.RenderImageRequest.prototype.hasOperator = function() {
 
 
 /**
- * repeated parameters.Parameter parameters = 2;
+ * repeated operators.Parameter parameters = 2;
  * If you change this array by adding, removing or replacing elements, or if you
  * replace the array itself, then you must call the setter to update it.
- * @return {!Array.<!proto.parameters.Parameter>}
+ * @return {!Array.<!proto.operators.Parameter>}
  */
 proto.compute.RenderImageRequest.prototype.getParametersList = function() {
-  return /** @type{!Array.<!proto.parameters.Parameter>} */ (
-    jspb.Message.getRepeatedWrapperField(this, parameters_parameters_pb.Parameter, 2));
+  return /** @type{!Array.<!proto.operators.Parameter>} */ (
+    jspb.Message.getRepeatedWrapperField(this, operators_operators_pb.Parameter, 2));
 };
 
 
-/** @param {!Array.<!proto.parameters.Parameter>} value */
+/** @param {!Array.<!proto.operators.Parameter>} value */
 proto.compute.RenderImageRequest.prototype.setParametersList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 2, value);
 };
 
 
 /**
- * @param {!proto.parameters.Parameter=} opt_value
+ * @param {!proto.operators.Parameter=} opt_value
  * @param {number=} opt_index
- * @return {!proto.parameters.Parameter}
+ * @return {!proto.operators.Parameter}
  */
 proto.compute.RenderImageRequest.prototype.addParameters = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 2, opt_value, proto.parameters.Parameter, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 2, opt_value, proto.operators.Parameter, opt_index);
 };
 
 

@@ -5,8 +5,8 @@ import (
 )
 
 type Scene struct {
-	Id        int64  `json:"id" db:"id"`
-	ProjectId int64  `json:"project_id" db:"project_id"`
+	Id        string `json:"id" db:"id"`
+	ProjectId string `json:"project_id" db:"project_id"`
 	Name      string `json:"name" db:"name"`
 }
 

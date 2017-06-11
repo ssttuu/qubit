@@ -52,7 +52,7 @@ func (s *Server) Create(ctx context.Context, in *projects_pb.CreateProjectReques
 		return nil, errors.Wrap(err, "Failed to retrieve new ID")
 	}
 	newProject := project.Project{
-		Id:   id,
+		Id:   string(id),
 		Name: in.Project.Name,
 	}
 	return newProject.ToProto(), nil
