@@ -33,11 +33,11 @@ name: api.endpoints.qubit-161916.cloud.goog
 #
 title: API
 apis:
-- name: organizations.Organizations
-- name: scenes.Scenes
+- name: images.Images
 - name: operators.Operators
-- name: parameters.Parameters
-#- name: images.Images
+- name: organizations.Organizations
+- name: projects.Projects
+- name: scenes.Scenes
 
 #
 # API usage restrictions.
