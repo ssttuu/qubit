@@ -74,8 +74,8 @@ proto.images.Image.prototype.toObject = function(opt_includeInstance) {
  */
 proto.images.Image.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    imageSequenceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
     name: jspb.Message.getFieldWithDefault(msg, 3, ""),
     width: jspb.Message.getFieldWithDefault(msg, 4, 0),
     height: jspb.Message.getFieldWithDefault(msg, 5, 0),
@@ -119,12 +119,12 @@ proto.images.Image.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readInt64());
-      msg.setSceneId(value);
+      var value = /** @type {string} */ (reader.readString());
+      msg.setImageSequenceId(value);
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
@@ -188,15 +188,15 @@ proto.images.Image.prototype.serializeBinary = function() {
 proto.images.Image.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
   }
-  f = this.getSceneId();
-  if (f !== 0) {
-    writer.writeInt64(
+  f = this.getImageSequenceId();
+  if (f.length > 0) {
+    writer.writeString(
       2,
       f
     );
@@ -238,31 +238,31 @@ proto.images.Image.prototype.serializeBinaryToWriter = function (writer) {
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.images.Image.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.images.Image.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional int64 scene_id = 2;
- * @return {number}
+ * optional string image_sequence_id = 2;
+ * @return {string}
  */
-proto.images.Image.prototype.getSceneId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+proto.images.Image.prototype.getImageSequenceId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
-/** @param {number} value */
-proto.images.Image.prototype.setSceneId = function(value) {
+/** @param {string} value */
+proto.images.Image.prototype.setImageSequenceId = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
@@ -1457,7 +1457,7 @@ proto.images.GetImageRequest.prototype.toObject = function(opt_includeInstance) 
  */
 proto.images.GetImageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    id: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -1495,7 +1495,7 @@ proto.images.GetImageRequest.deserializeBinaryFromReader = function(msg, reader)
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     default:
@@ -1537,8 +1537,8 @@ proto.images.GetImageRequest.prototype.serializeBinary = function() {
 proto.images.GetImageRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1547,15 +1547,15 @@ proto.images.GetImageRequest.prototype.serializeBinaryToWriter = function (write
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.images.GetImageRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.images.GetImageRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
@@ -1774,7 +1774,7 @@ proto.images.UpdateImageRequest.prototype.toObject = function(opt_includeInstanc
  */
 proto.images.UpdateImageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     image: (f = msg.getImage()) && proto.images.Image.toObject(includeInstance, f)
   };
 
@@ -1813,7 +1813,7 @@ proto.images.UpdateImageRequest.deserializeBinaryFromReader = function(msg, read
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     case 2:
@@ -1860,8 +1860,8 @@ proto.images.UpdateImageRequest.prototype.serializeBinary = function() {
 proto.images.UpdateImageRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1878,15 +1878,15 @@ proto.images.UpdateImageRequest.prototype.serializeBinaryToWriter = function (wr
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.images.UpdateImageRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.images.UpdateImageRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
@@ -1968,7 +1968,7 @@ proto.images.DeleteImageRequest.prototype.toObject = function(opt_includeInstanc
  */
 proto.images.DeleteImageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    id: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -2006,7 +2006,7 @@ proto.images.DeleteImageRequest.deserializeBinaryFromReader = function(msg, read
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     default:
@@ -2048,8 +2048,8 @@ proto.images.DeleteImageRequest.prototype.serializeBinary = function() {
 proto.images.DeleteImageRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -2058,15 +2058,15 @@ proto.images.DeleteImageRequest.prototype.serializeBinaryToWriter = function (wr
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.images.DeleteImageRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.images.DeleteImageRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };

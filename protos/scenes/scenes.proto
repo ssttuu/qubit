@@ -37,8 +37,8 @@ service Scenes {
 }
 
 message Scene {
-    int64 id = 1;
-    int64 project_id = 2;
+    string id = 1;
+    string project_id = 2;
     string name = 3;
 }
 
@@ -53,7 +53,7 @@ message ListScenesResponse {
 }
 
 message GetSceneRequest {
-    int64 id = 1;
+    string id = 1;
 }
 
 message CreateSceneRequest {
@@ -61,10 +61,10 @@ message CreateSceneRequest {
 }
 
 message UpdateSceneRequest {
-    int64 id = 1;
+    string id = 1;
     Scene scene = 2;
 }
 
 message DeleteSceneRequest {
-    int64 id = 1;
+    string id = 1;
 }

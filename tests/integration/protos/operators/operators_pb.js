@@ -67,8 +67,8 @@ proto.operators.Operator.prototype.toObject = function(opt_includeInstance) {
  */
 proto.operators.Operator.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    sceneId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
     type: jspb.Message.getFieldWithDefault(msg, 3, ""),
     name: jspb.Message.getFieldWithDefault(msg, 4, ""),
     context: jspb.Message.getFieldWithDefault(msg, 5, "")
@@ -109,11 +109,11 @@ proto.operators.Operator.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setSceneId(value);
       break;
     case 3:
@@ -167,15 +167,15 @@ proto.operators.Operator.prototype.serializeBinary = function() {
 proto.operators.Operator.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
   }
   f = this.getSceneId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       2,
       f
     );
@@ -205,30 +205,30 @@ proto.operators.Operator.prototype.serializeBinaryToWriter = function (writer) {
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.operators.Operator.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.operators.Operator.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional int64 scene_id = 2;
- * @return {number}
+ * optional string scene_id = 2;
+ * @return {string}
  */
 proto.operators.Operator.prototype.getSceneId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.operators.Operator.prototype.setSceneId = function(value) {
   jspb.Message.setField(this, 2, value);
 };
@@ -707,7 +707,7 @@ proto.operators.GetOperatorRequest.prototype.toObject = function(opt_includeInst
  */
 proto.operators.GetOperatorRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    id: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -745,7 +745,7 @@ proto.operators.GetOperatorRequest.deserializeBinaryFromReader = function(msg, r
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     default:
@@ -787,8 +787,8 @@ proto.operators.GetOperatorRequest.prototype.serializeBinary = function() {
 proto.operators.GetOperatorRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -797,15 +797,15 @@ proto.operators.GetOperatorRequest.prototype.serializeBinaryToWriter = function 
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.operators.GetOperatorRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.operators.GetOperatorRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
@@ -1024,7 +1024,7 @@ proto.operators.UpdateOperatorRequest.prototype.toObject = function(opt_includeI
  */
 proto.operators.UpdateOperatorRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     operator: (f = msg.getOperator()) && proto.operators.Operator.toObject(includeInstance, f)
   };
 
@@ -1063,7 +1063,7 @@ proto.operators.UpdateOperatorRequest.deserializeBinaryFromReader = function(msg
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     case 2:
@@ -1110,8 +1110,8 @@ proto.operators.UpdateOperatorRequest.prototype.serializeBinary = function() {
 proto.operators.UpdateOperatorRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1128,15 +1128,15 @@ proto.operators.UpdateOperatorRequest.prototype.serializeBinaryToWriter = functi
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.operators.UpdateOperatorRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.operators.UpdateOperatorRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
@@ -1218,7 +1218,7 @@ proto.operators.DeleteOperatorRequest.prototype.toObject = function(opt_includeI
  */
 proto.operators.DeleteOperatorRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    id: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -1256,7 +1256,7 @@ proto.operators.DeleteOperatorRequest.deserializeBinaryFromReader = function(msg
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     default:
@@ -1298,8 +1298,8 @@ proto.operators.DeleteOperatorRequest.prototype.serializeBinary = function() {
 proto.operators.DeleteOperatorRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1308,15 +1308,15 @@ proto.operators.DeleteOperatorRequest.prototype.serializeBinaryToWriter = functi
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.operators.DeleteOperatorRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.operators.DeleteOperatorRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
@@ -1368,7 +1368,7 @@ proto.operators.RenderOperatorRequest.prototype.toObject = function(opt_includeI
  */
 proto.operators.RenderOperatorRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     frame: jspb.Message.getFieldWithDefault(msg, 2, 0),
     boundingBox: (f = msg.getBoundingBox()) && geometry_geometry_pb.BoundingBox2D.toObject(includeInstance, f)
   };
@@ -1408,7 +1408,7 @@ proto.operators.RenderOperatorRequest.deserializeBinaryFromReader = function(msg
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     case 2:
@@ -1459,8 +1459,8 @@ proto.operators.RenderOperatorRequest.prototype.serializeBinary = function() {
 proto.operators.RenderOperatorRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1484,15 +1484,15 @@ proto.operators.RenderOperatorRequest.prototype.serializeBinaryToWriter = functi
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.operators.RenderOperatorRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.operators.RenderOperatorRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };

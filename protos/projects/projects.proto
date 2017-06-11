@@ -37,8 +37,8 @@ service Projects {
 }
 
 message Project {
-    int64 id = 1;
-    int64 organization_id = 2;
+    string id = 1;
+    string organization_id = 2;
     string name = 3;
 }
 
@@ -53,7 +53,7 @@ message ListProjectsResponse {
 }
 
 message GetProjectRequest {
-    int64 id = 1;
+    string id = 1;
 }
 
 message CreateProjectRequest {
@@ -61,10 +61,10 @@ message CreateProjectRequest {
 }
 
 message UpdateProjectRequest {
-    int64 id = 1;
+    string id = 1;
     Project project = 2;
 }
 
 message DeleteProjectRequest {
-    int64 id = 1;
+    string id = 1;
 }

@@ -31,4 +31,3 @@ elif [ "${type}" = "js" ]; then
 		--grpc_out=./tests/integration/protos/ \
 		${proto_path}
 fi
-

@@ -45,8 +45,8 @@ service Operators {
 }
 
 message Operator {
-    int64 id = 1;
-    int64 scene_id = 2;
+    string id = 1;
+    string scene_id = 2;
     string type = 3;
     string name = 4;
     string context = 5;
@@ -63,7 +63,7 @@ message ListOperatorsResponse {
 }
 
 message GetOperatorRequest {
-    int64 id = 1;
+    string id = 1;
 }
 
 message CreateOperatorRequest {
@@ -71,16 +71,16 @@ message CreateOperatorRequest {
 }
 
 message UpdateOperatorRequest {
-    int64 id = 1;
+    string id = 1;
     Operator operator = 2;
 }
 
 message DeleteOperatorRequest {
-    int64 id = 1;
+    string id = 1;
 }
 
 message RenderOperatorRequest {
-    int64 id = 1;
+    string id = 1;
 
     // TODO: use double?
     int32 frame = 2;

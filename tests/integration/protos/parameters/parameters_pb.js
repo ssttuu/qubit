@@ -219,7 +219,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<number>}
  * @const
  */
-proto.parameters.Parameter.repeatedFields_ = [4];
+proto.parameters.Parameter.repeatedFields_ = [3];
 
 
 
@@ -249,8 +249,7 @@ proto.parameters.Parameter.prototype.toObject = function(opt_includeInstance) {
  */
 proto.parameters.Parameter.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    name: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    name: jspb.Message.getFieldWithDefault(msg, 1, ""),
     labelsMap: (f = msg.getLabelsMap()) ? f.toArray() : [],
     componentsList: jspb.Message.toObjectList(msg.getComponentsList(),
     proto.parameters.Component.toObject, includeInstance)
@@ -291,20 +290,16 @@ proto.parameters.Parameter.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
-      msg.setId(value);
-      break;
-    case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.setName(value);
       break;
-    case 3:
+    case 2:
       var value = msg.getLabelsMap();
       reader.readMessage(value, function(message, reader) {
         jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readString);
          });
       break;
-    case 4:
+    case 3:
       var value = new proto.parameters.Component;
       reader.readMessage(value,proto.parameters.Component.deserializeBinaryFromReader);
       msg.addComponents(value);
@@ -347,28 +342,21 @@ proto.parameters.Parameter.prototype.serializeBinary = function() {
  */
 proto.parameters.Parameter.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
-      1,
-      f
-    );
-  }
   f = this.getName();
   if (f.length > 0) {
     writer.writeString(
-      2,
+      1,
       f
     );
   }
   f = this.getLabelsMap(true);
   if (f && f.getLength() > 0) {
-    f.serializeBinary(3, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeString);
+    f.serializeBinary(2, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeString);
   }
   f = this.getComponentsList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
-      4,
+      3,
       f,
       proto.parameters.Component.serializeBinaryToWriter
     );
@@ -377,44 +365,29 @@ proto.parameters.Parameter.prototype.serializeBinaryToWriter = function (writer)
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
- */
-proto.parameters.Parameter.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
-};
-
-
-/** @param {number} value */
-proto.parameters.Parameter.prototype.setId = function(value) {
-  jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string name = 2;
+ * optional string name = 1;
  * @return {string}
  */
 proto.parameters.Parameter.prototype.getName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
 proto.parameters.Parameter.prototype.setName = function(value) {
-  jspb.Message.setField(this, 2, value);
+  jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * map<string, string> labels = 3;
+ * map<string, string> labels = 2;
  * @param {boolean=} opt_noLazyCreate Do not create the map if
  * empty, instead returning `undefined`
  * @return {!jspb.Map<string,string>}
  */
 proto.parameters.Parameter.prototype.getLabelsMap = function(opt_noLazyCreate) {
   return /** @type {!jspb.Map<string,string>} */ (
-      jspb.Message.getMapField(this, 3, opt_noLazyCreate,
+      jspb.Message.getMapField(this, 2, opt_noLazyCreate,
       null));
 };
 
@@ -425,20 +398,20 @@ proto.parameters.Parameter.prototype.clearLabelsMap = function() {
 
 
 /**
- * repeated Component components = 4;
+ * repeated Component components = 3;
  * If you change this array by adding, removing or replacing elements, or if you
  * replace the array itself, then you must call the setter to update it.
  * @return {!Array.<!proto.parameters.Component>}
  */
 proto.parameters.Parameter.prototype.getComponentsList = function() {
   return /** @type{!Array.<!proto.parameters.Component>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.parameters.Component, 4));
+    jspb.Message.getRepeatedWrapperField(this, proto.parameters.Component, 3));
 };
 
 
 /** @param {!Array.<!proto.parameters.Component>} value */
 proto.parameters.Parameter.prototype.setComponentsList = function(value) {
-  jspb.Message.setRepeatedWrapperField(this, 4, value);
+  jspb.Message.setRepeatedWrapperField(this, 3, value);
 };
 
 
@@ -448,7 +421,7 @@ proto.parameters.Parameter.prototype.setComponentsList = function(value) {
  * @return {!proto.parameters.Component}
  */
 proto.parameters.Parameter.prototype.addComponents = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.parameters.Component, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 3, opt_value, proto.parameters.Component, opt_index);
 };
 
 
@@ -885,7 +858,7 @@ proto.parameters.GetParameterRequest.prototype.toObject = function(opt_includeIn
  */
 proto.parameters.GetParameterRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    id: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -923,7 +896,7 @@ proto.parameters.GetParameterRequest.deserializeBinaryFromReader = function(msg,
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     default:
@@ -965,8 +938,8 @@ proto.parameters.GetParameterRequest.prototype.serializeBinary = function() {
 proto.parameters.GetParameterRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -975,15 +948,15 @@ proto.parameters.GetParameterRequest.prototype.serializeBinaryToWriter = functio
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.parameters.GetParameterRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.parameters.GetParameterRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
@@ -1202,7 +1175,7 @@ proto.parameters.UpdateParameterRequest.prototype.toObject = function(opt_includ
  */
 proto.parameters.UpdateParameterRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     parameter: (f = msg.getParameter()) && proto.parameters.Parameter.toObject(includeInstance, f)
   };
 
@@ -1241,7 +1214,7 @@ proto.parameters.UpdateParameterRequest.deserializeBinaryFromReader = function(m
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     case 2:
@@ -1288,8 +1261,8 @@ proto.parameters.UpdateParameterRequest.prototype.serializeBinary = function() {
 proto.parameters.UpdateParameterRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1306,15 +1279,15 @@ proto.parameters.UpdateParameterRequest.prototype.serializeBinaryToWriter = func
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.parameters.UpdateParameterRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.parameters.UpdateParameterRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
@@ -1396,7 +1369,7 @@ proto.parameters.DeleteParameterRequest.prototype.toObject = function(opt_includ
  */
 proto.parameters.DeleteParameterRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    id: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -1434,7 +1407,7 @@ proto.parameters.DeleteParameterRequest.deserializeBinaryFromReader = function(m
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     default:
@@ -1476,8 +1449,8 @@ proto.parameters.DeleteParameterRequest.prototype.serializeBinary = function() {
 proto.parameters.DeleteParameterRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1486,15 +1459,15 @@ proto.parameters.DeleteParameterRequest.prototype.serializeBinaryToWriter = func
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.parameters.DeleteParameterRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.parameters.DeleteParameterRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };

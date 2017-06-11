@@ -64,8 +64,8 @@ proto.scenes.Scene.prototype.toObject = function(opt_includeInstance) {
  */
 proto.scenes.Scene.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    projectId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    projectId: jspb.Message.getFieldWithDefault(msg, 2, ""),
     name: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
@@ -104,11 +104,11 @@ proto.scenes.Scene.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setProjectId(value);
       break;
     case 3:
@@ -154,15 +154,15 @@ proto.scenes.Scene.prototype.serializeBinary = function() {
 proto.scenes.Scene.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
   }
   f = this.getProjectId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       2,
       f
     );
@@ -178,30 +178,30 @@ proto.scenes.Scene.prototype.serializeBinaryToWriter = function (writer) {
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.scenes.Scene.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.scenes.Scene.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional int64 project_id = 2;
- * @return {number}
+ * optional string project_id = 2;
+ * @return {string}
  */
 proto.scenes.Scene.prototype.getProjectId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.scenes.Scene.prototype.setProjectId = function(value) {
   jspb.Message.setField(this, 2, value);
 };
@@ -650,7 +650,7 @@ proto.scenes.GetSceneRequest.prototype.toObject = function(opt_includeInstance) 
  */
 proto.scenes.GetSceneRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    id: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -688,7 +688,7 @@ proto.scenes.GetSceneRequest.deserializeBinaryFromReader = function(msg, reader)
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     default:
@@ -730,8 +730,8 @@ proto.scenes.GetSceneRequest.prototype.serializeBinary = function() {
 proto.scenes.GetSceneRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -740,15 +740,15 @@ proto.scenes.GetSceneRequest.prototype.serializeBinaryToWriter = function (write
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.scenes.GetSceneRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.scenes.GetSceneRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
@@ -967,7 +967,7 @@ proto.scenes.UpdateSceneRequest.prototype.toObject = function(opt_includeInstanc
  */
 proto.scenes.UpdateSceneRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     scene: (f = msg.getScene()) && proto.scenes.Scene.toObject(includeInstance, f)
   };
 
@@ -1006,7 +1006,7 @@ proto.scenes.UpdateSceneRequest.deserializeBinaryFromReader = function(msg, read
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     case 2:
@@ -1053,8 +1053,8 @@ proto.scenes.UpdateSceneRequest.prototype.serializeBinary = function() {
 proto.scenes.UpdateSceneRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1071,15 +1071,15 @@ proto.scenes.UpdateSceneRequest.prototype.serializeBinaryToWriter = function (wr
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.scenes.UpdateSceneRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.scenes.UpdateSceneRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
@@ -1161,7 +1161,7 @@ proto.scenes.DeleteSceneRequest.prototype.toObject = function(opt_includeInstanc
  */
 proto.scenes.DeleteSceneRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    id: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -1199,7 +1199,7 @@ proto.scenes.DeleteSceneRequest.deserializeBinaryFromReader = function(msg, read
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     default:
@@ -1241,8 +1241,8 @@ proto.scenes.DeleteSceneRequest.prototype.serializeBinary = function() {
 proto.scenes.DeleteSceneRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
   f = this.getId();
-  if (f !== 0) {
-    writer.writeInt64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1251,15 +1251,15 @@ proto.scenes.DeleteSceneRequest.prototype.serializeBinaryToWriter = function (wr
 
 
 /**
- * optional int64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.scenes.DeleteSceneRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.scenes.DeleteSceneRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
 };

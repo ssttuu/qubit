@@ -37,7 +37,7 @@ service Organizations {
 }
 
 message Organization {
-    int64 id = 1;
+    string id = 1;
     string name = 2;
 }
 
@@ -52,7 +52,7 @@ message ListOrganizationsResponse {
 }
 
 message GetOrganizationRequest {
-    int64 id = 1;
+    string id = 1;
 }
 
 message CreateOrganizationRequest {
@@ -60,10 +60,10 @@ message CreateOrganizationRequest {
 }
 
 message UpdateOrganizationRequest {
-    int64 id = 1;
+    string id = 1;
     Organization organization = 2;
 }
 
 message DeleteOrganizationRequest {
-    int64 id = 1;
+    string id = 1;
 }

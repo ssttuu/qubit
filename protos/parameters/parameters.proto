@@ -43,10 +43,9 @@ message Component {
 }
 
 message Parameter {
-    int64 id = 1;
-    string name = 2;
-    map<string, string> labels = 3;
-    repeated Component components = 4;
+    string name = 1;
+    map<string, string> labels = 2;
+    repeated Component components = 3;
 }
 
 message ListParametersRequest {
@@ -60,7 +59,7 @@ message ListParametersResponse {
 }
 
 message GetParameterRequest {
-    int64 id = 1;
+    string id = 1;
 }
 
 message CreateParameterRequest {
@@ -68,10 +67,10 @@ message CreateParameterRequest {
 }
 
 message UpdateParameterRequest {
-    int64 id = 1;
+    string id = 1;
     Parameter parameter = 2;
 }
 
 message DeleteParameterRequest {
-    int64 id = 1;
+    string id = 1;
 }
