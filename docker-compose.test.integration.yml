@@ -16,7 +16,7 @@ services:
 
   api:
     image: us.gcr.io/qubit-161916/api
-    build: ./services/api
+    build: ./applications/api/services
     environment:
       - GOOGLE_PROJECT_ID=qubit-161916
       - STORAGE_BUCKET=qubit-dev-161916
@@ -42,7 +42,7 @@ services:
 
   compute:
     image: us.gcr.io/qubit-161916/compute
-    build: ./services/compute
+    build: ./applications/compute/services
     environment:
       - GOOGLE_PROJECT_ID=qubit-161916
       - STORAGE_BUCKET=qubit-dev-161916

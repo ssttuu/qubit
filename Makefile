@@ -1,24 +1,24 @@
-API_FILES = $(shell find services/api -type f -name "*.go")
-COMPUTE_FILES = $(shell find services/compute -type f -name "*.go")
+API_FILES = $(shell find applications/api/services -type f -name "*.go")
+COMPUTE_FILES = $(shell find applications/compute/services -type f -name "*.go")
 
 # First target is default
 build-go: fmt build-api-go build-compute-go
 
 clean:
-	touch services/api/run && rm services/api/run
-	touch services/compute/run && rm services/compute/run
+	touch applications/api/services/run && rm applications/api/services/run
+	touch applications/compute/services/run && rm applications/compute/services/run
 
 fmt:
 	go fmt ./...
 
 # Go binaries
-services/api/run: $(API_FILES)
-	cd services/api && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
-build-api-go: services/api/run
+applications/api/services/run: $(API_FILES)
+	cd applications/api/services && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
+build-api-go: applications/api/services/run
 
-services/compute/run: $(COMPUTE_FILES)
-	cd services/compute && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
-build-compute-go: services/compute/run
+applications/compute/services/run: $(COMPUTE_FILES)
+	cd applications/compute/services && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
+build-compute-go: applications/compute/services/run
 
 # Docker images
 build-api: build-api-go

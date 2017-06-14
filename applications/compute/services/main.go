@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 
-	"github.com/stupschwartz/qubit/services/compute/compute"
+	"github.com/stupschwartz/qubit/applications/compute/services/compute"
 )
 
 func serve(server *grpc.Server, listener net.Listener, done chan bool) {
