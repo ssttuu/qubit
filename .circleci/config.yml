@@ -99,7 +99,7 @@ jobs:
             - run:
                 name: Compute - Copy Back Artifacts
                 command: |
-                    docker cp go-compute-build-volumes:/go/src/github.com/stupschwartz/qubit/applications/compute/run `pwd`/applications/compute/run
+                    docker cp go-compute-build-volumes:/go/src/github.com/stupschwartz/qubit/applications/compute/services/run `pwd`/applications/compute/services/run
 
             - run:
                 name: Compute - Build Container
