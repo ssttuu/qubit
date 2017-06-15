@@ -7,20 +7,21 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	_ "github.com/bmizerany/pq"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 
+	"github.com/stupschwartz/qubit/applications/api/services/images"
+	"github.com/stupschwartz/qubit/applications/api/services/operators"
+	"github.com/stupschwartz/qubit/applications/api/services/organizations"
+	"github.com/stupschwartz/qubit/applications/api/services/scenes"
 	"github.com/stupschwartz/qubit/proto-gen/go/compute"
-	"github.com/stupschwartz/qubit/services/api/images"
-	"github.com/stupschwartz/qubit/services/api/operators"
-	"github.com/stupschwartz/qubit/services/api/organizations"
-	"github.com/stupschwartz/qubit/services/api/scenes"
 )
 
-func serve(server *grpc.Server, listener net.Listener, done chan bool) {
+func runServer(server *grpc.Server, listener net.Listener, done chan bool) {
 	server.Serve(listener)
 	done <- true
 }
@@ -42,6 +43,10 @@ func main() {
 	if computeAddress == "" {
 		log.Fatal(`You need to set the environment variable "COMPUTE_SERVICE_ADDRESS"`)
 	}
+	postgresURL := os.Getenv("POSTGRES_URL")
+	if postgresURL == "" {
+		log.Fatal(`You need to set the environment variable "POSTGRES_URL"`)
+	}
 	ctx := context.Background()
 	serviceCredentials := option.WithServiceAccountFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
 	storageClient, err := storage.NewClient(ctx, serviceCredentials)
@@ -50,7 +55,7 @@ func main() {
 		time.Sleep(100 * time.Millisecond)
 		storageClient, err = storage.NewClient(ctx, serviceCredentials)
 	}
-	postgresClient, err := sqlx.Open("postgres", os.Getenv("POSTGRES_URL"))
+	postgresClient, err := sqlx.Open("postgres", postgresURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,7 +65,7 @@ func main() {
 	}
 	grpcServer := grpc.NewServer()
 	servingDone := make(chan bool)
-	go serve(grpcServer, lis, servingDone)
+	go runServer(grpcServer, lis, servingDone)
 	conn, err := grpc.Dial(apiAddress, grpc.WithInsecure())
 	for err != nil {
 		log.Printf("Could not connect to Api Service: %v\n", err)
