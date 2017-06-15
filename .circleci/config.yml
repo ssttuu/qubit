@@ -1,149 +1,165 @@
 version: 2
 jobs:
-    build:
+    build_base:
         docker:
             - image: docker:17
-
         working_directory: /workspace
-
         steps:
             - checkout
             - setup_remote_docker
-
             - run:
                 name: Pull
                 command: |
                     docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
                     docker pull ${DOCKER_USER}/qubit-builder || echo "Getting qubit-builder"
-
             - run:
                 name: Build
                 command: |
                     docker build --no-cache -t ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1} -t ${DOCKER_USER}/qubit-builder:latest ./builder/
-
             - run:
                 name: Push
                 command: |
                     docker push ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1}
                     docker push ${DOCKER_USER}/qubit-builder:latest
 
-            - run:
-                name: Trigger Containers Build
-                command: |
-                    docker run --rm ${DOCKER_USER}/qubit-builder:latest curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=build_containers --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
-
-    build_containers:
+    build_api:
         docker:
             - image: stuschwartz/qubit-builder:latest
-
         working_directory: /go/src/github.com/stupschwartz/qubit
-
         environment:
             TEST_RESULTS: /tmp/test-results
-
         steps:
             - checkout
             - setup_remote_docker
-
             - run:
                 name: Authenticate GCloud
                 command: scripts/auth-gcloud.sh
-
-            # Build API
             - run:
                 name: API - Start Go Build
                 command: |
                     docker create -v /go -w /go/src/github.com/stupschwartz/qubit/applications/api/services --name go-api-build-volumes alpine:3.4 /bin/true
-
             - run:
                 name: API - Copy Source to Container
                 command: |
                     docker cp ./ go-api-build-volumes:/go/src/github.com/stupschwartz/qubit
-
             - run:
                 name: API - Build Go Code
                 command: |
                     docker run --volumes-from go-api-build-volumes -w /go/src/github.com/stupschwartz/qubit/applications/api/services golang:1.8 bash -c "go get ./...; go build -o run"
-
             - run:
                 name: API - Copy Back Artifacts
                 command: |
                     docker cp go-api-build-volumes:/go/src/github.com/stupschwartz/qubit/applications/api/services/run `pwd`/applications/api/services/run
-
             - run:
                 name: API - Build Container
                 command: |
                     gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/api:${CIRCLE_SHA1} ./applications/api/services
-
             - run:
                 name: API - Push Container
                 command: |
                     gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/api:${CIRCLE_SHA1}
 
-            # Build Compute
+    build_compute:
+        docker:
+            - image: stuschwartz/qubit-builder:latest
+        working_directory: /go/src/github.com/stupschwartz/qubit
+        environment:
+            TEST_RESULTS: /tmp/test-results
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run:
+                name: Authenticate GCloud
+                command: scripts/auth-gcloud.sh
             - run:
                 name: Compute - Start Go Build
                 command: |
                     docker create -v /go -w /go/src/github.com/stupschwartz/qubit/applications/compute/services --name go-compute-build-volumes alpine:3.4 /bin/true
-
             - run:
                 name: Compute - Copy Source to Container
                 command: |
                     docker cp ./ go-compute-build-volumes:/go/src/github.com/stupschwartz/qubit
-
             - run:
                 name: Compute - Build Go Code
                 command: |
                     docker run --volumes-from go-compute-build-volumes -w /go/src/github.com/stupschwartz/qubit/applications/compute/services golang:1.8 bash -c "go get ./...; go build -o run"
-
             - run:
                 name: Compute - Copy Back Artifacts
                 command: |
                     docker cp go-compute-build-volumes:/go/src/github.com/stupschwartz/qubit/applications/compute/services/run `pwd`/applications/compute/services/run
-
             - run:
                 name: Compute - Build Container
                 command: |
                     gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/compute:${CIRCLE_SHA1} ./applications/compute/services
-
             - run:
                 name: Compute - Push Container
                 command: |
                     gcloud docker -- push ${EXTERNALREGISTRYENDPOINT}/compute:${CIRCLE_SHA1}
 
-            # TRIGGER NEXT STEP
-            - run:
-                name: Trigger Containers Deployment
-                command: |
-                    curl -u ${CIRCLE_API_TOKEN}: --data build_parameters[CIRCLE_JOB]=deploy_containers --data revision=${CIRCLE_SHA1} https://circleci.com/api/v1.1/project/github/stupschwartz/qubit/tree/${CIRCLE_BRANCH}
-
-
-    deploy_containers:
+    test_api:
         docker:
             - image: stuschwartz/qubit-builder:latest
-
-        branches:
-            only:
-                - master
-
         working_directory: /go/src/github.com/stupschwartz/qubit
-
         environment:
             TEST_RESULTS: /tmp/test-results
-
         steps:
             - checkout
             - setup_remote_docker
 
+    test_compute:
+        docker:
+            - image: stuschwartz/qubit-builder:latest
+        working_directory: /go/src/github.com/stupschwartz/qubit
+        environment:
+            TEST_RESULTS: /tmp/test-results
+        steps:
+            - checkout
+            - setup_remote_docker
+
+    deploy:
+        docker:
+            - image: stuschwartz/qubit-builder:latest
+        branches:
+            only:
+                - master
+        working_directory: /go/src/github.com/stupschwartz/qubit
+        environment:
+            TEST_RESULTS: /tmp/test-results
+        steps:
+            - checkout
+            - setup_remote_docker
             - run:
                 name: Authenticate GCloud
                 command: scripts/auth-gcloud.sh
-
             - run:
                 name: Cluster Credentials
                 command: |
                     gcloud container clusters get-credentials dev-cluster --zone us-central1-a
-
             - run:
                 name: Deploy API Services
                 command: ./deploy.sh
+
+workflows:
+    version: 2
+    build_test_deploy:
+        jobs:
+            - build_base
+            - build_api:
+                requires:
+                    - build_base
+            - build_compute:
+                requires:
+                    - build_base
+            - test_api:
+                requires:
+                    - build_api
+            - test_compute:
+                requires:
+                    - build_compute
+            - deploy:
+                requires:
+                    - test_api
+                    - test_compute
+                filters:
+                    branches:
+                        only: master
