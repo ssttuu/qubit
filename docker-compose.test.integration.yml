@@ -6,13 +6,14 @@ services:
       - API_SERVICE_ADDRESS=api.qubit.site:9000
       - GOOGLE_PROJECT_ID=qubit-161916
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
-    entrypoint: npm
-    command: test
+    entrypoint: /bin/bash
+    command: -c "npm install && npm test"
     working_dir: /workspace/tests/integration
     volumes:
       - .:/workspace
     depends_on:
       - api-services
+      - compute-services
 
   api-services:
     image: us.gcr.io/qubit-161916/api
