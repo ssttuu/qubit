@@ -18,6 +18,7 @@ import organizations "organizations"
 import projects "projects"
 import scenes "scenes"
 import operators "github.com/stupschwartz/qubit/proto-gen/go/operators"
+import image_sequences "image_sequences"
 import images "github.com/stupschwartz/qubit/proto-gen/go/images"
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -449,6 +450,107 @@ func (m *RenderOperatorResponse) GetResultType() string {
 	return (*operators.RenderOperatorResponse)(m).GetResultType()
 }
 
+// ImageSequence from public import image_sequences/image_sequences.proto
+type ImageSequence image_sequences.ImageSequence
+
+func (m *ImageSequence) Reset()         { (*image_sequences.ImageSequence)(m).Reset() }
+func (m *ImageSequence) String() string { return (*image_sequences.ImageSequence)(m).String() }
+func (*ImageSequence) ProtoMessage()    {}
+func (m *ImageSequence) GetId() string  { return (*image_sequences.ImageSequence)(m).GetId() }
+func (m *ImageSequence) GetProjectId() string {
+	return (*image_sequences.ImageSequence)(m).GetProjectId()
+}
+func (m *ImageSequence) GetName() string { return (*image_sequences.ImageSequence)(m).GetName() }
+
+// ListImageSequencesRequest from public import image_sequences/image_sequences.proto
+type ListImageSequencesRequest image_sequences.ListImageSequencesRequest
+
+func (m *ListImageSequencesRequest) Reset() { (*image_sequences.ListImageSequencesRequest)(m).Reset() }
+func (m *ListImageSequencesRequest) String() string {
+	return (*image_sequences.ListImageSequencesRequest)(m).String()
+}
+func (*ListImageSequencesRequest) ProtoMessage() {}
+func (m *ListImageSequencesRequest) GetPageSize() int32 {
+	return (*image_sequences.ListImageSequencesRequest)(m).GetPageSize()
+}
+func (m *ListImageSequencesRequest) GetPageToken() string {
+	return (*image_sequences.ListImageSequencesRequest)(m).GetPageToken()
+}
+
+// ListImageSequencesResponse from public import image_sequences/image_sequences.proto
+type ListImageSequencesResponse image_sequences.ListImageSequencesResponse
+
+func (m *ListImageSequencesResponse) Reset() { (*image_sequences.ListImageSequencesResponse)(m).Reset() }
+func (m *ListImageSequencesResponse) String() string {
+	return (*image_sequences.ListImageSequencesResponse)(m).String()
+}
+func (*ListImageSequencesResponse) ProtoMessage() {}
+func (m *ListImageSequencesResponse) GetImageSequences() []*ImageSequence {
+	o := (*image_sequences.ListImageSequencesResponse)(m).GetImageSequences()
+	if o == nil {
+		return nil
+	}
+	s := make([]*ImageSequence, len(o))
+	for i, x := range o {
+		s[i] = (*ImageSequence)(x)
+	}
+	return s
+}
+func (m *ListImageSequencesResponse) GetNextPageToken() string {
+	return (*image_sequences.ListImageSequencesResponse)(m).GetNextPageToken()
+}
+
+// GetImageSequenceRequest from public import image_sequences/image_sequences.proto
+type GetImageSequenceRequest image_sequences.GetImageSequenceRequest
+
+func (m *GetImageSequenceRequest) Reset() { (*image_sequences.GetImageSequenceRequest)(m).Reset() }
+func (m *GetImageSequenceRequest) String() string {
+	return (*image_sequences.GetImageSequenceRequest)(m).String()
+}
+func (*GetImageSequenceRequest) ProtoMessage() {}
+func (m *GetImageSequenceRequest) GetId() string {
+	return (*image_sequences.GetImageSequenceRequest)(m).GetId()
+}
+
+// CreateImageSequenceRequest from public import image_sequences/image_sequences.proto
+type CreateImageSequenceRequest image_sequences.CreateImageSequenceRequest
+
+func (m *CreateImageSequenceRequest) Reset() { (*image_sequences.CreateImageSequenceRequest)(m).Reset() }
+func (m *CreateImageSequenceRequest) String() string {
+	return (*image_sequences.CreateImageSequenceRequest)(m).String()
+}
+func (*CreateImageSequenceRequest) ProtoMessage() {}
+func (m *CreateImageSequenceRequest) GetImageSequence() *ImageSequence {
+	return (*ImageSequence)((*image_sequences.CreateImageSequenceRequest)(m).GetImageSequence())
+}
+
+// UpdateImageSequenceRequest from public import image_sequences/image_sequences.proto
+type UpdateImageSequenceRequest image_sequences.UpdateImageSequenceRequest
+
+func (m *UpdateImageSequenceRequest) Reset() { (*image_sequences.UpdateImageSequenceRequest)(m).Reset() }
+func (m *UpdateImageSequenceRequest) String() string {
+	return (*image_sequences.UpdateImageSequenceRequest)(m).String()
+}
+func (*UpdateImageSequenceRequest) ProtoMessage() {}
+func (m *UpdateImageSequenceRequest) GetId() string {
+	return (*image_sequences.UpdateImageSequenceRequest)(m).GetId()
+}
+func (m *UpdateImageSequenceRequest) GetImageSequence() *ImageSequence {
+	return (*ImageSequence)((*image_sequences.UpdateImageSequenceRequest)(m).GetImageSequence())
+}
+
+// DeleteImageSequenceRequest from public import image_sequences/image_sequences.proto
+type DeleteImageSequenceRequest image_sequences.DeleteImageSequenceRequest
+
+func (m *DeleteImageSequenceRequest) Reset() { (*image_sequences.DeleteImageSequenceRequest)(m).Reset() }
+func (m *DeleteImageSequenceRequest) String() string {
+	return (*image_sequences.DeleteImageSequenceRequest)(m).String()
+}
+func (*DeleteImageSequenceRequest) ProtoMessage() {}
+func (m *DeleteImageSequenceRequest) GetId() string {
+	return (*image_sequences.DeleteImageSequenceRequest)(m).GetId()
+}
+
 // Image from public import images/images.proto
 type Image images.Image
 
@@ -614,13 +716,15 @@ func (m *DeleteImageRequest) GetId() string  { return (*images.DeleteImageReques
 func init() { proto.RegisterFile("api/api.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 127 bytes of a gzipped FileDescriptorProto
+	// 145 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x4d, 0x2c, 0xc8, 0xd4,
 	0x07, 0x62, 0xbd, 0x82, 0xa2, 0xfc, 0x92, 0x7c, 0x21, 0x96, 0xe4, 0xfc, 0xa2, 0x54, 0x29, 0xc5,
 	0xfc, 0xa2, 0xf4, 0xc4, 0xbc, 0xcc, 0xaa, 0xc4, 0x92, 0xcc, 0xfc, 0xbc, 0x62, 0x7d, 0x14, 0x1e,
 	0x44, 0xa1, 0x94, 0x38, 0x90, 0xca, 0x4a, 0x4d, 0x2e, 0x29, 0xd6, 0x87, 0x31, 0xa0, 0x12, 0xc2,
 	0xc5, 0xc9, 0xa9, 0x79, 0xa9, 0xc5, 0xfa, 0x10, 0x0a, 0x2a, 0x28, 0x99, 0x5f, 0x90, 0x5a, 0x94,
-	0x58, 0x92, 0x5f, 0x04, 0x34, 0x0c, 0xc6, 0x82, 0xa9, 0xcf, 0xcc, 0x4d, 0x4c, 0x07, 0xaa, 0x87,
-	0x50, 0x10, 0xc1, 0x00, 0x86, 0x00, 0xc6, 0x00, 0xa6, 0x00, 0xe6, 0x00, 0x96, 0x24, 0x36, 0xb0,
-	0x80, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x35, 0xbe, 0x5c, 0xa5, 0xa8, 0x00, 0x00, 0x00,
+	0x58, 0x92, 0x5f, 0x04, 0x34, 0x0c, 0xc6, 0x82, 0x4a, 0xa9, 0x66, 0xe6, 0x26, 0xa6, 0xa7, 0xc6,
+	0x17, 0xa7, 0x16, 0x96, 0xa6, 0xe6, 0x25, 0x03, 0x35, 0xa2, 0xf1, 0x61, 0xc6, 0x82, 0x85, 0xa1,
+	0xb2, 0x50, 0xc1, 0x00, 0x86, 0x00, 0xc6, 0x00, 0xa6, 0x00, 0xe6, 0x00, 0x96, 0x00, 0xd6, 0x24,
+	0x36, 0xb0, 0x90, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0xb3, 0x23, 0x40, 0x5a, 0xd1, 0x00, 0x00,
+	0x00,
 }

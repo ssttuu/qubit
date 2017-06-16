@@ -14,7 +14,7 @@ service Projects {
     }
     rpc Get (GetProjectRequest) returns (Project) {
         option (google.api.http) = {
-            get: "/v1/projects/{project_id}"
+            get: "/v1/projects/{id}"
         };
     }
     rpc Create (CreateProjectRequest) returns (Project) {
@@ -25,13 +25,13 @@ service Projects {
     }
     rpc Update (UpdateProjectRequest) returns (Project) {
         option (google.api.http) = {
-            put: "/v1/projects/{project_id}"
+            put: "/v1/projects/{id}"
             body: "project"
         };
     }
     rpc Delete (DeleteProjectRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/projects/{project_id}"
+            delete: "/v1/projects/{id}"
         };
     }
 }

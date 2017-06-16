@@ -17,6 +17,7 @@ import (
 	"github.com/stupschwartz/qubit/applications/api/services/images"
 	"github.com/stupschwartz/qubit/applications/api/services/operators"
 	"github.com/stupschwartz/qubit/applications/api/services/organizations"
+	"github.com/stupschwartz/qubit/applications/api/services/projects"
 	"github.com/stupschwartz/qubit/applications/api/services/scenes"
 	"github.com/stupschwartz/qubit/proto-gen/go/compute"
 )
@@ -82,6 +83,7 @@ func main() {
 	defer conn.Close()
 	computeClient := compute.NewComputeClient(computeConn)
 	organizations.Register(grpcServer, postgresClient)
+	projects.Register(grpcServer, postgresClient)
 	scenes.Register(grpcServer, postgresClient)
 	operators.Register(grpcServer, postgresClient, storageClient, computeClient)
 	images.Register(grpcServer, postgresClient, storageClient)
