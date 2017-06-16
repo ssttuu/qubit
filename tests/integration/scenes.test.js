@@ -1,102 +1,50 @@
 const grpc = require('grpc');
 
+const helpers = require('./lib/helpers');
 const organizations_pb = require('./protos/organizations/organizations_pb');
 const organizations_grpc_pb = require('./protos/organizations/organizations_grpc_pb');
-
+const projects_pb = require('./protos/projects/projects_pb');
+const projects_grpc_pb = require('./protos/projects/projects_grpc_pb');
 const scenes_pb = require('./protos/scenes/scenes_pb');
 const scenes_grpc_pb = require('./protos/scenes/scenes_grpc_pb');
 
-let SERVER = process.env.API_SERVICE_ADDRESS;
-
-let checkDatastore = () => {
-    return new Promise((resolve, reject) => {
-        let datastore = require('@google-cloud/datastore')({
-            projectId: process.env.GOOGLE_PROJECT_ID,
-            keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-        });
-
-        let query = datastore.createQuery('TestCheck');
-
-        datastore.runQuery(query, (err, entities) => {
-            if (err) {
-                reject();
-            } else {
-                resolve(datastore);
-            }
-        });
-    });
-};
+const SERVER = process.env.API_SERVICE_ADDRESS;
 
 describe('Scenes', () => {
+    let ORGANIZATIONS_CLIENT = null;
+    let PROJECTS_CLIENT = null;
+    let SCENES_CLIENT = null;
     let ORG_ID = null;
+    let PROJECT_ID = null;
 
     beforeAll(() => {
-        return checkDatastore().then(() => {
-            let client = new organizations_grpc_pb.OrganizationsClient(SERVER, grpc.credentials.createInsecure());
-
-            let createRequest = new organizations_pb.CreateOrganizationRequest();
-            let org = new organizations_pb.Organization();
-            org.setName("Test Org.");
-            createRequest.setOrganization(org);
-
-            return new Promise((resolve, reject) => {
-                client.create(createRequest, (err, response) => {
-                    expect(err).toEqual(null);
-                    expect(response.getName()).toEqual("Test Org.");
-
-                    ORG_ID = response.getId();
-
-                    resolve()
-                })
-            });
+        ORGANIZATIONS_CLIENT = new organizations_grpc_pb.OrganizationsClient(SERVER, grpc.credentials.createInsecure());
+        PROJECTS_CLIENT = new projects_grpc_pb.ProjectsClient(SERVER, grpc.credentials.createInsecure());
+        SCENES_CLIENT = new scenes_grpc_pb.ScenesClient(SERVER, grpc.credentials.createInsecure());
+        return helpers.createOrganization(ORGANIZATIONS_CLIENT, 'Test Organization').then((organization) => {
+            ORG_ID = organization.getId();
+            return helpers.createProject(PROJECTS_CLIENT, ORG_ID, 'Test Project');
+        }).then((project) => {
+            PROJECT_ID = project.getId();
         });
     });
 
-
     test('Create', () => {
-        let client = new scenes_grpc_pb.ScenesClient(SERVER, grpc.credentials.createInsecure());
-
-        let createRequest = new scenes_pb.CreateSceneRequest();
-        createRequest.setOrganizationId(ORG_ID);
-
-        let scene = new scenes_pb.Scene();
-        scene.setName("Test Co.");
-        createRequest.setScene(scene);
-
-        return new Promise((resolve, reject) => {
-            client.create(createRequest, (err, response) => {
-                expect(err).toEqual(null);
-                expect(response.getName()).toEqual("Test Co.");
-                resolve()
-            })
-        });
+        const name = 'Test scene 1';
+        return helpers.createScene(SCENES_CLIENT, PROJECT_ID, name).then((scene) => {
+            expect(scene.getName()).toEqual(name);
+        })
     });
 
     test('Get', () => {
-        let client = new scenes_grpc_pb.ScenesClient(SERVER, grpc.credentials.createInsecure());
-
-        let createRequest = new scenes_pb.CreateSceneRequest();
-        createRequest.setOrganizationId(ORG_ID);
-
-        let scene = new scenes_pb.Scene();
-        scene.setName("Test Co.");
-        createRequest.setScene(scene);
-
-        return new Promise((resolve, reject) => {
-            client.create(createRequest, (err, response) => {
-                expect(err).toEqual(null);
-                expect(response.getName()).toEqual("Test Co.");
-                resolve(response.getId())
-            })
-        }).then((sceneId) => {
+        const name = 'Test scene 1';
+        return helpers.createScene(SCENES_CLIENT, PROJECT_ID, name).then((scene) => {
             let getRequest = new scenes_pb.GetSceneRequest();
-            getRequest.setOrganizationId(ORG_ID);
-            getRequest.setSceneId(sceneId);
-
+            getRequest.setId(scene.getId());
             return new Promise((resolve, reject) => {
-                client.get(getRequest, (err, response) => {
+                SCENES_CLIENT.get(getRequest, (err, response) => {
                     expect(err).toEqual(null);
-                    expect(response.getName()).toEqual("Test Co.");
+                    expect(response.getName()).toEqual(name);
                     resolve()
                 })
             });
@@ -104,47 +52,29 @@ describe('Scenes', () => {
     });
 
     test('List', () => {
-        let client = new scenes_grpc_pb.ScenesClient(SERVER, grpc.credentials.createInsecure());
-
-        let listRequest = new scenes_pb.ListScenesRequest();
-        listRequest.setOrganizationId(ORG_ID);
-
-        return new Promise((resolve, reject) => {
-            client.list(listRequest, (err, response) => {
-                expect(err).toEqual(null);
-                expect(response.getScenesList().length).toBeGreaterThan(0);
-                resolve()
-            })
+        const name = 'Test scene 1';
+        return helpers.createScene(SCENES_CLIENT, PROJECT_ID, name).then((scene) => {
+            let listRequest = new scenes_pb.ListScenesRequest();
+            return new Promise((resolve, reject) => {
+                SCENES_CLIENT.list(listRequest, (err, response) => {
+                    expect(err).toEqual(null);
+                    expect(response.getScenesList().length).toBeGreaterThan(0);
+                    resolve()
+                })
+            });
         });
     });
 
     test('Update', () => {
-        let client = new scenes_grpc_pb.ScenesClient(SERVER, grpc.credentials.createInsecure());
-
-        let createRequest = new scenes_pb.CreateSceneRequest();
-        createRequest.setOrganizationId(ORG_ID);
-
-        let scene = new scenes_pb.Scene();
-        scene.setName("Test Co.");
-        createRequest.setScene(scene);
-
-        return new Promise((resolve, reject) => {
-            client.create(createRequest, (err, response) => {
-                expect(err).toEqual(null);
-                expect(response.getName()).toEqual("Test Co.");
-                resolve(response.getId())
-            })
-        }).then((sceneId) => {
+        const name = 'Test scene 1';
+        return helpers.createScene(SCENES_CLIENT, PROJECT_ID, name).then((scene) => {
             let updateRequest = new scenes_pb.UpdateSceneRequest();
-            updateRequest.setOrganizationId(ORG_ID);
-            updateRequest.setSceneId(sceneId);
-
+            updateRequest.setId(scene.getId());
             let updateScene = new scenes_pb.Scene();
             updateScene.setName("New Name");
             updateRequest.setScene(updateScene);
-
             return new Promise((resolve, reject) => {
-                client.update(updateRequest, (err, response) => {
+                SCENES_CLIENT.update(updateRequest, (err, response) => {
                     expect(err).toEqual(null);
                     expect(response.getName()).toEqual("New Name");
                     resolve()
@@ -154,28 +84,12 @@ describe('Scenes', () => {
     });
 
     test('Delete', () => {
-        let client = new scenes_grpc_pb.ScenesClient(SERVER, grpc.credentials.createInsecure());
-
-        let createRequest = new scenes_pb.CreateSceneRequest();
-        createRequest.setOrganizationId(ORG_ID);
-
-        let scene = new scenes_pb.Scene();
-        scene.setName("Test Co.");
-        createRequest.setScene(scene);
-
-        return new Promise((resolve, reject) => {
-            client.create(createRequest, (err, response) => {
-                expect(err).toEqual(null);
-                expect(response.getName()).toEqual("Test Co.");
-                resolve(response.getId())
-            })
-        }).then((sceneId) => {
+        const name = 'Test scene 1';
+        return helpers.createScene(SCENES_CLIENT, PROJECT_ID, name).then((scene) => {
             let deleteRequest = new scenes_pb.DeleteSceneRequest();
-            deleteRequest.setOrganizationId(ORG_ID);
-            deleteRequest.setSceneId(sceneId);
-
+            deleteRequest.setId(scene.getId());
             return new Promise((resolve, reject) => {
-                client.delete(deleteRequest, (err, response) => {
+                SCENES_CLIENT.delete(deleteRequest, (err, response) => {
                     expect(err).toEqual(null);
                     expect(response.toArray().length).toBe(0);
                     resolve()

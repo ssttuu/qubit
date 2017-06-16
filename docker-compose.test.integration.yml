@@ -1,57 +1,20 @@
 version: '2'
+volumes:
+  qubit-api-postgres:
+    external: true
 services:
   test:
-    image: node:7
+    build: ./tests/integration
     environment:
       - API_SERVICE_ADDRESS=api.qubit.site:9000
       - GOOGLE_PROJECT_ID=qubit-161916
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
-    entrypoint: /bin/bash
-    command: -c "npm install && npm test"
     working_dir: /workspace/tests/integration
     volumes:
       - .:/workspace
+      - /workspace/tests/integration/node_modules
+    networks:
+      - default
     depends_on:
       - api-services
       - compute-services
-
-  api-services:
-    image: us.gcr.io/qubit-161916/api
-    build: ./applications/api/services
-    environment:
-      - GOOGLE_PROJECT_ID=qubit-161916
-      - STORAGE_BUCKET=qubit-dev-161916
-      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
-      - PORT=9000
-      - API_SERVICE_ADDRESS=api.qubit.site:9000
-      - COMPUTE_SERVICE_ADDRESS=compute.qubit.site:9000
-    volumes:
-      - ./credentials:/opt/etc/credentials
-    networks:
-      default:
-        aliases:
-          - api.qubit.site
-    depends_on:
-      - postgres
-      - compute-services
-  postgres:
-    image: postgres:9.6
-    networks:
-      default:
-        aliases:
-          - postgres.api.qubit.site
-
-  compute-services:
-    image: us.gcr.io/qubit-161916/compute
-    build: ./applications/compute/services
-    environment:
-      - GOOGLE_PROJECT_ID=qubit-161916
-      - STORAGE_BUCKET=qubit-dev-161916
-      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
-      - PORT=9000
-    volumes:
-      - ./credentials:/opt/etc/credentials
-    networks:
-      default:
-        aliases:
-          - compute.qubit.site

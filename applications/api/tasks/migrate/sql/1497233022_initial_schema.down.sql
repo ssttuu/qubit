@@ -1,3 +1,5 @@
+DROP TABLE operator_inputs;
+
 DROP TABLE operators;
 
 DROP TABLE images;

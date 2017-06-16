@@ -1,74 +1,34 @@
 const grpc = require('grpc');
 
+const helpers = require('./lib/helpers');
 const organizations_pb = require('./protos/organizations/organizations_pb');
 const organizations_grpc_pb = require('./protos/organizations/organizations_grpc_pb');
 
-
-let SERVER = process.env.API_SERVICE_ADDRESS;
-
-let checkDatastore = () => {
-    return new Promise((resolve, reject) => {
-        let datastore = require('@google-cloud/datastore')({
-            projectId: process.env.GOOGLE_PROJECT_ID,
-            keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-        });
-
-        let query = datastore.createQuery('TestCheck');
-
-        datastore.runQuery(query, (err, entities) => {
-            if (err) {
-                reject();
-            } else {
-                resolve(datastore);
-            }
-        });
-    });
-};
+const SERVER = process.env.API_SERVICE_ADDRESS;
 
 describe('Organizations', () => {
+    let ORGANIZATIONS_CLIENT = null;
+
     beforeAll(() => {
-        return checkDatastore();
+        ORGANIZATIONS_CLIENT = new organizations_grpc_pb.OrganizationsClient(SERVER, grpc.credentials.createInsecure());
     });
 
     test('Create', () => {
-        let client = new organizations_grpc_pb.OrganizationsClient(SERVER, grpc.credentials.createInsecure());
-
-        let createRequest = new organizations_pb.CreateOrganizationRequest();
-        let orgMessage = new organizations_pb.Organization();
-        orgMessage.setName("Test Co.");
-        createRequest.setOrganization(orgMessage);
-
-        return new Promise((resolve, reject) => {
-            client.create(createRequest, (err, response) => {
-                expect(err).toEqual(null);
-                expect(response.getName()).toEqual("Test Co.");
-                resolve()
-            })
-        });
+        const name = 'Test Co.';
+        return helpers.createOrganization(ORGANIZATIONS_CLIENT, name).then((organization) => {
+            expect(organization.getName()).toEqual(name);
+        })
     });
 
     test('Get', () => {
-        let client = new organizations_grpc_pb.OrganizationsClient(SERVER, grpc.credentials.createInsecure());
-
-        let createRequest = new organizations_pb.CreateOrganizationRequest();
-        let orgMessage = new organizations_pb.Organization();
-        orgMessage.setName("Test Co.");
-        createRequest.setOrganization(orgMessage);
-
-        return new Promise((resolve, reject) => {
-            client.create(createRequest, (err, response) => {
-                expect(err).toEqual(null);
-                expect(response.getName()).toEqual("Test Co.");
-                resolve(response.getId())
-            })
-        }).then((orgId) => {
+        const name = 'Test Co.';
+        return helpers.createOrganization(ORGANIZATIONS_CLIENT, name).then((organization) => {
             let getRequest = new organizations_pb.GetOrganizationRequest();
-            getRequest.setOrganizationId(orgId);
-
+            getRequest.setId(organization.getId());
             return new Promise((resolve, reject) => {
-                client.get(getRequest, (err, response) => {
+                ORGANIZATIONS_CLIENT.get(getRequest, (err, response) => {
                     expect(err).toEqual(null);
-                    expect(response.getName()).toEqual("Test Co.");
+                    expect(response.getName()).toEqual(name);
                     resolve()
                 })
             });
@@ -76,12 +36,9 @@ describe('Organizations', () => {
     });
 
     test('List', () => {
-        let client = new organizations_grpc_pb.OrganizationsClient(SERVER, grpc.credentials.createInsecure());
-
         let listRequest = new organizations_pb.ListOrganizationsRequest();
-
         return new Promise((resolve, reject) => {
-            client.list(listRequest, (err, response) => {
+            ORGANIZATIONS_CLIENT.list(listRequest, (err, response) => {
                 expect(err).toEqual(null);
                 expect(response.getOrganizationsList().length).toBeGreaterThan(0);
                 resolve()
@@ -90,29 +47,15 @@ describe('Organizations', () => {
     });
 
     test('Update', () => {
-        let client = new organizations_grpc_pb.OrganizationsClient(SERVER, grpc.credentials.createInsecure());
-
-        let createRequest = new organizations_pb.CreateOrganizationRequest();
-        let orgMessage = new organizations_pb.Organization();
-        orgMessage.setName("Test Co.");
-        createRequest.setOrganization(orgMessage);
-
-        return new Promise((resolve, reject) => {
-            client.create(createRequest, (err, response) => {
-                expect(err).toEqual(null);
-                expect(response.getName()).toEqual("Test Co.");
-                resolve(response.getId())
-            })
-        }).then((orgId) => {
+        const name = 'Test Co.';
+        return helpers.createOrganization(ORGANIZATIONS_CLIENT, name).then((organization) => {
             let updateRequest = new organizations_pb.UpdateOrganizationRequest();
-            updateRequest.setOrganizationId(orgId);
-
+            updateRequest.setId(organization.getId());
             let updateOrg = new organizations_pb.Organization();
             updateOrg.setName("New Name");
             updateRequest.setOrganization(updateOrg);
-
             return new Promise((resolve, reject) => {
-                client.update(updateRequest, (err, response) => {
+                ORGANIZATIONS_CLIENT.update(updateRequest, (err, response) => {
                     expect(err).toEqual(null);
                     expect(response.getName()).toEqual("New Name");
                     resolve()
@@ -122,25 +65,12 @@ describe('Organizations', () => {
     });
 
     test('Delete', () => {
-        let client = new organizations_grpc_pb.OrganizationsClient(SERVER, grpc.credentials.createInsecure());
-
-        let createRequest = new organizations_pb.CreateOrganizationRequest();
-        let orgMessage = new organizations_pb.Organization();
-        orgMessage.setName("Test Co.");
-        createRequest.setOrganization(orgMessage);
-
-        return new Promise((resolve, reject) => {
-            client.create(createRequest, (err, response) => {
-                expect(err).toEqual(null);
-                expect(response.getName()).toEqual("Test Co.");
-                resolve(response.getId())
-            })
-        }).then((orgId) => {
+        const name = 'Test Co.';
+        return helpers.createOrganization(ORGANIZATIONS_CLIENT, name).then((organization) => {
             let deleteRequest = new organizations_pb.DeleteOrganizationRequest();
-            deleteRequest.setOrganizationId(orgId);
-
+            deleteRequest.setId(organization.getId());
             return new Promise((resolve, reject) => {
-                client.delete(deleteRequest, (err, response) => {
+                ORGANIZATIONS_CLIENT.delete(deleteRequest, (err, response) => {
                     expect(err).toEqual(null);
                     expect(response.toArray().length).toBe(0);
                     resolve()

@@ -3,7 +3,7 @@
 set -euvo pipefail
 
 postgres_data_dir=/var/lib/postgresql/data
-postgres_url=postgres://postgres@postgres.api.qubit.site/postgres?sslmode=disable
+postgres_url=postgres://postgres@postgres.api.qubit.site:5432/postgres?sslmode=disable
 
 docker volume rm qubit-api-postgres || :
 docker volume create qubit-api-postgres
