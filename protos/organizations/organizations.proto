@@ -14,7 +14,7 @@ service Organizations {
     }
     rpc Get (GetOrganizationRequest) returns (Organization) {
         option (google.api.http) = {
-            get: "/v1/organizations/{organization_id}"
+            get: "/v1/organizations/{id}"
         };
     }
     rpc Create (CreateOrganizationRequest) returns (Organization) {
@@ -25,13 +25,13 @@ service Organizations {
     }
     rpc Update (UpdateOrganizationRequest) returns (Organization) {
         option (google.api.http) = {
-            put: "/v1/organizations/{organization_id}"
+            put: "/v1/organizations/{id}"
             body: "organization"
         };
     }
     rpc Delete (DeleteOrganizationRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/organizations/{organization_id}"
+            delete: "/v1/organizations/{id}"
         };
     }
 }

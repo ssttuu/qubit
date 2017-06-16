@@ -16,7 +16,7 @@ service Operators {
     }
     rpc Get (GetOperatorRequest) returns (Operator) {
         option (google.api.http) = {
-            get: "/v1/operators/{operator_id}"
+            get: "/v1/operators/{id}"
         };
     }
     rpc Create (CreateOperatorRequest) returns (Operator) {
@@ -27,18 +27,18 @@ service Operators {
     }
     rpc Update (UpdateOperatorRequest) returns (Operator) {
         option (google.api.http) = {
-            put: "/v1/operators/{operator_id}"
+            put: "/v1/operators/{id}"
             body: "operator"
         };
     }
     rpc Delete (DeleteOperatorRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/operators/{operator_id}"
+            delete: "/v1/operators/{id}"
         };
     }
     rpc Render (RenderOperatorRequest) returns (RenderOperatorResponse) {
         option (google.api.http) = {
-            post: "/v1/operators/{operator_id}/render"
+            post: "/v1/operators/{id}/render"
             body: ""
         };
     }

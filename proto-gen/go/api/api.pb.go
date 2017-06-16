@@ -15,8 +15,10 @@ import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import organizations "organizations"
+import projects "projects"
 import scenes "scenes"
 import operators "github.com/stupschwartz/qubit/proto-gen/go/operators"
+import images "github.com/stupschwartz/qubit/proto-gen/go/images"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -126,6 +128,87 @@ func (*DeleteOrganizationRequest) ProtoMessage() {}
 func (m *DeleteOrganizationRequest) GetId() string {
 	return (*organizations.DeleteOrganizationRequest)(m).GetId()
 }
+
+// Project from public import projects/projects.proto
+type Project projects.Project
+
+func (m *Project) Reset()                    { (*projects.Project)(m).Reset() }
+func (m *Project) String() string            { return (*projects.Project)(m).String() }
+func (*Project) ProtoMessage()               {}
+func (m *Project) GetId() string             { return (*projects.Project)(m).GetId() }
+func (m *Project) GetOrganizationId() string { return (*projects.Project)(m).GetOrganizationId() }
+func (m *Project) GetName() string           { return (*projects.Project)(m).GetName() }
+
+// ListProjectsRequest from public import projects/projects.proto
+type ListProjectsRequest projects.ListProjectsRequest
+
+func (m *ListProjectsRequest) Reset()         { (*projects.ListProjectsRequest)(m).Reset() }
+func (m *ListProjectsRequest) String() string { return (*projects.ListProjectsRequest)(m).String() }
+func (*ListProjectsRequest) ProtoMessage()    {}
+func (m *ListProjectsRequest) GetPageSize() int32 {
+	return (*projects.ListProjectsRequest)(m).GetPageSize()
+}
+func (m *ListProjectsRequest) GetPageToken() string {
+	return (*projects.ListProjectsRequest)(m).GetPageToken()
+}
+
+// ListProjectsResponse from public import projects/projects.proto
+type ListProjectsResponse projects.ListProjectsResponse
+
+func (m *ListProjectsResponse) Reset()         { (*projects.ListProjectsResponse)(m).Reset() }
+func (m *ListProjectsResponse) String() string { return (*projects.ListProjectsResponse)(m).String() }
+func (*ListProjectsResponse) ProtoMessage()    {}
+func (m *ListProjectsResponse) GetProjects() []*Project {
+	o := (*projects.ListProjectsResponse)(m).GetProjects()
+	if o == nil {
+		return nil
+	}
+	s := make([]*Project, len(o))
+	for i, x := range o {
+		s[i] = (*Project)(x)
+	}
+	return s
+}
+func (m *ListProjectsResponse) GetNextPageToken() string {
+	return (*projects.ListProjectsResponse)(m).GetNextPageToken()
+}
+
+// GetProjectRequest from public import projects/projects.proto
+type GetProjectRequest projects.GetProjectRequest
+
+func (m *GetProjectRequest) Reset()         { (*projects.GetProjectRequest)(m).Reset() }
+func (m *GetProjectRequest) String() string { return (*projects.GetProjectRequest)(m).String() }
+func (*GetProjectRequest) ProtoMessage()    {}
+func (m *GetProjectRequest) GetId() string  { return (*projects.GetProjectRequest)(m).GetId() }
+
+// CreateProjectRequest from public import projects/projects.proto
+type CreateProjectRequest projects.CreateProjectRequest
+
+func (m *CreateProjectRequest) Reset()         { (*projects.CreateProjectRequest)(m).Reset() }
+func (m *CreateProjectRequest) String() string { return (*projects.CreateProjectRequest)(m).String() }
+func (*CreateProjectRequest) ProtoMessage()    {}
+func (m *CreateProjectRequest) GetProject() *Project {
+	return (*Project)((*projects.CreateProjectRequest)(m).GetProject())
+}
+
+// UpdateProjectRequest from public import projects/projects.proto
+type UpdateProjectRequest projects.UpdateProjectRequest
+
+func (m *UpdateProjectRequest) Reset()         { (*projects.UpdateProjectRequest)(m).Reset() }
+func (m *UpdateProjectRequest) String() string { return (*projects.UpdateProjectRequest)(m).String() }
+func (*UpdateProjectRequest) ProtoMessage()    {}
+func (m *UpdateProjectRequest) GetId() string  { return (*projects.UpdateProjectRequest)(m).GetId() }
+func (m *UpdateProjectRequest) GetProject() *Project {
+	return (*Project)((*projects.UpdateProjectRequest)(m).GetProject())
+}
+
+// DeleteProjectRequest from public import projects/projects.proto
+type DeleteProjectRequest projects.DeleteProjectRequest
+
+func (m *DeleteProjectRequest) Reset()         { (*projects.DeleteProjectRequest)(m).Reset() }
+func (m *DeleteProjectRequest) String() string { return (*projects.DeleteProjectRequest)(m).String() }
+func (*DeleteProjectRequest) ProtoMessage()    {}
+func (m *DeleteProjectRequest) GetId() string  { return (*projects.DeleteProjectRequest)(m).GetId() }
 
 // Scene from public import scenes/scenes.proto
 type Scene scenes.Scene
@@ -366,15 +449,178 @@ func (m *RenderOperatorResponse) GetResultType() string {
 	return (*operators.RenderOperatorResponse)(m).GetResultType()
 }
 
+// Image from public import images/images.proto
+type Image images.Image
+
+func (m *Image) Reset()                     { (*images.Image)(m).Reset() }
+func (m *Image) String() string             { return (*images.Image)(m).String() }
+func (*Image) ProtoMessage()                {}
+func (m *Image) GetId() string              { return (*images.Image)(m).GetId() }
+func (m *Image) GetImageSequenceId() string { return (*images.Image)(m).GetImageSequenceId() }
+func (m *Image) GetName() string            { return (*images.Image)(m).GetName() }
+func (m *Image) GetWidth() int32            { return (*images.Image)(m).GetWidth() }
+func (m *Image) GetHeight() int32           { return (*images.Image)(m).GetHeight() }
+func (m *Image) GetLabels() map[string]string {
+	o := (*images.Image)(m).GetLabels()
+	if o == nil {
+		return nil
+	}
+	s := make(map[string]string, len(o))
+	for k, v := range o {
+		s[k] = (string)(v)
+	}
+	return s
+}
+func (m *Image) GetPlanes() []*Plane {
+	o := (*images.Image)(m).GetPlanes()
+	if o == nil {
+		return nil
+	}
+	s := make([]*Plane, len(o))
+	for i, x := range o {
+		s[i] = (*Plane)(x)
+	}
+	return s
+}
+
+// Plane from public import images/images.proto
+type Plane images.Plane
+
+func (m *Plane) Reset()           { (*images.Plane)(m).Reset() }
+func (m *Plane) String() string   { return (*images.Plane)(m).String() }
+func (*Plane) ProtoMessage()      {}
+func (m *Plane) GetName() string  { return (*images.Plane)(m).GetName() }
+func (m *Plane) GetWidth() int32  { return (*images.Plane)(m).GetWidth() }
+func (m *Plane) GetHeight() int32 { return (*images.Plane)(m).GetHeight() }
+func (m *Plane) GetLabels() map[string]string {
+	o := (*images.Plane)(m).GetLabels()
+	if o == nil {
+		return nil
+	}
+	s := make(map[string]string, len(o))
+	for k, v := range o {
+		s[k] = (string)(v)
+	}
+	return s
+}
+func (m *Plane) GetChannels() []*Channel {
+	o := (*images.Plane)(m).GetChannels()
+	if o == nil {
+		return nil
+	}
+	s := make([]*Channel, len(o))
+	for i, x := range o {
+		s[i] = (*Channel)(x)
+	}
+	return s
+}
+
+// Channel from public import images/images.proto
+type Channel images.Channel
+
+func (m *Channel) Reset()          { (*images.Channel)(m).Reset() }
+func (m *Channel) String() string  { return (*images.Channel)(m).String() }
+func (*Channel) ProtoMessage()     {}
+func (m *Channel) GetName() string { return (*images.Channel)(m).GetName() }
+func (m *Channel) GetRows() []*Row {
+	o := (*images.Channel)(m).GetRows()
+	if o == nil {
+		return nil
+	}
+	s := make([]*Row, len(o))
+	for i, x := range o {
+		s[i] = (*Row)(x)
+	}
+	return s
+}
+
+// Row from public import images/images.proto
+type Row images.Row
+
+func (m *Row) Reset()             { (*images.Row)(m).Reset() }
+func (m *Row) String() string     { return (*images.Row)(m).String() }
+func (*Row) ProtoMessage()        {}
+func (m *Row) GetData() []float64 { return (*images.Row)(m).GetData() }
+
+// ListImagesRequest from public import images/images.proto
+type ListImagesRequest images.ListImagesRequest
+
+func (m *ListImagesRequest) Reset()             { (*images.ListImagesRequest)(m).Reset() }
+func (m *ListImagesRequest) String() string     { return (*images.ListImagesRequest)(m).String() }
+func (*ListImagesRequest) ProtoMessage()        {}
+func (m *ListImagesRequest) GetPageSize() int32 { return (*images.ListImagesRequest)(m).GetPageSize() }
+func (m *ListImagesRequest) GetPageToken() string {
+	return (*images.ListImagesRequest)(m).GetPageToken()
+}
+
+// ListImagesResponse from public import images/images.proto
+type ListImagesResponse images.ListImagesResponse
+
+func (m *ListImagesResponse) Reset()         { (*images.ListImagesResponse)(m).Reset() }
+func (m *ListImagesResponse) String() string { return (*images.ListImagesResponse)(m).String() }
+func (*ListImagesResponse) ProtoMessage()    {}
+func (m *ListImagesResponse) GetImages() []*Image {
+	o := (*images.ListImagesResponse)(m).GetImages()
+	if o == nil {
+		return nil
+	}
+	s := make([]*Image, len(o))
+	for i, x := range o {
+		s[i] = (*Image)(x)
+	}
+	return s
+}
+func (m *ListImagesResponse) GetNextPageToken() string {
+	return (*images.ListImagesResponse)(m).GetNextPageToken()
+}
+
+// GetImageRequest from public import images/images.proto
+type GetImageRequest images.GetImageRequest
+
+func (m *GetImageRequest) Reset()         { (*images.GetImageRequest)(m).Reset() }
+func (m *GetImageRequest) String() string { return (*images.GetImageRequest)(m).String() }
+func (*GetImageRequest) ProtoMessage()    {}
+func (m *GetImageRequest) GetId() string  { return (*images.GetImageRequest)(m).GetId() }
+
+// CreateImageRequest from public import images/images.proto
+type CreateImageRequest images.CreateImageRequest
+
+func (m *CreateImageRequest) Reset()         { (*images.CreateImageRequest)(m).Reset() }
+func (m *CreateImageRequest) String() string { return (*images.CreateImageRequest)(m).String() }
+func (*CreateImageRequest) ProtoMessage()    {}
+func (m *CreateImageRequest) GetImage() *Image {
+	return (*Image)((*images.CreateImageRequest)(m).GetImage())
+}
+
+// UpdateImageRequest from public import images/images.proto
+type UpdateImageRequest images.UpdateImageRequest
+
+func (m *UpdateImageRequest) Reset()         { (*images.UpdateImageRequest)(m).Reset() }
+func (m *UpdateImageRequest) String() string { return (*images.UpdateImageRequest)(m).String() }
+func (*UpdateImageRequest) ProtoMessage()    {}
+func (m *UpdateImageRequest) GetId() string  { return (*images.UpdateImageRequest)(m).GetId() }
+func (m *UpdateImageRequest) GetImage() *Image {
+	return (*Image)((*images.UpdateImageRequest)(m).GetImage())
+}
+
+// DeleteImageRequest from public import images/images.proto
+type DeleteImageRequest images.DeleteImageRequest
+
+func (m *DeleteImageRequest) Reset()         { (*images.DeleteImageRequest)(m).Reset() }
+func (m *DeleteImageRequest) String() string { return (*images.DeleteImageRequest)(m).String() }
+func (*DeleteImageRequest) ProtoMessage()    {}
+func (m *DeleteImageRequest) GetId() string  { return (*images.DeleteImageRequest)(m).GetId() }
+
 func init() { proto.RegisterFile("api/api.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 101 bytes of a gzipped FileDescriptorProto
+	// 127 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x4d, 0x2c, 0xc8, 0xd4,
 	0x07, 0x62, 0xbd, 0x82, 0xa2, 0xfc, 0x92, 0x7c, 0x21, 0x96, 0xe4, 0xfc, 0xa2, 0x54, 0x29, 0xc5,
 	0xfc, 0xa2, 0xf4, 0xc4, 0xbc, 0xcc, 0xaa, 0xc4, 0x92, 0xcc, 0xfc, 0xbc, 0x62, 0x7d, 0x14, 0x1e,
-	0x44, 0xa1, 0x94, 0x70, 0x71, 0x72, 0x6a, 0x5e, 0x6a, 0xb1, 0x3e, 0x84, 0x82, 0x0a, 0x4a, 0xe6,
-	0x17, 0xa4, 0x16, 0x25, 0x96, 0xe4, 0x17, 0x01, 0xf5, 0xc0, 0x58, 0x10, 0xa9, 0x00, 0x86, 0x00,
-	0xc6, 0x00, 0xa6, 0x24, 0x36, 0x30, 0xc7, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0x34, 0xd9, 0x7c,
-	0xba, 0x76, 0x00, 0x00, 0x00,
+	0x44, 0xa1, 0x94, 0x38, 0x90, 0xca, 0x4a, 0x4d, 0x2e, 0x29, 0xd6, 0x87, 0x31, 0xa0, 0x12, 0xc2,
+	0xc5, 0xc9, 0xa9, 0x79, 0xa9, 0xc5, 0xfa, 0x10, 0x0a, 0x2a, 0x28, 0x99, 0x5f, 0x90, 0x5a, 0x94,
+	0x58, 0x92, 0x5f, 0x04, 0x34, 0x0c, 0xc6, 0x82, 0xa9, 0xcf, 0xcc, 0x4d, 0x4c, 0x07, 0xaa, 0x87,
+	0x50, 0x10, 0xc1, 0x00, 0x86, 0x00, 0xc6, 0x00, 0xa6, 0x00, 0xe6, 0x00, 0x96, 0x24, 0x36, 0xb0,
+	0x80, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x35, 0xbe, 0x5c, 0xa5, 0xa8, 0x00, 0x00, 0x00,
 }
