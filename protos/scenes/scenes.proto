@@ -14,7 +14,7 @@ service Scenes {
     }
     rpc Get (GetSceneRequest) returns (Scene) {
         option (google.api.http) = {
-            get: "/v1/scenes/{scene_id}"
+            get: "/v1/scenes/{id}"
         };
     }
     rpc Create (CreateSceneRequest) returns (Scene) {
@@ -25,13 +25,13 @@ service Scenes {
     }
     rpc Update (UpdateSceneRequest) returns (Scene) {
         option (google.api.http) = {
-            put: "/v1/scenes/{scene_id}"
+            put: "/v1/scenes/{id}"
             body: "scene"
         };
     }
     rpc Delete (DeleteSceneRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/scenes/{scene_id}"
+            delete: "/v1/scenes/{id}"
         };
     }
 }

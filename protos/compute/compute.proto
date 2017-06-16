@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package compute;
 
-import "geometry/geometry.proto";
-import "images/images.proto";
-import "operators/operators.proto";
+import public "geometry/geometry.proto";
+import public "images/images.proto";
+import public "operators/operators.proto";
 
 service Compute {
     rpc RenderImage (RenderImageRequest) returns (RenderImageResponse) {}

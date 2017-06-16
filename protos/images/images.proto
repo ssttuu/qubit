@@ -13,7 +13,7 @@ service Images {
     }
     rpc Get (GetImageRequest) returns (Image) {
         option (google.api.http) = {
-            get: "/v1/images/{image_id}"
+            get: "/v1/images/{id}"
         };
     }
     rpc Create (CreateImageRequest) returns (Image) {
@@ -24,13 +24,13 @@ service Images {
     }
     rpc Update (UpdateImageRequest) returns (Image) {
         option (google.api.http) = {
-            put: "/v1/images/{image_id}"
+            put: "/v1/images/{id}"
             body: "image"
         };
     }
     rpc Delete (DeleteImageRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/images/{image_id}"
+            delete: "/v1/images/{id}"
         };
     }
 }

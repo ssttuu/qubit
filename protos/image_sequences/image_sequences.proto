@@ -13,7 +13,7 @@ service ImageSequences {
     }
     rpc Get (GetImageSequenceRequest) returns (ImageSequence) {
         option (google.api.http) = {
-            get: "/v1/image_sequences/{image_sequence_id}"
+            get: "/v1/image_sequences/{id}"
         };
     }
     rpc Create (CreateImageSequenceRequest) returns (ImageSequence) {
@@ -24,13 +24,13 @@ service ImageSequences {
     }
     rpc Update (UpdateImageSequenceRequest) returns (ImageSequence) {
         option (google.api.http) = {
-            put: "/v1/image_sequences/{image_sequence_id}"
+            put: "/v1/image_sequences/{id}"
             body: "image_sequence"
         };
     }
     rpc Delete (DeleteImageSequenceRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/image_sequences/{image_sequence_id}"
+            delete: "/v1/image_sequences/{id}"
         };
     }
 }
