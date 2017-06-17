@@ -54,25 +54,25 @@ bootstrap-postgres: build-api
 # Generate proto code
 #####################
 
+.PHONY: protoman
+protoman:
+	docker build -t stupschwartz/protoman -f protoman/Dockerfile protoman
+
+all-protos: $(shell find protos -type f -name "*.proto")
+	./scripts/generate-protos.sh
+
 proto-gen/services/%.pb: protos/%.proto
-	./scripts/gen-proto.sh service $*
+	./scripts/generate-protos.sh $* service
 
 proto-gen/go/%.pb.go: protos/%.proto
-	./scripts/gen-proto.sh go $*
+	./scripts/generate-protos.sh $* go
 
 proto-gen/js/%_pb.js proto-gen/js/%_grpc_pb.js: protos/%.proto
-	./scripts/gen-proto.sh js $*
+	./scripts/generate-protos.sh $* js
 
-protonames = $(shell find protos -name "*.proto" | xargs -n1 basename | awk '{split($$0,a,"."); print a[1]}')
+protonames = $(shell find protos -type f -name "*.proto" | xargs -n1 basename | awk '{split($$0,a,"."); print a[1]}')
 
 protos: $(foreach protoname,$(protonames),$(subst NAME,$(protoname),proto-gen/services/NAME/NAME.pb proto-gen/go/NAME/NAME.pb.go proto-gen/js/NAME/NAME_pb.js))
-
-.PHONY: all-protos
-all-protos:
-	find protos -name "*.proto" \
-		| awk '{split($$0,a,"."); print a[1]}' \
-		| cut -c 8- \
-		| xargs -n1 -I{} bash -c "./scripts/gen-proto.sh go {} && ./scripts/gen-proto.sh js {} && ./scripts/gen-proto.sh service {}"
 
 ################
 # Run containers

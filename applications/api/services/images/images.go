@@ -31,14 +31,14 @@ func (s *Server) List(ctx context.Context, in *images_pb.ListImagesRequest) (*im
 
 func (s *Server) Get(ctx context.Context, in *images_pb.GetImageRequest) (*images_pb.Image, error) {
 	// TODO: Permissions
-	image_id, err := strconv.ParseInt(in.GetId(), 10, 64)
+	imageId, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
 	}
 	var im image.Image
-	err = s.PostgresClient.Get(&im, "SELECT * FROM images WHERE id=$1", image_id)
+	err = s.PostgresClient.Get(&im, "SELECT * FROM images WHERE id=$1", imageId)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not get image with ID %v", image_id)
+		return nil, errors.Wrapf(err, "Could not get image with ID %v", imageId)
 	}
 	return im.ToProto(), nil
 }
@@ -71,21 +71,21 @@ func (s *Server) Create(ctx context.Context, in *images_pb.CreateImageRequest) (
 
 func (s *Server) Update(ctx context.Context, in *images_pb.UpdateImageRequest) (*images_pb.Image, error) {
 	// TODO: Permissions & validation
-	image_id, err := strconv.ParseInt(in.GetId(), 10, 64)
+	imageId, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
 	}
 	tx, err := s.PostgresClient.Begin()
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to begin transaction for image with ID %v", image_id)
+		return nil, errors.Wrapf(err, "Failed to begin transaction for image with ID %v", imageId)
 	}
 	txStmt, err := tx.Prepare(`SELECT id, name, width, height, labels, planes FROM images WHERE id=$1 FOR UPDATE`)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to select image in tx %v", image_id)
+		return nil, errors.Wrapf(err, "Failed to select image in tx %v", imageId)
 	}
-	row := txStmt.QueryRow(image_id)
+	row := txStmt.QueryRow(imageId)
 	if row == nil {
-		return nil, errors.Wrapf(err, "No image with ID %v exists", image_id)
+		return nil, errors.Wrapf(err, "No image with ID %v exists", imageId)
 	}
 	var existingImage image.Image
 	err = row.Scan(&existingImage.Id, &existingImage.Name, &existingImage.Width,
@@ -104,10 +104,10 @@ func (s *Server) Update(ctx context.Context, in *images_pb.UpdateImageRequest) (
 			newImage.Height,
 			newImage.Labels,
 			newImage.Planes,
-			image_id,
+			imageId,
 		)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to update image with ID %v", image_id)
+			return nil, errors.Wrapf(err, "Failed to update image with ID %v", imageId)
 		}
 	}
 	err = tx.Commit()
@@ -120,13 +120,13 @@ func (s *Server) Update(ctx context.Context, in *images_pb.UpdateImageRequest) (
 func (s *Server) Delete(ctx context.Context, in *images_pb.DeleteImageRequest) (*empty.Empty, error) {
 	// TODO: Permissions
 	// TODO: Delete dependent entities with service calls
-	image_id, err := strconv.ParseInt(in.GetId(), 10, 64)
+	imageId, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
 	}
-	_, err = s.PostgresClient.Queryx("DELETE FROM images WHERE id=$1", image_id)
+	_, err = s.PostgresClient.Queryx("DELETE FROM images WHERE id=$1", imageId)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to deleted image by id: %v", image_id)
+		return nil, errors.Wrapf(err, "Failed to deleted image by id: %v", imageId)
 	}
 	return &empty.Empty{}, nil
 }
