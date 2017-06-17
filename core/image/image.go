@@ -30,7 +30,7 @@ func (i *Image) ToProto() *pb.Image {
 	}
 }
 
-func NewImageFromProto(pbimage *pb.Image) Image {
+func NewFromProto(pbimage *pb.Image) Image {
 	planes := make([]Plane, len(pbimage.Planes))
 	for index, plane := range pbimage.Planes {
 		planes[index] = *NewPlaneFromProto(plane)
@@ -46,7 +46,7 @@ func NewImageFromProto(pbimage *pb.Image) Image {
 	}
 }
 
-type Images []*Image
+type Images []Image
 
 func (i *Images) ToProto() []*pb.Image {
 	var pbimages []*pb.Image

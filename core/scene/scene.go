@@ -18,7 +18,7 @@ func (s *Scene) ToProto() *pb.Scene {
 	}
 }
 
-func NewSceneFromProto(pbscene *pb.Scene) Scene {
+func NewFromProto(pbscene *pb.Scene) Scene {
 	return Scene{
 		Id:        pbscene.Id,
 		ProjectId: pbscene.ProjectId,
@@ -26,7 +26,7 @@ func NewSceneFromProto(pbscene *pb.Scene) Scene {
 	}
 }
 
-type Scenes []*Scene
+type Scenes []Scene
 
 func (s *Scenes) ToProto() []*pb.Scene {
 	var pbscenes []*pb.Scene

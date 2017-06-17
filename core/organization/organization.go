@@ -13,14 +13,14 @@ func (o *Organization) ToProto() *pb.Organization {
 	return &pb.Organization{Id: o.Id, Name: o.Name}
 }
 
-func NewOrganizationFromProto(pborganization *pb.Organization) Organization {
+func NewFromProto(pborganization *pb.Organization) Organization {
 	return Organization{
 		Id:   pborganization.Id,
 		Name: pborganization.Name,
 	}
 }
 
-type Organizations []*Organization
+type Organizations []Organization
 
 func (o *Organizations) ToProto() []*pb.Organization {
 	var pborganizations []*pb.Organization

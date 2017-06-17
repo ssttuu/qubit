@@ -87,7 +87,7 @@ func (s *Server) Update(ctx context.Context, in *scenes_pb.UpdateSceneRequest) (
 		return nil, errors.Wrap(err, "Failed to load scene from row")
 	}
 	// TODO: Make update fields dynamic
-	newScene := scene.NewSceneFromProto(in.Scene)
+	newScene := scene.NewFromProto(in.Scene)
 	if newScene.Name != existingScene.Name {
 		existingScene.Name = newScene.Name
 		_, err = tx.Exec("UPDATE scenes SET name=$1 WHERE id=$2", newScene.Name, sceneId)

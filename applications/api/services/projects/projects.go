@@ -87,7 +87,7 @@ func (s *Server) Update(ctx context.Context, in *projects_pb.UpdateProjectReques
 		return nil, errors.Wrap(err, "Failed to load project from row")
 	}
 	// TODO: Make update fields dynamic
-	newProject := project.NewProjectFromProto(in.Project)
+	newProject := project.NewFromProto(in.Project)
 	if newProject.Name != existingProject.Name {
 		existingProject.Name = newProject.Name
 		_, err = tx.Exec("UPDATE projects SET name=$1 WHERE id=$2", newProject.Name, projectId)

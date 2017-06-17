@@ -18,7 +18,7 @@ func (i *ImageSequence) ToProto() *pb.ImageSequence {
 	}
 }
 
-func NewImageFromProto(pbimage *pb.ImageSequence) ImageSequence {
+func NewFromProto(pbimage *pb.ImageSequence) ImageSequence {
 	return ImageSequence{
 		Id:        pbimage.Id,
 		ProjectId: pbimage.ProjectId,
@@ -26,10 +26,10 @@ func NewImageFromProto(pbimage *pb.ImageSequence) ImageSequence {
 	}
 }
 
-type ImageSequences []*ImageSequence
+type ImageSequences []ImageSequence
 
-func (i *ImageSequences) ToProto() []*pb.Image {
-	var pbimages_sequences []*pb.Image
+func (i *ImageSequences) ToProto() []*pb.ImageSequence {
+	var pbimages_sequences []*pb.ImageSequence
 	for _, image_sequence := range *i {
 		image_seq_proto := image_sequence.ToProto()
 		pbimages_sequences = append(pbimages_sequences, image_seq_proto)

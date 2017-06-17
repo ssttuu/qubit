@@ -18,7 +18,7 @@ func (p *Project) ToProto() *pb.Project {
 	}
 }
 
-func NewProjectFromProto(pbproject *pb.Project) Project {
+func NewFromProto(pbproject *pb.Project) Project {
 	return Project{
 		Id:             pbproject.Id,
 		OrganizationId: pbproject.OrganizationId,
@@ -26,7 +26,7 @@ func NewProjectFromProto(pbproject *pb.Project) Project {
 	}
 }
 
-type Projects []*Project
+type Projects []Project
 
 func (p *Projects) ToProto() []*pb.Project {
 	var pbprojects []*pb.Project

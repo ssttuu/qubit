@@ -86,7 +86,7 @@ func (s *Server) Update(ctx context.Context, in *organizations_pb.UpdateOrganiza
 		return nil, errors.Wrap(err, "Failed to load organization from row")
 	}
 	// TODO: Make update fields dynamic
-	newOrganization := organization.NewOrganizationFromProto(in.Organization)
+	newOrganization := organization.NewFromProto(in.Organization)
 	if newOrganization.Name != existingOrganization.Name {
 		existingOrganization.Name = newOrganization.Name
 		_, err = tx.Exec("UPDATE organizations SET name=$1 WHERE id=$2", newOrganization.Name, orgId)
