@@ -29,14 +29,14 @@ func (s *Server) List(ctx context.Context, in *organizations_pb.ListOrganization
 
 func (s *Server) Get(ctx context.Context, in *organizations_pb.GetOrganizationRequest) (*organizations_pb.Organization, error) {
 	// TODO: Permissions
-	org_id, err := strconv.ParseInt(in.GetId(), 10, 64)
+	orgId, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
 	}
 	var org organization.Organization
-	err = s.PostgresClient.Get(&org, "SELECT * FROM organizations WHERE id=$1", int64(org_id))
+	err = s.PostgresClient.Get(&org, "SELECT * FROM organizations WHERE id=$1", int64(orgId))
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not get organization with ID %v", org_id)
+		return nil, errors.Wrapf(err, "Could not get organization with ID %v", orgId)
 	}
 	return org.ToProto(), nil
 }
@@ -64,21 +64,21 @@ func (s *Server) Create(ctx context.Context, in *organizations_pb.CreateOrganiza
 
 func (s *Server) Update(ctx context.Context, in *organizations_pb.UpdateOrganizationRequest) (*organizations_pb.Organization, error) {
 	// TODO: Permissions & validation
-	org_id, err := strconv.ParseInt(in.GetId(), 10, 64)
+	orgId, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not convert to integer %s", in.GetId())
 	}
 	tx, err := s.PostgresClient.Begin()
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to begin transaction for organization with ID %v", org_id)
+		return nil, errors.Wrapf(err, "Failed to begin transaction for organization with ID %v", orgId)
 	}
 	txStmt, err := tx.Prepare(`SELECT id, name FROM organizations WHERE id=$1 FOR UPDATE`)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to select organization in tx %v", org_id)
+		return nil, errors.Wrapf(err, "Failed to select organization in tx %v", orgId)
 	}
-	row := txStmt.QueryRow(org_id)
+	row := txStmt.QueryRow(orgId)
 	if row == nil {
-		return nil, errors.Wrapf(err, "No organization with ID %v exists", org_id)
+		return nil, errors.Wrapf(err, "No organization with ID %v exists", orgId)
 	}
 	var existingOrganization organization.Organization
 	err = row.Scan(&existingOrganization.Id, &existingOrganization.Name)
@@ -89,9 +89,9 @@ func (s *Server) Update(ctx context.Context, in *organizations_pb.UpdateOrganiza
 	newOrganization := organization.NewOrganizationFromProto(in.Organization)
 	if newOrganization.Name != existingOrganization.Name {
 		existingOrganization.Name = newOrganization.Name
-		_, err = tx.Exec("UPDATE organizations SET name=$1 WHERE id=$2", newOrganization.Name, org_id)
+		_, err = tx.Exec("UPDATE organizations SET name=$1 WHERE id=$2", newOrganization.Name, orgId)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to update organization with ID %v", org_id)
+			return nil, errors.Wrapf(err, "Failed to update organization with ID %v", orgId)
 		}
 	}
 	err = tx.Commit()
@@ -104,13 +104,13 @@ func (s *Server) Update(ctx context.Context, in *organizations_pb.UpdateOrganiza
 func (s *Server) Delete(ctx context.Context, in *organizations_pb.DeleteOrganizationRequest) (*empty.Empty, error) {
 	// TODO: Permissions
 	// TODO: Delete dependent entities with service calls
-	org_id, err := strconv.ParseInt(in.GetId(), 10, 64)
+	orgId, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not convert to integer %s", in.GetId())
 	}
-	_, err = s.PostgresClient.Queryx("DELETE FROM organizations WHERE id=$1", org_id)
+	_, err = s.PostgresClient.Queryx("DELETE FROM organizations WHERE id=$1", orgId)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to deleted organization by id: %v", org_id)
+		return nil, errors.Wrapf(err, "Failed to deleted organization by id: %v", orgId)
 	}
 	return &empty.Empty{}, nil
 }

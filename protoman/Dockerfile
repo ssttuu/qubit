@@ -55,4 +55,4 @@ RUN npm install -g grpc-tools
 RUN mkdir /workspace
 WORKDIR /workspace
 
-ENTRYPOINT ["/usr/bin/protoc", "-I/protobuf", "-I/googleapis"]
+ENTRYPOINT []

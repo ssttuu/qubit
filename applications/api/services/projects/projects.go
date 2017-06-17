@@ -29,14 +29,14 @@ func (s *Server) List(ctx context.Context, in *projects_pb.ListProjectsRequest) 
 
 func (s *Server) Get(ctx context.Context, in *projects_pb.GetProjectRequest) (*projects_pb.Project, error) {
 	// TODO: Permissions
-	project_id, err := strconv.ParseInt(in.GetId(), 10, 64)
+	projectId, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
 	}
 	var sc project.Project
-	err = s.PostgresClient.Get(&sc, "SELECT * FROM projects WHERE id=$1", project_id)
+	err = s.PostgresClient.Get(&sc, "SELECT * FROM projects WHERE id=$1", projectId)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not get project with ID %v", project_id)
+		return nil, errors.Wrapf(err, "Could not get project with ID %v", projectId)
 	}
 	return sc.ToProto(), nil
 }
@@ -65,21 +65,21 @@ func (s *Server) Create(ctx context.Context, in *projects_pb.CreateProjectReques
 
 func (s *Server) Update(ctx context.Context, in *projects_pb.UpdateProjectRequest) (*projects_pb.Project, error) {
 	// TODO: Permissions & validation
-	project_id, err := strconv.ParseInt(in.GetId(), 10, 64)
+	projectId, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
 	}
 	tx, err := s.PostgresClient.Begin()
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to begin transaction for project with ID %v", project_id)
+		return nil, errors.Wrapf(err, "Failed to begin transaction for project with ID %v", projectId)
 	}
 	txStmt, err := tx.Prepare(`SELECT id, name FROM projects WHERE id=$1 FOR UPDATE`)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to select project in tx %v", project_id)
+		return nil, errors.Wrapf(err, "Failed to select project in tx %v", projectId)
 	}
-	row := txStmt.QueryRow(project_id)
+	row := txStmt.QueryRow(projectId)
 	if row == nil {
-		return nil, errors.Wrapf(err, "No project with ID %v exists", project_id)
+		return nil, errors.Wrapf(err, "No project with ID %v exists", projectId)
 	}
 	var existingProject project.Project
 	err = row.Scan(&existingProject.Id, &existingProject.Name)
@@ -90,9 +90,9 @@ func (s *Server) Update(ctx context.Context, in *projects_pb.UpdateProjectReques
 	newProject := project.NewProjectFromProto(in.Project)
 	if newProject.Name != existingProject.Name {
 		existingProject.Name = newProject.Name
-		_, err = tx.Exec("UPDATE projects SET name=$1 WHERE id=$2", newProject.Name, project_id)
+		_, err = tx.Exec("UPDATE projects SET name=$1 WHERE id=$2", newProject.Name, projectId)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to update project with ID %v", project_id)
+			return nil, errors.Wrapf(err, "Failed to update project with ID %v", projectId)
 		}
 	}
 	err = tx.Commit()
@@ -105,13 +105,13 @@ func (s *Server) Update(ctx context.Context, in *projects_pb.UpdateProjectReques
 func (s *Server) Delete(ctx context.Context, in *projects_pb.DeleteProjectRequest) (*empty.Empty, error) {
 	// TODO: Permissions
 	// TODO: Delete dependent entities with service calls
-	project_id, err := strconv.ParseInt(in.GetId(), 10, 64)
+	projectId, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
 	}
-	_, err = s.PostgresClient.Queryx("DELETE FROM projects WHERE id=$1", project_id)
+	_, err = s.PostgresClient.Queryx("DELETE FROM projects WHERE id=$1", projectId)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to deleted project by id: %v", project_id)
+		return nil, errors.Wrapf(err, "Failed to deleted project by id: %v", projectId)
 	}
 	return &empty.Empty{}, nil
 }
