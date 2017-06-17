@@ -1,6 +1,8 @@
 package images
 
 import (
+	"strconv"
+
 	"cloud.google.com/go/storage"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/jmoiron/sqlx"
@@ -29,58 +31,65 @@ func (s *Server) List(ctx context.Context, in *images_pb.ListImagesRequest) (*im
 
 func (s *Server) Get(ctx context.Context, in *images_pb.GetImageRequest) (*images_pb.Image, error) {
 	// TODO: Permissions
-	var im image.Image
-	err := s.PostgresClient.Get(&im, "SELECT * FROM images WHERE id=$1", in.Id)
+	image_id, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not get image with ID %v", in.Id)
+		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
+	}
+	var im image.Image
+	err = s.PostgresClient.Get(&im, "SELECT * FROM images WHERE id=$1", image_id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not get image with ID %v", image_id)
 	}
 	return im.ToProto(), nil
 }
 
 func (s *Server) Create(ctx context.Context, in *images_pb.CreateImageRequest) (*images_pb.Image, error) {
 	// TODO: Validation
-	result, err := s.PostgresClient.NamedExec(
-		`INSERT INTO images (image_sequence_id, name, width, height, labels, planes)
-			VALUES (:image_sequence_id, :name, :width, :height, :labels, :planes)`,
-		map[string]interface{}{
-			"image_sequence_id": in.Image.ImageSequenceId,
-			"name":              in.Image.Name,
-			"width":             in.Image.Width,
-			"height":            in.Image.Height,
-			"labels":            in.Image.Labels,
-			"planes":            in.Image.Planes,
-		},
-	)
+	query := `INSERT INTO images (image_sequence_id, name, width, height, labels, planes)
+			  VALUES (:image_sequence_id, :name, :width, :height, :labels, :planes)
+			  RETURNING id`
+	stmt, err := s.PostgresClient.PrepareNamed(query)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to prepare statement, %s", query)
+	}
+	var id int64
+	err = stmt.Get(&id, map[string]interface{}{
+		"image_sequence_id": in.Image.ImageSequenceId,
+		"name":              in.Image.Name,
+		"width":             in.Image.Width,
+		"height":            in.Image.Height,
+		"labels":            in.Image.Labels,
+		"planes":            in.Image.Planes,
+	})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create image, %s", in.Image.Name)
 	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to retrieve new ID")
-	}
-	newImage := image.Image{
-		Id:   string(id),
-		Name: in.Image.Name,
-	}
+	newImage := image.NewImageFromProto(in.Image)
+	newImage.Id = strconv.FormatInt(id, 10)
 	return newImage.ToProto(), nil
 }
 
 func (s *Server) Update(ctx context.Context, in *images_pb.UpdateImageRequest) (*images_pb.Image, error) {
 	// TODO: Permissions & validation
+	image_id, err := strconv.ParseInt(in.GetId(), 10, 64)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
+	}
 	tx, err := s.PostgresClient.Begin()
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to begin transaction for image with ID %v", in.Id)
+		return nil, errors.Wrapf(err, "Failed to begin transaction for image with ID %v", image_id)
 	}
-	txStmt, err := tx.Prepare(`SELECT * FROM images WHERE id=? FOR UPDATE`)
+	txStmt, err := tx.Prepare(`SELECT id, name, width, height, labels, planes FROM images WHERE id=$1 FOR UPDATE`)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to select image in tx %v", in.Id)
+		return nil, errors.Wrapf(err, "Failed to select image in tx %v", image_id)
 	}
-	row := txStmt.QueryRow(in.Id)
+	row := txStmt.QueryRow(image_id)
 	if row == nil {
-		return nil, errors.Wrapf(err, "No image with ID %v exists", in.Id)
+		return nil, errors.Wrapf(err, "No image with ID %v exists", image_id)
 	}
 	var existingImage image.Image
-	err = row.Scan(&existingImage)
+	err = row.Scan(&existingImage.Id, &existingImage.Name, &existingImage.Width,
+		&existingImage.Height, &existingImage.Labels, &existingImage.Planes)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to load image from row")
 	}
@@ -89,16 +98,16 @@ func (s *Server) Update(ctx context.Context, in *images_pb.UpdateImageRequest) (
 	if newImage.Name != existingImage.Name {
 		existingImage.Name = newImage.Name
 		_, err = tx.Exec(
-			`UPDATE images SET name=?, width=?, height=?, labels=?, planes=? WHERE id=?`,
+			`UPDATE images SET name=$1, width=$2, height=$3, labels=$4, planes=$5 WHERE id=$6`,
 			newImage.Name,
 			newImage.Width,
 			newImage.Height,
 			newImage.Labels,
 			newImage.Planes,
-			in.Id,
+			image_id,
 		)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to update image with ID %v", in.Id)
+			return nil, errors.Wrapf(err, "Failed to update image with ID %v", image_id)
 		}
 	}
 	err = tx.Commit()
@@ -111,9 +120,13 @@ func (s *Server) Update(ctx context.Context, in *images_pb.UpdateImageRequest) (
 func (s *Server) Delete(ctx context.Context, in *images_pb.DeleteImageRequest) (*empty.Empty, error) {
 	// TODO: Permissions
 	// TODO: Delete dependent entities with service calls
-	_, err := s.PostgresClient.Queryx("DELETE FROM images WHERE id=?", in.Id)
+	image_id, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to deleted image by id: %v", in.Id)
+		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
+	}
+	_, err = s.PostgresClient.Queryx("DELETE FROM images WHERE id=$1", image_id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to deleted image by id: %v", image_id)
 	}
 	return &empty.Empty{}, nil
 }

@@ -16,10 +16,10 @@ const (
 type Operator struct {
 	Id      string `json:"id" db:"id"`
 	SceneId string `json:"scene_id" db:"scene_id"`
-	Type    string `json:"type" db:"type"`
-	Name    string `json:"name" db:"name"`
 	// 2d, 3d, etc.
 	Context string `json:"context" db:"context"`
+	Type    string `json:"type" db:"type"`
+	Name    string `json:"name" db:"name"`
 	// Array of IDs of input operators
 	Inputs     []string             `json:"inputs" db:"inputs"`
 	Parameters parameter.Parameters `json:"parameters" db:"parameters"`

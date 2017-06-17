@@ -17,7 +17,6 @@
     "usePathForSuiteName": "true"
   },
   "dependencies": {
-    "@google-cloud/datastore": "^1.0.2",
     "async": "^2.4.1",
     "bluebird": "^3.5.0",
     "google-protobuf": "^3.3.0",

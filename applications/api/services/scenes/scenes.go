@@ -1,6 +1,8 @@
 package scenes
 
 import (
+	"strconv"
+
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
@@ -27,32 +29,35 @@ func (s *Server) List(ctx context.Context, in *scenes_pb.ListScenesRequest) (*sc
 
 func (s *Server) Get(ctx context.Context, in *scenes_pb.GetSceneRequest) (*scenes_pb.Scene, error) {
 	// TODO: Permissions
-	var sc scene.Scene
-	err := s.PostgresClient.Get(&sc, "SELECT * FROM scenes WHERE id=$1", in.Id)
+	scene_id, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not get scene with ID %v", in.Id)
+		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
+	}
+	var sc scene.Scene
+	err = s.PostgresClient.Get(&sc, "SELECT * FROM scenes WHERE id=$1", scene_id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not get scene with ID %v", scene_id)
 	}
 	return sc.ToProto(), nil
 }
 
 func (s *Server) Create(ctx context.Context, in *scenes_pb.CreateSceneRequest) (*scenes_pb.Scene, error) {
 	// TODO: Validation
-	result, err := s.PostgresClient.NamedExec(
-		`INSERT INTO scenes (project_id, name) VALUES (:project_id, :name)`,
-		map[string]interface{}{
-			"project_id": in.Scene.ProjectId,
-			"name":       in.Scene.Name,
-		},
-	)
+	query := `INSERT INTO scenes (project_id, name) VALUES (:project_id, :name) RETURNING id`
+	stmt, err := s.PostgresClient.PrepareNamed(query)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to prepare statement, %s", query)
+	}
+	var id int64
+	err = stmt.Get(&id, map[string]interface{}{
+		"project_id": in.Scene.ProjectId,
+		"name":       in.Scene.Name,
+	})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create scene, %s", in.Scene.Name)
 	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to retrieve new ID")
-	}
 	newScene := scene.Scene{
-		Id:   string(id),
+		Id:   strconv.FormatInt(id, 10),
 		Name: in.Scene.Name,
 	}
 	return newScene.ToProto(), nil
@@ -60,20 +65,24 @@ func (s *Server) Create(ctx context.Context, in *scenes_pb.CreateSceneRequest) (
 
 func (s *Server) Update(ctx context.Context, in *scenes_pb.UpdateSceneRequest) (*scenes_pb.Scene, error) {
 	// TODO: Permissions & validation
+	scene_id, err := strconv.ParseInt(in.GetId(), 10, 64)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
+	}
 	tx, err := s.PostgresClient.Begin()
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to begin transaction for scene with ID %v", in.Id)
+		return nil, errors.Wrapf(err, "Failed to begin transaction for scene with ID %v", scene_id)
 	}
-	txStmt, err := tx.Prepare(`SELECT * FROM scenes WHERE id=? FOR UPDATE`)
+	txStmt, err := tx.Prepare(`SELECT id, name FROM scenes WHERE id=$1 FOR UPDATE`)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to select scene in tx %v", in.Id)
+		return nil, errors.Wrapf(err, "Failed to select scene in tx %v", scene_id)
 	}
-	row := txStmt.QueryRow(in.Id)
+	row := txStmt.QueryRow(scene_id)
 	if row == nil {
-		return nil, errors.Wrapf(err, "No scene with ID %v exists", in.Id)
+		return nil, errors.Wrapf(err, "No scene with ID %v exists", scene_id)
 	}
 	var existingScene scene.Scene
-	err = row.Scan(&existingScene)
+	err = row.Scan(&existingScene.Id, &existingScene.Name)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to load scene from row")
 	}
@@ -81,9 +90,9 @@ func (s *Server) Update(ctx context.Context, in *scenes_pb.UpdateSceneRequest) (
 	newScene := scene.NewSceneFromProto(in.Scene)
 	if newScene.Name != existingScene.Name {
 		existingScene.Name = newScene.Name
-		_, err = tx.Exec("UPDATE scenes SET name=? WHERE id=", newScene.Name, in.Id)
+		_, err = tx.Exec("UPDATE scenes SET name=$1 WHERE id=$2", newScene.Name, scene_id)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to update scene with ID %v", in.Id)
+			return nil, errors.Wrapf(err, "Failed to update scene with ID %v", scene_id)
 		}
 	}
 	err = tx.Commit()
@@ -96,9 +105,13 @@ func (s *Server) Update(ctx context.Context, in *scenes_pb.UpdateSceneRequest) (
 func (s *Server) Delete(ctx context.Context, in *scenes_pb.DeleteSceneRequest) (*empty.Empty, error) {
 	// TODO: Permissions
 	// TODO: Delete dependent entities with service calls
-	_, err := s.PostgresClient.Queryx("DELETE FROM scenes WHERE id=?", in.Id)
+	scene_id, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to deleted scene by id: %v", in.Id)
+		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
+	}
+	_, err = s.PostgresClient.Queryx("DELETE FROM scenes WHERE id=$1", scene_id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to deleted scene by id: %v", scene_id)
 	}
 	return &empty.Empty{}, nil
 }

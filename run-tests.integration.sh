@@ -2,7 +2,7 @@
 
 set -euvo pipefail
 
-compose_args="-f docker-compose.test.integration.yml"
+compose_args="-f docker-compose.yml -f docker-compose.test.integration.yml"
 make bootstrap-postgres
 
 function cleanup() {
@@ -12,4 +12,5 @@ function cleanup() {
 }
 trap 'cleanup' EXIT
 
+docker-compose ${compose_args} build test
 docker-compose ${compose_args} run test

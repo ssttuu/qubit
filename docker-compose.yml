@@ -13,7 +13,7 @@ services:
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
       - GOOGLE_PROJECT_ID=qubit-161916
       - PORT=9000
-      - POSTGRES_URL=postgres://postgres@postgres.api.qubit.site/postgres
+      - POSTGRES_URL=postgres://postgres@postgres.api.qubit.site:5432/postgres?sslmode=disable
       - STORAGE_BUCKET=qubit-dev-161916
     volumes:
       - ./credentials:/opt/etc/credentials

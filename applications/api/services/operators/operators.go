@@ -1,6 +1,8 @@
 package operators
 
 import (
+	"strconv"
+
 	"cloud.google.com/go/storage"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/jmoiron/sqlx"
@@ -25,7 +27,7 @@ type Server struct {
 func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest) (*operators_pb.ListOperatorsResponse, error) {
 	// TODO: Permissions
 	var ops operator.Operators
-	err := s.PostgresClient.Select(&ops, "SELECT * FROM operators")
+	err := s.PostgresClient.Select(&ops, "SELECT id, scene_id, context, type, name FROM operators")
 	if err != nil {
 		return nil, errors.Wrap(err, "Could not select operators")
 	}
@@ -34,80 +36,87 @@ func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest
 
 func (s *Server) Get(ctx context.Context, in *operators_pb.GetOperatorRequest) (*operators_pb.Operator, error) {
 	// TODO: Permissions
-	var op operator.Operator
-	err := s.PostgresClient.Get(&op, "SELECT * FROM operators WHERE id=$1", in.Id)
+	operator_id, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not get operator with ID %v", in.Id)
+		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
+	}
+	var op operator.Operator
+	err = s.PostgresClient.Get(&op, "SELECT id, scene_id, context, type, name FROM operators WHERE id=$1", operator_id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not get operator with ID %v", operator_id)
 	}
 	return op.ToProto(), nil
 }
 
 func (s *Server) Create(ctx context.Context, in *operators_pb.CreateOperatorRequest) (*operators_pb.Operator, error) {
 	// TODO: Validation
-	result, err := s.PostgresClient.NamedExec(
-		`INSERT INTO operators (name, context, type) VALUES (:name, :context, :type)`,
-		map[string]interface{}{
-			"context": in.Operator.Context,
-			"name":    in.Operator.Name,
-			"type":    in.Operator.Type,
-		},
-	)
+	query := `INSERT INTO operators (scene_id, context, type, name)
+			  VALUES (:scene_id, :context, :type, :name)
+			  RETURNING id`
+	stmt, err := s.PostgresClient.PrepareNamed(query)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to prepare statement, %s", query)
+	}
+	var id int64
+	err = stmt.Get(&id, map[string]interface{}{
+		"scene_id": in.Operator.SceneId,
+		"context":  in.Operator.Context,
+		"type":     in.Operator.Type,
+		"name":     in.Operator.Name,
+	})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create operator, %s", in.Operator.Name)
 	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to retrieve new ID")
-	}
 	newOp := operator.Operator{
+		Id:         strconv.FormatInt(id, 10),
 		Context:    in.Operator.Context,
-		Id:         string(id),
-		Inputs:     in.Operator.Inputs,
+		Type:       in.Operator.Type,
 		Name:       in.Operator.Name,
 		Parameters: parameter.NewParametersFromProto(in.Operator.Parameters),
-		Type:       in.Operator.Type,
 	}
 	return newOp.ToProto(), nil
 }
 
 func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequest) (*operators_pb.Operator, error) {
 	// TODO: Permissions & validation
+	operator_id, err := strconv.ParseInt(in.GetId(), 10, 64)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
+	}
 	tx, err := s.PostgresClient.Begin()
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to begin transaction for operator with ID %v", in.Id)
+		return nil, errors.Wrapf(err, "Failed to begin transaction for operator with ID %v", operator_id)
 	}
-	txStmt, err := tx.Prepare(`SELECT * FROM operators WHERE id=? FOR UPDATE`)
+	txStmt, err := tx.Prepare(`SELECT id, context, type, name FROM operators WHERE id=$1 FOR UPDATE`)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to select operator in tx %v", in.Id)
+		return nil, errors.Wrapf(err, "Failed to select operator in tx %v", operator_id)
 	}
-	row := txStmt.QueryRow(in.Id)
+	row := txStmt.QueryRow(operator_id)
 	if row == nil {
-		return nil, errors.Wrapf(err, "No operator with ID %v exists", in.Id)
+		return nil, errors.Wrapf(err, "No operator with ID %v exists", operator_id)
 	}
 	var existingOperator operator.Operator
-	err = row.Scan(&existingOperator)
+	// TODO: Scan parameters
+	err = row.Scan(&existingOperator.Id, &existingOperator.Context, &existingOperator.Type, &existingOperator.Name)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to load operator from row")
 	}
 	// TODO: Make update fields dynamic
 	newOperator := operator.NewOperatorFromProto(in.Operator)
-	if newOperator.Type != existingOperator.Type || newOperator.Name != existingOperator.Name || newOperator.Context != existingOperator.Context {
+	// TODO: Handle parameters
+	if newOperator.Context != existingOperator.Context || newOperator.Type != existingOperator.Type || newOperator.Name != existingOperator.Name {
 		existingOperator.Context = newOperator.Context
-		existingOperator.Inputs = newOperator.Inputs
-		existingOperator.Name = newOperator.Name
-		existingOperator.Parameters = newOperator.Parameters
 		existingOperator.Type = newOperator.Type
+		existingOperator.Name = newOperator.Name
 		_, err = tx.Exec(
-			`UPDATE operators SET type=?, name=?, context=?, inputs=?, parameters=? WHERE id=?`,
+			`UPDATE operators SET context=$1, type=$2, name=$3 WHERE id=$4`,
+			newOperator.Context,
 			newOperator.Type,
 			newOperator.Name,
-			newOperator.Context,
-			newOperator.Inputs,
-			newOperator.Parameters,
-			in.Id,
+			operator_id,
 		)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to update operator with ID %v", in.Id)
+			return nil, errors.Wrapf(err, "Failed to update operator with ID %v", operator_id)
 		}
 	}
 	err = tx.Commit()
@@ -120,9 +129,13 @@ func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequ
 func (s *Server) Delete(ctx context.Context, in *operators_pb.DeleteOperatorRequest) (*empty.Empty, error) {
 	// TODO: Permissions
 	// TODO: Delete dependent entities with service calls
-	_, err := s.PostgresClient.Queryx("DELETE FROM operators WHERE id=?", in.Id)
+	operator_id, err := strconv.ParseInt(in.GetId(), 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to deleted operator by id: %v", in.Id)
+		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
+	}
+	_, err = s.PostgresClient.Queryx("DELETE FROM operators WHERE id=$1", operator_id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to deleted operator by id: %v", operator_id)
 	}
 	return &empty.Empty{}, nil
 }
