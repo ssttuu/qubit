@@ -58,21 +58,21 @@ bootstrap-postgres: build-api
 protoman:
 	docker build -t stupschwartz/protoman -f protoman/Dockerfile protoman
 
+all-protos: $(shell find protos -type f -name "*.proto")
+	./scripts/generate-protos.sh
+
 proto-gen/services/%.pb: protos/%.proto
-	./scripts/gen-proto.sh $* service
+	./scripts/generate-protos.sh $* service
 
 proto-gen/go/%.pb.go: protos/%.proto
-	./scripts/gen-proto.sh $* go
+	./scripts/generate-protos.sh $* go
 
 proto-gen/js/%_pb.js proto-gen/js/%_grpc_pb.js: protos/%.proto
-	./scripts/gen-proto.sh $* js
+	./scripts/generate-protos.sh $* js
 
 protonames = $(shell find protos -type f -name "*.proto" | xargs -n1 basename | awk '{split($$0,a,"."); print a[1]}')
 
 protos: $(foreach protoname,$(protonames),$(subst NAME,$(protoname),proto-gen/services/NAME/NAME.pb proto-gen/go/NAME/NAME.pb.go proto-gen/js/NAME/NAME_pb.js))
-
-all-protos: $(shell find protos -type f -name "*.proto")
-	./scripts/gen-all-protos.sh
 
 ################
 # Run containers
