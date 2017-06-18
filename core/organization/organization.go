@@ -9,18 +9,30 @@ type Organization struct {
 	Name string `json:"name" db:"name"`
 }
 
-func (o *Organization) ToProto() *pb.Organization {
-	return &pb.Organization{Id: o.Id, Name: o.Name}
-}
+type Organizations []Organization
 
 func NewFromProto(pborganization *pb.Organization) Organization {
 	return Organization{
-		Id:   pborganization.Id,
-		Name: pborganization.Name,
+		Id:   pborganization.GetId(),
+		Name: pborganization.GetName(),
 	}
 }
 
-type Organizations []Organization
+func (o *Organization) ToProto() *pb.Organization {
+	return &pb.Organization{
+		Id:   o.Id,
+		Name: o.Name,
+	}
+}
+
+func (o *Organization) ValidateCreate() error {
+	return nil
+}
+
+func (o *Organization) ValidateUpdate(newOrg interface{}) error {
+	//org := newOrg.(*Organization)
+	return nil
+}
 
 func (o *Organizations) ToProto() []*pb.Organization {
 	var pborganizations []*pb.Organization

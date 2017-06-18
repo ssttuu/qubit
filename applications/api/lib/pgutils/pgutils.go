@@ -37,6 +37,7 @@ type DeleteConfig struct {
 type InsertConfig struct {
 	Columns []string
 	DB      *sqlx.DB
+	Out     interface{}
 	Values  [][]interface{}
 	Table   string
 	Tx      *sqlx.Tx
@@ -48,6 +49,7 @@ type SelectConfig struct {
 	DB        *sqlx.DB
 	ForClause string
 	Id        string
+	Out       interface{}
 	Table     string
 	Tx        *sqlx.Tx
 }
@@ -80,7 +82,7 @@ func DeleteByID(deleteConfig *DeleteConfig) error {
 }
 
 // Insert inserts new records into a table
-func Insert(insertConfig *InsertConfig, destObjects interface{}) error {
+func Insert(insertConfig *InsertConfig) error {
 	valuesMap := map[string]interface{}{}
 	var params []string
 	for i, rowData := range insertConfig.Values {
@@ -102,7 +104,7 @@ func Insert(insertConfig *InsertConfig, destObjects interface{}) error {
 	if err != nil {
 		return errors.Wrapf(err, "Failed to prepare statement, %s", query)
 	}
-	err = stmt.Select(destObjects, valuesMap)
+	err = stmt.Select(insertConfig.Out, valuesMap)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to create rows in %v", insertConfig.Table)
 	}
@@ -110,7 +112,7 @@ func Insert(insertConfig *InsertConfig, destObjects interface{}) error {
 }
 
 // InsertOne inserts a single row
-func InsertOne(insertConfig *InsertConfig, destObject interface{}) error {
+func InsertOne(insertConfig *InsertConfig) error {
 	if len(insertConfig.Values) != 1 {
 		return errors.New("InsertOne expects only one array of items in InsertConfig.Values")
 	}
@@ -131,7 +133,7 @@ func InsertOne(insertConfig *InsertConfig, destObject interface{}) error {
 	if err != nil {
 		return errors.Wrapf(err, "Failed to prepare statement, %s", query)
 	}
-	err = stmt.Get(destObject, valuesMap)
+	err = stmt.Get(insertConfig.Out, valuesMap)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to create row in %v", insertConfig.Table)
 	}
@@ -139,14 +141,14 @@ func InsertOne(insertConfig *InsertConfig, destObject interface{}) error {
 }
 
 // Select selects records from a table
-func Select(selectConfig *SelectConfig, destObjects interface{}) error {
+func Select(selectConfig *SelectConfig) error {
 	columnString := getColumnString(selectConfig.Columns)
 	query := fmt.Sprintf("SELECT %v FROM %v %v", columnString, selectConfig.Table, selectConfig.ForClause)
 	var err error
 	if selectConfig.Tx == nil {
-		err = selectConfig.DB.Select(destObjects, query)
+		err = selectConfig.DB.Select(selectConfig.Out, query)
 	} else {
-		err = selectConfig.Tx.Select(destObjects, query)
+		err = selectConfig.Tx.Select(selectConfig.Out, query)
 	}
 	if err != nil {
 		return errors.Wrapf(err, "Could not select from table %v", selectConfig.Table)
@@ -155,7 +157,7 @@ func Select(selectConfig *SelectConfig, destObjects interface{}) error {
 }
 
 // SelectByID selects a record by ID
-func SelectByID(selectConfig *SelectConfig, destObject interface{}) error {
+func SelectByID(selectConfig *SelectConfig) error {
 	columnString := getColumnString(selectConfig.Columns)
 	objId, err := strconv.ParseInt(selectConfig.Id, 10, 64)
 	if err != nil {
@@ -163,9 +165,9 @@ func SelectByID(selectConfig *SelectConfig, destObject interface{}) error {
 	}
 	query := fmt.Sprintf("SELECT %v FROM %v WHERE id=$1 %v", columnString, selectConfig.Table, selectConfig.ForClause)
 	if selectConfig.Tx == nil {
-		err = selectConfig.DB.Get(destObject, query, objId)
+		err = selectConfig.DB.Get(selectConfig.Out, query, objId)
 	} else {
-		err = selectConfig.Tx.Get(destObject, query, objId)
+		err = selectConfig.Tx.Get(selectConfig.Out, query, objId)
 	}
 	if err != nil {
 		return errors.Wrapf(err, "Could not get row from table %v with ID %v", selectConfig.Table, objId)

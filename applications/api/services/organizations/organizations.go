@@ -3,11 +3,10 @@ package organizations
 import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"github.com/stupschwartz/qubit/applications/api/lib/pgutils"
+	"github.com/stupschwartz/qubit/applications/api/lib/apiutils"
 	"github.com/stupschwartz/qubit/core/organization"
 	organizations_pb "github.com/stupschwartz/qubit/proto-gen/go/organizations"
 )
@@ -18,99 +17,28 @@ type Server struct {
 	PostgresClient *sqlx.DB
 }
 
-func (s *Server) List(ctx context.Context, in *organizations_pb.ListOrganizationsRequest) (*organizations_pb.ListOrganizationsResponse, error) {
-	// TODO: Permissions
-	var orgs organization.Organizations
-	err := pgutils.Select(&pgutils.SelectConfig{
-		DB:    s.PostgresClient,
-		Table: organizationsTable,
-	}, &orgs)
-	if err != nil {
-		return nil, err
-	}
-	return &organizations_pb.ListOrganizationsResponse{Organizations: orgs.ToProto(), NextPageToken: ""}, nil
-}
-
-func (s *Server) Get(ctx context.Context, in *organizations_pb.GetOrganizationRequest) (*organizations_pb.Organization, error) {
-	// TODO: Permissions
-	var org organization.Organization
-	err := pgutils.SelectByID(&pgutils.SelectConfig{
-		DB:    s.PostgresClient,
-		Table: organizationsTable,
-		Id:    in.GetId(),
-	}, &org)
-	if err != nil {
-		return nil, err
-	}
-	return org.ToProto(), nil
+func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB) {
+	organizations_pb.RegisterOrganizationsServer(grpcServer, &Server{PostgresClient: postgresClient})
 }
 
 func (s *Server) Create(ctx context.Context, in *organizations_pb.CreateOrganizationRequest) (*organizations_pb.Organization, error) {
-	// TODO: Validation
-	createConfig := pgutils.InsertConfig{
-		Columns: []string{"name"},
-		DB:      s.PostgresClient,
-		Values: [][]interface{}{
-			{in.Organization.Name},
-		},
-		Table: organizationsTable,
-	}
-	newOrganization := organization.Organization{
-		Name: in.Organization.Name,
-	}
-	err := pgutils.InsertOne(&createConfig, &newOrganization.Id)
+	newObject := organization.NewFromProto(in.Organization)
+	err := apiutils.Create(&apiutils.CreateConfig{
+		DB:     s.PostgresClient,
+		Object: &newObject,
+		Table:  organizationsTable,
+	})
 	if err != nil {
 		return nil, err
 	}
-	return newOrganization.ToProto(), nil
-}
-
-func (s *Server) Update(ctx context.Context, in *organizations_pb.UpdateOrganizationRequest) (*organizations_pb.Organization, error) {
-	// TODO: Permissions & validation
-	tx, err := s.PostgresClient.Beginx()
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to begin transaction")
-	}
-	var org organization.Organization
-	err = pgutils.SelectByID(&pgutils.SelectConfig{
-		ForClause: "FOR UPDATE",
-		Id:        in.GetId(),
-		Table:     organizationsTable,
-		Tx:        tx,
-	}, &org)
-	if err != nil {
-		return nil, err
-	}
-	// TODO: Make update fields dynamic
-	newOrganization := organization.NewFromProto(in.Organization)
-	if newOrganization.Name != org.Name {
-		org.Name = newOrganization.Name
-		err = pgutils.UpdateByID(&pgutils.UpdateConfig{
-			Id:    org.Id,
-			Table: organizationsTable,
-			Tx:    tx,
-			Updates: map[string]interface{}{
-				"name": newOrganization.Name,
-			},
-		})
-		if err != nil {
-			return nil, err
-		}
-	}
-	err = tx.Commit()
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to commit transaction")
-	}
-	return org.ToProto(), nil
+	return newObject.ToProto(), nil
 }
 
 func (s *Server) Delete(ctx context.Context, in *organizations_pb.DeleteOrganizationRequest) (*empty.Empty, error) {
-	// TODO: Permissions
-	// TODO: Delete dependent entities with service calls
-	err := pgutils.DeleteByID(&pgutils.DeleteConfig{
+	err := apiutils.Delete(&apiutils.DeleteConfig{
 		DB:    s.PostgresClient,
-		Table: organizationsTable,
 		Id:    in.GetId(),
+		Table: organizationsTable,
 	})
 	if err != nil {
 		return nil, err
@@ -118,6 +46,44 @@ func (s *Server) Delete(ctx context.Context, in *organizations_pb.DeleteOrganiza
 	return &empty.Empty{}, nil
 }
 
-func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB) {
-	organizations_pb.RegisterOrganizationsServer(grpcServer, &Server{PostgresClient: postgresClient})
+func (s *Server) Get(ctx context.Context, in *organizations_pb.GetOrganizationRequest) (*organizations_pb.Organization, error) {
+	var obj organization.Organization
+	err := apiutils.Get(&apiutils.GetConfig{
+		DB:    s.PostgresClient,
+		Id:    in.GetId(),
+		Out:   &obj,
+		Table: organizationsTable,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return obj.ToProto(), nil
+}
+
+func (s *Server) List(ctx context.Context, in *organizations_pb.ListOrganizationsRequest) (*organizations_pb.ListOrganizationsResponse, error) {
+	var objectList organization.Organizations
+	err := apiutils.List(&apiutils.ListConfig{
+		DB:    s.PostgresClient,
+		Out:   &objectList,
+		Table: organizationsTable,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &organizations_pb.ListOrganizationsResponse{Organizations: objectList.ToProto()}, nil
+}
+
+func (s *Server) Update(ctx context.Context, in *organizations_pb.UpdateOrganizationRequest) (*organizations_pb.Organization, error) {
+	newObject := organization.NewFromProto(in.Organization)
+	err := apiutils.Update(&apiutils.UpdateConfig{
+		DB:        s.PostgresClient,
+		Id:        in.GetId(),
+		NewObject: &newObject,
+		OldObject: &organization.Organization{},
+		Table:     organizationsTable,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return newObject.ToProto(), nil
 }
