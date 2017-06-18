@@ -79,7 +79,8 @@ proto.operators.Operator.toObject = function(includeInstance, msg) {
     type: jspb.Message.getFieldWithDefault(msg, 3, ""),
     name: jspb.Message.getFieldWithDefault(msg, 4, ""),
     context: jspb.Message.getFieldWithDefault(msg, 5, ""),
-    inputsList: jspb.Message.getField(msg, 6)
+    inputsList: jspb.Message.getField(msg, 6),
+    parameterRoot: msg.getParameterRoot_asB64()
   };
 
   if (includeInstance) {
@@ -139,6 +140,10 @@ proto.operators.Operator.deserializeBinaryFromReader = function(msg, reader) {
     case 6:
       var value = /** @type {string} */ (reader.readString());
       msg.addInputs(value);
+      break;
+    case 7:
+      var value = /** @type {!Uint8Array} */ (reader.readBytes());
+      msg.setParameterRoot(value);
       break;
     default:
       reader.skipField();
@@ -217,6 +222,13 @@ proto.operators.Operator.prototype.serializeBinaryToWriter = function (writer) {
   if (f.length > 0) {
     writer.writeRepeatedString(
       6,
+      f
+    );
+  }
+  f = this.getParameterRoot_asU8();
+  if (f.length > 0) {
+    writer.writeBytes(
+      7,
       f
     );
   }
@@ -326,6 +338,45 @@ proto.operators.Operator.prototype.addInputs = function(value, opt_index) {
 
 proto.operators.Operator.prototype.clearInputsList = function() {
   this.setInputsList([]);
+};
+
+
+/**
+ * optional bytes parameter_root = 7;
+ * @return {!(string|Uint8Array)}
+ */
+proto.operators.Operator.prototype.getParameterRoot = function() {
+  return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
+};
+
+
+/**
+ * optional bytes parameter_root = 7;
+ * This is a type-conversion wrapper around `getParameterRoot()`
+ * @return {string}
+ */
+proto.operators.Operator.prototype.getParameterRoot_asB64 = function() {
+  return /** @type {string} */ (jspb.Message.bytesAsB64(
+      this.getParameterRoot()));
+};
+
+
+/**
+ * optional bytes parameter_root = 7;
+ * Note that Uint8Array is not supported on all browsers.
+ * @see http://caniuse.com/Uint8Array
+ * This is a type-conversion wrapper around `getParameterRoot()`
+ * @return {!Uint8Array}
+ */
+proto.operators.Operator.prototype.getParameterRoot_asU8 = function() {
+  return /** @type {!Uint8Array} */ (jspb.Message.bytesAsU8(
+      this.getParameterRoot()));
+};
+
+
+/** @param {!(string|Uint8Array)} value */
+proto.operators.Operator.prototype.setParameterRoot = function(value) {
+  jspb.Message.setField(this, 7, value);
 };
 
 

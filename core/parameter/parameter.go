@@ -51,11 +51,11 @@ func (b *Bool) GetValue(time float64) bool {
 	return b.Default
 }
 
-func NewBoolParameter(Default bool) Parameter {
+func NewBoolParameter(defaultValue bool) Parameter {
 	return Parameter{
 		TypeName: "bool",
 		Type: Bool{
-			Default: Default,
+			Default: defaultValue,
 		},
 	}
 }
@@ -100,11 +100,11 @@ func (i *Int64) GetValue(time float64) int64 {
 	return i.Default
 }
 
-func NewInt64Parameter(Default int64) Parameter {
+func NewInt64Parameter(defaultValue int64) Parameter {
 	return Parameter{
 		TypeName: "int64",
 		Type: Int64{
-			Default: Default,
+			Default: defaultValue,
 		},
 	}
 }
@@ -149,11 +149,11 @@ func (f *Float64) GetValue(time float64) float64 {
 	return f.Default
 }
 
-func NewFloat64Parameter(Default float64) Parameter {
+func NewFloat64Parameter(defaultValue float64) Parameter {
 	return Parameter{
 		TypeName: "float64",
 		Type: Float64{
-			Default: Default,
+			Default: defaultValue,
 		},
 	}
 }
@@ -198,11 +198,11 @@ func (s *String) GetValue(time float64) string {
 	return s.Default
 }
 
-func NewStringParameter(Default string) Parameter {
+func NewStringParameter(defaultValue string) Parameter {
 	return Parameter{
 		TypeName: "string",
 		Type: String{
-			Default: Default,
+			Default: defaultValue,
 		},
 	}
 }
@@ -248,17 +248,16 @@ func (e *Enum) GetValue(time float64) string {
 	return e.Default
 }
 
-func NewEnumParameter(Options []string, Default string) Parameter {
+func NewEnumParameter(options []string, defaultValue string) Parameter {
 	return Parameter{
-		TypeName: "float64",
+		TypeName: "enum",
 		Type: Enum{
-			Options: Options,
-			Default: Default,
+			Options: options,
+			Default: defaultValue,
 		},
 	}
 }
 
-// A Multi Parameter represents a dynamically sized array of parameters.
 type Multi struct {
 	ParameterType
 	Template   Parameter
@@ -270,18 +269,17 @@ func (m *Multi) GetParameterByIndex(index int32) Parameter {
 	return m.Array[index]
 }
 
-func NewMultiParameter(Template Parameter, ArrayCount int32, Array ParameterArray) Parameter {
+func NewMultiParameter(template Parameter, arrayCount int32, array ParameterArray) Parameter {
 	return Parameter{
 		TypeName: "multi",
 		Type: Multi{
-			Template:   Template,
-			ArrayCount: ArrayCount,
-			Array:      Array,
+			Template:   template,
+			ArrayCount: arrayCount,
+			Array:      array,
 		},
 	}
 }
 
-// A Tuple Parameter represents a tuple of parameters
 type Group struct {
 	ParameterType
 	GroupType string
@@ -289,17 +287,46 @@ type Group struct {
 	Order     []string
 }
 
-func (g *Group) GetParameter(name string) Parameter {
-	return g.Children[name]
+func (g *Group) GetParameter(name string) *Parameter {
+	p := g.Children[name]
+	return &p
 }
 
-func NewGroupParameter(GroupType string, Children ParameterMap, Order []string) Parameter {
+func (g *Group) GetBool(name string) Bool {
+	return g.GetParameter(name).GetBool()
+}
+
+func (g *Group) GetInt64(name string) Int64 {
+	return g.GetParameter(name).GetInt64()
+}
+
+func (g *Group) GetFloat64(name string) Float64 {
+	return g.GetParameter(name).GetFloat64()
+}
+
+func (g *Group) GetString(name string) String {
+	return g.GetParameter(name).GetString()
+}
+
+func (g *Group) GetEnum(name string) Enum {
+	return g.GetParameter(name).GetEnum()
+}
+
+func (g *Group) GetGroup(name string) Group {
+	return g.GetParameter(name).GetGroup()
+}
+
+func (g *Group) GetMulti(name string) Multi {
+	return g.GetParameter(name).GetMulti()
+}
+
+func NewGroupParameter(groupType string, children ParameterMap, order []string) Parameter {
 	return Parameter{
 		TypeName: "group",
 		Type: Group{
-			GroupType: GroupType,
-			Children:  Children,
-			Order:     Order,
+			GroupType: groupType,
+			Children:  children,
+			Order:     order,
 		},
 	}
 }

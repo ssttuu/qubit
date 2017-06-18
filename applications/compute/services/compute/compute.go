@@ -4,7 +4,9 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"encoding/json"
 	"github.com/pkg/errors"
+	"github.com/stupschwartz/qubit/core/geometry"
 	"github.com/stupschwartz/qubit/core/operator"
 	"github.com/stupschwartz/qubit/core/parameter"
 	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
@@ -18,7 +20,20 @@ func (s *Server) RenderImage(ctx context.Context, in *compute_pb.RenderImageRequ
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to get Operation for rendering, %v", in.Operator.Type)
 	}
-	imagePlane, err := op.Process(nil, in.Operator.Parameters, in.BoundingBox.StartX, in.BoundingBox.StartY, in.BoundingBox.EndX, in.BoundingBox.EndY)
+
+	var p parameter.Parameter
+	err = json.Unmarshal(in.Operator.ParameterRoot, &p)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to unmarshal ParameterRoot for rendering, %v", in.Operator.Type)
+	}
+
+	renderContext := operator.RenderImageContext{
+		ParameterRoot: &p,
+		BoundingBox:   geometry.NewBoundingBoxFromProto(in.BoundingBox),
+		Time:          in.Time,
+	}
+
+	imagePlane, err := op.Process(&renderContext)
 	return &compute_pb.RenderImageResponse{ImagePlane: imagePlane.ToProto()}, nil
 }
 
