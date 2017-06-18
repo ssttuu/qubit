@@ -6,7 +6,6 @@ compose_args="-f docker-compose.yml -f docker-compose.test.integration.yml"
 make bootstrap-postgres
 
 function cleanup() {
-    docker volume rm qubit-api-postgres || :
     docker-compose ${compose_args} logs || :
     docker-compose ${compose_args} down || :
 }

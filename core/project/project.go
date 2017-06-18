@@ -10,6 +10,16 @@ type Project struct {
 	Name           string `json:"name" db:"name"`
 }
 
+type Projects []Project
+
+func NewFromProto(pbproject *pb.Project) Project {
+	return Project{
+		Id:             pbproject.GetId(),
+		OrganizationId: pbproject.GetOrganizationId(),
+		Name:           pbproject.GetName(),
+	}
+}
+
 func (p *Project) ToProto() *pb.Project {
 	return &pb.Project{
 		Id:             p.Id,
@@ -18,15 +28,14 @@ func (p *Project) ToProto() *pb.Project {
 	}
 }
 
-func NewProjectFromProto(pbproject *pb.Project) Project {
-	return Project{
-		Id:             pbproject.Id,
-		OrganizationId: pbproject.OrganizationId,
-		Name:           pbproject.Name,
-	}
+func (p *Project) ValidateCreate() error {
+	return nil
 }
 
-type Projects []*Project
+func (p *Project) ValidateUpdate(newProject interface{}) error {
+	//project := newProject.(*Project)
+	return nil
+}
 
 func (p *Projects) ToProto() []*pb.Project {
 	var pbprojects []*pb.Project

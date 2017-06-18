@@ -35,7 +35,7 @@ func (o *Operator) ToProto() *pb.Operator {
 	}
 }
 
-func NewOperatorFromProto(pb_op *pb.Operator) Operator {
+func NewFromProto(pb_op *pb.Operator) Operator {
 	return Operator{
 		Id:      pb_op.Id,
 		SceneId: pb_op.SceneId,
@@ -45,7 +45,7 @@ func NewOperatorFromProto(pb_op *pb.Operator) Operator {
 	}
 }
 
-type Operators []*Operator
+type Operators []Operator
 
 func (o *Operators) ToProto() []*pb.Operator {
 	var pb_ops []*pb.Operator

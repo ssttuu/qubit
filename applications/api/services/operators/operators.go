@@ -102,7 +102,7 @@ func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequ
 		return nil, errors.Wrap(err, "Failed to load operator from row")
 	}
 	// TODO: Make update fields dynamic
-	newOperator := operator.NewOperatorFromProto(in.Operator)
+	newOperator := operator.NewFromProto(in.Operator)
 	// TODO: Handle parameters
 	if newOperator.Context != existingOperator.Context || newOperator.Type != existingOperator.Type || newOperator.Name != existingOperator.Name {
 		existingOperator.Context = newOperator.Context

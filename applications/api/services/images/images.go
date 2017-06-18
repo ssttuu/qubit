@@ -64,7 +64,7 @@ func (s *Server) Create(ctx context.Context, in *images_pb.CreateImageRequest) (
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create image, %s", in.Image.Name)
 	}
-	newImage := image.NewImageFromProto(in.Image)
+	newImage := image.NewFromProto(in.Image)
 	newImage.Id = strconv.FormatInt(id, 10)
 	return newImage.ToProto(), nil
 }
@@ -94,7 +94,7 @@ func (s *Server) Update(ctx context.Context, in *images_pb.UpdateImageRequest) (
 		return nil, errors.Wrap(err, "Failed to load image from row")
 	}
 	// TODO: Make update fields dynamic
-	newImage := image.NewImageFromProto(in.Image)
+	newImage := image.NewFromProto(in.Image)
 	if newImage.Name != existingImage.Name {
 		existingImage.Name = newImage.Name
 		_, err = tx.Exec(
