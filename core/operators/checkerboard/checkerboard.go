@@ -8,11 +8,20 @@ import (
 
 const Name string = "CheckerBoard"
 
+var Params parameter.Parameter = parameter.NewGroupParameter(
+	"root",
+	parameter.ParameterMap{
+		"size": parameter.NewFloat64Parameter(256.0),
+	},
+	[]string{"size"},
+)
+
 type CheckerBoard struct{}
 
-func (c *CheckerBoard) Process(inputs []*image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) (*image.Plane, error) {
-	sizeParam := p.GetByName("Size")
-	sizeValue := int32(sizeParam.GetValueByIndex(0))
+func (c *CheckerBoard) Process(inputs []*image.Plane, p parameter.Parameter, startX int32, startY int32, endX int32, endY int32) (*image.Plane, error) {
+	//sizeValue := int32(p["size"].ValueFloat64())
+	size := p.GetGroup().GetParameter("size").GetFloat64()
+	sizeValue := size.GetValue(0.0)
 	width := endX - startX
 	height := endY - startY
 	redChannel := image.Channel{Rows: make([]*image.Row, height)}
@@ -36,10 +45,6 @@ func (c *CheckerBoard) Process(inputs []*image.Plane, p parameter.Parameters, st
 		blueChannel.Rows[row] = &image.Row{Data: rowData}
 	}
 	return image.NewPlane(width, height, []image.Channel{redChannel, greenChannel, blueChannel}), nil
-}
-
-var Params parameter.Parameters = parameter.Parameters{
-	parameter.NewFloatParameter("Size"),
 }
 
 func init() {

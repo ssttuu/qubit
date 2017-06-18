@@ -26,19 +26,12 @@ goog.exportSymbol('proto.compute.RenderImageResponse', null, global);
  * @constructor
  */
 proto.compute.RenderImageRequest = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.compute.RenderImageRequest.repeatedFields_, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.compute.RenderImageRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   proto.compute.RenderImageRequest.displayName = 'proto.compute.RenderImageRequest';
 }
-/**
- * List of repeated fields within this message type.
- * @private {!Array<number>}
- * @const
- */
-proto.compute.RenderImageRequest.repeatedFields_ = [2];
-
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -68,8 +61,6 @@ proto.compute.RenderImageRequest.prototype.toObject = function(opt_includeInstan
 proto.compute.RenderImageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     operator: (f = msg.getOperator()) && operators_operators_pb.Operator.toObject(includeInstance, f),
-    parametersList: jspb.Message.toObjectList(msg.getParametersList(),
-    operators_operators_pb.Parameter.toObject, includeInstance),
     boundingBox: (f = msg.getBoundingBox()) && geometry_geometry_pb.BoundingBox2D.toObject(includeInstance, f)
   };
 
@@ -111,11 +102,6 @@ proto.compute.RenderImageRequest.deserializeBinaryFromReader = function(msg, rea
       var value = new operators_operators_pb.Operator;
       reader.readMessage(value,operators_operators_pb.Operator.deserializeBinaryFromReader);
       msg.setOperator(value);
-      break;
-    case 2:
-      var value = new operators_operators_pb.Parameter;
-      reader.readMessage(value,operators_operators_pb.Parameter.deserializeBinaryFromReader);
-      msg.addParameters(value);
       break;
     case 3:
       var value = new geometry_geometry_pb.BoundingBox2D;
@@ -168,14 +154,6 @@ proto.compute.RenderImageRequest.prototype.serializeBinaryToWriter = function (w
       operators_operators_pb.Operator.serializeBinaryToWriter
     );
   }
-  f = this.getParametersList();
-  if (f.length > 0) {
-    writer.writeRepeatedMessage(
-      2,
-      f,
-      operators_operators_pb.Parameter.serializeBinaryToWriter
-    );
-  }
   f = this.getBoundingBox();
   if (f != null) {
     writer.writeMessage(
@@ -214,39 +192,6 @@ proto.compute.RenderImageRequest.prototype.clearOperator = function() {
  */
 proto.compute.RenderImageRequest.prototype.hasOperator = function() {
   return jspb.Message.getField(this, 1) != null;
-};
-
-
-/**
- * repeated operators.Parameter parameters = 2;
- * If you change this array by adding, removing or replacing elements, or if you
- * replace the array itself, then you must call the setter to update it.
- * @return {!Array.<!proto.operators.Parameter>}
- */
-proto.compute.RenderImageRequest.prototype.getParametersList = function() {
-  return /** @type{!Array.<!proto.operators.Parameter>} */ (
-    jspb.Message.getRepeatedWrapperField(this, operators_operators_pb.Parameter, 2));
-};
-
-
-/** @param {!Array.<!proto.operators.Parameter>} value */
-proto.compute.RenderImageRequest.prototype.setParametersList = function(value) {
-  jspb.Message.setRepeatedWrapperField(this, 2, value);
-};
-
-
-/**
- * @param {!proto.operators.Parameter=} opt_value
- * @param {number=} opt_index
- * @return {!proto.operators.Parameter}
- */
-proto.compute.RenderImageRequest.prototype.addParameters = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 2, opt_value, proto.operators.Parameter, opt_index);
-};
-
-
-proto.compute.RenderImageRequest.prototype.clearParametersList = function() {
-  this.setParametersList([]);
 };
 
 

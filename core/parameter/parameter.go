@@ -1,100 +1,435 @@
 package parameter
 
 import (
-	pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
+	"encoding/json"
 )
 
+/////////////////////
+// Parameter Types //
+/////////////////////
+
+type ParameterType interface {
+}
+
+type BoolKeyFrame struct {
+	Time  float64
+	Value bool
+	// TODO: will need slope and magnitude values for more fine grained control
+	// TODO: interpolation function
+}
+
+type Bool struct {
+	ParameterType
+	Default bool
+	// Keyframes are sorted by time
+	KeyFrames  []BoolKeyFrame
+	Expression string
+}
+
+func (b *Bool) GetValue(time float64) bool {
+	if b.Expression != "" {
+
+	}
+
+	if len(b.KeyFrames) != 0 {
+		var lowKeyFrame BoolKeyFrame
+		//var highKeyFrame BoolKeyFrame
+		for _, kf := range b.KeyFrames {
+
+			if kf.Time > time {
+				//highKeyFrame = kf
+				break
+			}
+
+			lowKeyFrame = kf
+		}
+
+		// TODO: interpolate between keyframes to get value
+		return lowKeyFrame.Value
+	}
+
+	return b.Default
+}
+
+func NewBoolParameter(Default bool) Parameter {
+	return Parameter{
+		TypeName: "bool",
+		Type: Bool{
+			Default: Default,
+		},
+	}
+}
+
+type Int64KeyFrame struct {
+	Time  float64
+	Value int64
+	// TODO: will need slope and magnitude values for more fine grained control
+	// TODO: interpolation function
+}
+
+type Int64 struct {
+	ParameterType
+	Default int64
+	// Keyframes are sorted by time
+	KeyFrames  []Int64KeyFrame
+	Expression string
+}
+
+func (i *Int64) GetValue(time float64) int64 {
+	if i.Expression != "" {
+
+	}
+
+	if len(i.KeyFrames) != 0 {
+		var lowKeyFrame Int64KeyFrame
+		//var highKeyFrame Int64KeyFrame
+		for _, kf := range i.KeyFrames {
+
+			if kf.Time > time {
+				//highKeyFrame = kf
+				break
+			}
+
+			lowKeyFrame = kf
+		}
+
+		// TODO: interpolate between keyframes to get value
+		return lowKeyFrame.Value
+	}
+
+	return i.Default
+}
+
+func NewInt64Parameter(Default int64) Parameter {
+	return Parameter{
+		TypeName: "int64",
+		Type: Int64{
+			Default: Default,
+		},
+	}
+}
+
+type Float64KeyFrame struct {
+	Time  float64
+	Value float64
+	// TODO: will need slope and magnitude values for more fine grained control
+	// TODO: interpolation function
+}
+
+type Float64 struct {
+	ParameterType
+	Default float64
+	// Keyframes are sorted by time
+	KeyFrames  []Float64KeyFrame
+	Expression string
+}
+
+func (f *Float64) GetValue(time float64) float64 {
+	if f.Expression != "" {
+
+	}
+
+	if len(f.KeyFrames) != 0 {
+		var lowKeyFrame Float64KeyFrame
+		//var highKeyFrame Float64KeyFrame
+		for _, kf := range f.KeyFrames {
+
+			if kf.Time > time {
+				//highKeyFrame = kf
+				break
+			}
+
+			lowKeyFrame = kf
+		}
+
+		// TODO: interpolate between keyframes to get value
+		return lowKeyFrame.Value
+	}
+
+	return f.Default
+}
+
+func NewFloat64Parameter(Default float64) Parameter {
+	return Parameter{
+		TypeName: "float64",
+		Type: Float64{
+			Default: Default,
+		},
+	}
+}
+
+type StringKeyFrame struct {
+	Time  float64
+	Value string
+	// TODO: will need slope and magnitude values for more fine grained control
+	// TODO: interpolation function
+}
+
+type String struct {
+	ParameterType
+	Default string
+	// Keyframes are sorted by time
+	KeyFrames  []StringKeyFrame
+	Expression string
+}
+
+func (s *String) GetValue(time float64) string {
+	if s.Expression != "" {
+
+	}
+
+	if len(s.KeyFrames) != 0 {
+		var lowKeyFrame StringKeyFrame
+		//var highKeyFrame StringKeyFrame
+		for _, kf := range s.KeyFrames {
+
+			if kf.Time > time {
+				//highKeyFrame = kf
+				break
+			}
+
+			lowKeyFrame = kf
+		}
+
+		// TODO: interpolate between keyframes to get value
+		return lowKeyFrame.Value
+	}
+
+	return s.Default
+}
+
+func NewStringParameter(Default string) Parameter {
+	return Parameter{
+		TypeName: "string",
+		Type: String{
+			Default: Default,
+		},
+	}
+}
+
+type EnumKeyFrame struct {
+	Time  float64
+	Value string
+	// TODO: will need slope and magnitude values for more fine grained control
+	// TODO: interpolation function
+}
+
+type Enum struct {
+	ParameterType
+	Options []string
+	Default string
+	// Keyframes are sorted by time
+	KeyFrames  []EnumKeyFrame
+	Expression string
+}
+
+func (e *Enum) GetValue(time float64) string {
+	if e.Expression != "" {
+
+	}
+
+	if len(e.KeyFrames) != 0 {
+		var lowKeyFrame EnumKeyFrame
+		//var highKeyFrame EnumKeyFrame
+		for _, kf := range e.KeyFrames {
+
+			if kf.Time > time {
+				//highKeyFrame = kf
+				break
+			}
+
+			lowKeyFrame = kf
+		}
+
+		// TODO: interpolate between keyframes to get value
+		return lowKeyFrame.Value
+	}
+
+	return e.Default
+}
+
+func NewEnumParameter(Options []string, Default string) Parameter {
+	return Parameter{
+		TypeName: "float64",
+		Type: Enum{
+			Options: Options,
+			Default: Default,
+		},
+	}
+}
+
+// A Multi Parameter represents a dynamically sized array of parameters.
+type Multi struct {
+	ParameterType
+	Template   Parameter
+	ArrayCount int32
+	Array      ParameterArray
+}
+
+func (m *Multi) GetParameterByIndex(index int32) Parameter {
+	return m.Array[index]
+}
+
+func NewMultiParameter(Template Parameter, ArrayCount int32, Array ParameterArray) Parameter {
+	return Parameter{
+		TypeName: "multi",
+		Type: Multi{
+			Template:   Template,
+			ArrayCount: ArrayCount,
+			Array:      Array,
+		},
+	}
+}
+
+// A Tuple Parameter represents a tuple of parameters
+type Group struct {
+	ParameterType
+	GroupType string
+	Children  ParameterMap
+	Order     []string
+}
+
+func (g *Group) GetParameter(name string) Parameter {
+	return g.Children[name]
+}
+
+func NewGroupParameter(GroupType string, Children ParameterMap, Order []string) Parameter {
+	return Parameter{
+		TypeName: "group",
+		Type: Group{
+			GroupType: GroupType,
+			Children:  Children,
+			Order:     Order,
+		},
+	}
+}
+
+///////////////
+// Parameter //
+///////////////
+
 type Parameter struct {
-	Name       string     `json:"name" db:"name"`
-	Components Components `json:"components" db:"components"`
+	TypeName string
+	Type     ParameterType
 }
 
-func (p *Parameter) GetValueByIndex(index int) float64 {
-	return p.Components[index].GetValue()
+func (p *Parameter) GetBool() Bool {
+	return p.Type.(Bool)
 }
 
-func (p *Parameter) SetValueByIndex(index int, value float64) {
-	p.Components[index].SetValue(value)
+func (p *Parameter) GetInt64() Int64 {
+	return p.Type.(Int64)
 }
 
-func (p *Parameter) GetComponentByName(name string) *Component {
-	for _, component := range p.Components {
-		if component.Name == name {
-			return component
-		}
+func (p *Parameter) GetFloat64() Float64 {
+	return p.Type.(Float64)
+}
+
+func (p *Parameter) GetString() String {
+	return p.Type.(String)
+}
+
+func (p *Parameter) GetEnum() Enum {
+	return p.Type.(Enum)
+}
+
+func (p *Parameter) GetGroup() Group {
+	return p.Type.(Group)
+}
+
+func (p *Parameter) GetMulti() Multi {
+	return p.Type.(Multi)
+}
+
+func (p *Parameter) UnmarshalJSON(b []byte) error {
+	type unmarshalParam struct {
+		TypeName  string
+		TypeBytes json.RawMessage `json:"Type"`
 	}
+	var unParam unmarshalParam
+
+	if err := json.Unmarshal(b, &unParam); err != nil {
+		return err
+	}
+
+	p.TypeName = unParam.TypeName
+
+	switch unParam.TypeName {
+	case "bool":
+		var paramType Bool
+		if err := json.Unmarshal(unParam.TypeBytes, &paramType); err != nil {
+			return err
+		}
+		p.Type = paramType
+	case "int64":
+		var paramType Int64
+		if err := json.Unmarshal(unParam.TypeBytes, &paramType); err != nil {
+			return err
+		}
+		p.Type = paramType
+	case "float64":
+		var paramType Float64
+		if err := json.Unmarshal(unParam.TypeBytes, &paramType); err != nil {
+			return err
+		}
+		p.Type = paramType
+	case "string":
+		var paramType String
+		if err := json.Unmarshal(unParam.TypeBytes, &paramType); err != nil {
+			return err
+		}
+		p.Type = paramType
+	case "enum":
+		var paramType Enum
+		if err := json.Unmarshal(unParam.TypeBytes, &paramType); err != nil {
+			return err
+		}
+		p.Type = paramType
+	case "group":
+		var paramType Group
+		if err := json.Unmarshal(unParam.TypeBytes, &paramType); err != nil {
+			return err
+		}
+		p.Type = paramType
+	case "multi":
+		var paramType Multi
+		if err := json.Unmarshal(unParam.TypeBytes, &paramType); err != nil {
+			return err
+		}
+		p.Type = paramType
+	}
+
 	return nil
 }
 
-func (p *Parameter) GetValueByName(name string) float64 {
-	return p.GetComponentByName(name).GetValue()
-}
+type ParameterMap map[string]Parameter
+type ParameterArray []Parameter
 
-func (p *Parameter) SetValueByName(name string, value float64) {
-	p.GetComponentByName(name).SetValue(value)
-}
+///////////////////////
+// Parameter Helpers //
+///////////////////////
 
-func (p *Parameter) ToProto() *pb.Parameter {
-	return &pb.Parameter{
-		Name:       p.Name,
-		Components: p.Components.ToProto(),
-	}
-}
-
-func NewParameterFromProto(pb_param *pb.Parameter) *Parameter {
-	return &Parameter{
-		Name:       pb_param.Name,
-		Components: NewComponentsFromProto(pb_param.Components),
-	}
-}
-
-func NewFloatParameter(name string) *Parameter {
-	return &Parameter{
-		Name: name,
-		Components: Components{
-			&Component{Name: "float", Value: 0.0},
+func NewRGBParameter() Parameter {
+	return NewGroupParameter(
+		"rgb",
+		ParameterMap{
+			"r": NewFloat64Parameter(0.0),
+			"g": NewFloat64Parameter(0.0),
+			"b": NewFloat64Parameter(0.0),
 		},
-	}
+		[]string{"r", "g", "b"},
+	)
 }
 
-func NewColorParameter(name string) *Parameter {
-	return &Parameter{
-		Name: name,
-		Components: Components{
-			&Component{Name: "Red", Value: 0.0},
-			&Component{Name: "Green", Value: 0.0},
-			&Component{Name: "Blue", Value: 0.0},
+func NewRGBAParameter() Parameter {
+	return NewGroupParameter(
+		"rgba",
+		ParameterMap{
+			"r": NewFloat64Parameter(0.0),
+			"g": NewFloat64Parameter(0.0),
+			"b": NewFloat64Parameter(0.0),
+			"a": NewFloat64Parameter(0.0),
 		},
-	}
-}
-
-type Parameters []*Parameter
-
-func (p *Parameters) GetByName(name string) *Parameter {
-	for _, param := range *p {
-		if param.Name == name {
-			return param
-		}
-	}
-	return nil
-}
-
-func (p *Parameters) SetByName(name string, component string, value float64) {
-	p.GetByName(name).SetValueByName(component, value)
-}
-
-func (p *Parameters) ToProto() []*pb.Parameter {
-	var pb_params []*pb.Parameter
-	for _, param := range *p {
-		pb_params = append(pb_params, param.ToProto())
-	}
-	return pb_params
-}
-
-func NewParametersFromProto(pb_params []*pb.Parameter) Parameters {
-	var params Parameters
-	for _, pb_param := range pb_params {
-		params = append(params, NewParameterFromProto(pb_param))
-	}
-	return params
+		[]string{"r", "g", "b", "a"},
+	)
 }

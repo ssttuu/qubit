@@ -8,13 +8,21 @@ import (
 
 const Name string = "Constant"
 
+var Params parameter.Parameter = parameter.NewGroupParameter(
+	"root",
+	parameter.ParameterMap{
+		"color": parameter.NewRGBParameter(),
+	},
+	[]string{"color"},
+)
+
 type Constant struct{}
 
-func (c *Constant) Process(inputs []*image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) (*image.Plane, error) {
-	colorParam := p.GetByName("Color")
-	redValue := colorParam.GetValueByName("Red")
-	greenValue := colorParam.GetValueByName("Green")
-	blueValue := colorParam.GetValueByName("Blue")
+func (c *Constant) Process(inputs []*image.Plane, p parameter.Parameter, startX int32, startY int32, endX int32, endY int32) (*image.Plane, error) {
+	colorParam := p.GetGroup().GetParameter("color").GetGroup()
+	redValue := colorParam.GetParameter("red").GetFloat64().GetValue(0.0)
+	greenValue := colorParam.GetParameter("green").GetFloat64().GetValue(0.0)
+	blueValue := colorParam.GetParameter("blue").GetFloat64().GetValue(0.0)
 	width := endX - startX
 	height := endY - startY
 	redComponent := image.Channel{Rows: make([]*image.Row, height)}
@@ -31,10 +39,6 @@ func (c *Constant) Process(inputs []*image.Plane, p parameter.Parameters, startX
 	}
 	return image.NewPlane(width, height, []image.Channel{redComponent, greenComponent, blueComponent}), nil
 
-}
-
-var Params parameter.Parameters = parameter.Parameters{
-	parameter.NewColorParameter("Color"),
 }
 
 func init() {
