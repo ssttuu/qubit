@@ -1,3 +1,4 @@
+API_LIB_FILES = $(shell find applications/api/lib -type f -name "*.go")
 API_SERVICES_FILES = $(shell find applications/api/services -type f -name "*.go")
 API_TASKS_FILES = $(shell find applications/api/tasks -type f -name "*.go")
 COMPUTE_SERVICES_FILES = $(shell find applications/compute/services -type f -name "*.go")
@@ -24,9 +25,9 @@ applications/api/tasks/migrate/bindata.go: $(shell find applications/api/tasks/m
 	cd applications/api/tasks/migrate && go-bindata -pkg migrate -prefix "sql/" sql
 bindata: applications/api/tasks/migrate/bindata.go
 
-applications/api/services/run: $(API_SERVICES_FILES)
+applications/api/services/run: $(API_SERVICES_FILES) $(API_LIB_FILES)
 	cd applications/api/services && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
-applications/api/tasks/run: $(API_TASKS_FILES)
+applications/api/tasks/run: $(API_TASKS_FILES) $(API_LIB_FILES)
 	cd applications/api/tasks && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
 build-api-go: fmt applications/api/services/run applications/api/tasks/run
 
@@ -38,10 +39,10 @@ build-compute-go: fmt applications/compute/services/run
 # Docker images
 ###############
 
-build-api: protos build-api-go
+build-api: all-protos build-api-go
 	docker-compose build api-services
 
-build-compute: protos build-compute-go
+build-compute: all-protos build-compute-go
 	docker-compose build compute-services
 
 build: build-api build-compute
