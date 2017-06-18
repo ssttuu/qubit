@@ -28,12 +28,25 @@ func (s *Scene) ToProto() *pb.Scene {
 	}
 }
 
+func (s *Scene) GetCreateData() map[string]interface{} {
+	return map[string]interface{}{
+		"project_id": s.ProjectId,
+		"name":       s.Name,
+	}
+}
+
+func (s *Scene) GetUpdateData() map[string]interface{} {
+	return map[string]interface{}{
+		"name": s.Name,
+	}
+}
+
 func (s *Scene) ValidateCreate() error {
 	return nil
 }
 
-func (s *Scene) ValidateUpdate(newScene interface{}) error {
-	//scene := newScene.(*Scene)
+func (s *Scene) ValidateUpdate(newObj interface{}) error {
+	//scene := newObj.(*Scene)
 	return nil
 }
 

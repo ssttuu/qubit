@@ -1,4 +1,4 @@
-package image
+package image_sequence
 
 import (
 	pb "github.com/stupschwartz/qubit/proto-gen/go/image_sequences"
@@ -10,13 +10,7 @@ type ImageSequence struct {
 	Name      string `json:"name" db:"name"`
 }
 
-func (i *ImageSequence) ToProto() *pb.ImageSequence {
-	return &pb.ImageSequence{
-		Id:        i.Id,
-		ProjectId: i.ProjectId,
-		Name:      i.Name,
-	}
-}
+type ImageSequences []ImageSequence
 
 func NewFromProto(pbimage *pb.ImageSequence) ImageSequence {
 	return ImageSequence{
@@ -26,7 +20,35 @@ func NewFromProto(pbimage *pb.ImageSequence) ImageSequence {
 	}
 }
 
-type ImageSequences []ImageSequence
+func (i *ImageSequence) ToProto() *pb.ImageSequence {
+	return &pb.ImageSequence{
+		Id:        i.Id,
+		ProjectId: i.ProjectId,
+		Name:      i.Name,
+	}
+}
+
+func (i *ImageSequence) GetCreateData() map[string]interface{} {
+	return map[string]interface{}{
+		"project_id": i.ProjectId,
+		"name":       i.Name,
+	}
+}
+
+func (i *ImageSequence) GetUpdateData() map[string]interface{} {
+	return map[string]interface{}{
+		"name": i.Name,
+	}
+}
+
+func (i *ImageSequence) ValidateCreate() error {
+	return nil
+}
+
+func (i *ImageSequence) ValidateUpdate(newObj interface{}) error {
+	//im := newObj.(*ImageSequence)
+	return nil
+}
 
 func (i *ImageSequences) ToProto() []*pb.ImageSequence {
 	var pbimages_sequences []*pb.ImageSequence

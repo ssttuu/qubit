@@ -14,6 +14,24 @@ type Image struct {
 	Planes          []Plane           `json:"planes" db:"planes"`
 }
 
+type Images []Image
+
+func NewFromProto(pbimage *pb.Image) Image {
+	planes := make([]Plane, len(pbimage.Planes))
+	for index, plane := range pbimage.Planes {
+		planes[index] = *NewPlaneFromProto(plane)
+	}
+	return Image{
+		Id:              pbimage.GetId(),
+		ImageSequenceId: pbimage.GetImageSequenceId(),
+		Name:            pbimage.GetName(),
+		Width:           pbimage.GetWidth(),
+		Height:          pbimage.GetHeight(),
+		Labels:          pbimage.GetLabels(),
+		Planes:          planes,
+	}
+}
+
 func (i *Image) ToProto() *pb.Image {
 	pb_planes := make([]*pb.Plane, len(i.Planes))
 	for index, plane := range i.Planes {
@@ -30,23 +48,33 @@ func (i *Image) ToProto() *pb.Image {
 	}
 }
 
-func NewFromProto(pbimage *pb.Image) Image {
-	planes := make([]Plane, len(pbimage.Planes))
-	for index, plane := range pbimage.Planes {
-		planes[index] = *NewPlaneFromProto(plane)
-	}
-	return Image{
-		Id:              pbimage.Id,
-		ImageSequenceId: pbimage.ImageSequenceId,
-		Name:            pbimage.Name,
-		Width:           pbimage.Width,
-		Height:          pbimage.Height,
-		Labels:          pbimage.Labels,
-		Planes:          planes,
+func (i *Image) GetCreateData() map[string]interface{} {
+	return map[string]interface{}{
+		"image_sequence_id": i.ImageSequenceId,
+		"name":              i.Name,
+		"width":             i.Width,
+		"height":            i.Height,
+		// TODO
 	}
 }
 
-type Images []Image
+func (i *Image) GetUpdateData() map[string]interface{} {
+	return map[string]interface{}{
+		"name":   i.Name,
+		"width":  i.Width,
+		"height": i.Height,
+		// TODO
+	}
+}
+
+func (i *Image) ValidateCreate() error {
+	return nil
+}
+
+func (i *Image) ValidateUpdate(newObj interface{}) error {
+	//im := newObj.(*Image)
+	return nil
+}
 
 func (i *Images) ToProto() []*pb.Image {
 	var pbimages []*pb.Image

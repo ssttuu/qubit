@@ -1,8 +1,6 @@
 package apiutils
 
 import (
-	"reflect"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
@@ -11,6 +9,8 @@ import (
 
 // APIModel is an interface for objects passed to apiutils functions
 type APIModel interface {
+	GetCreateData() map[string]interface{}
+	GetUpdateData() map[string]interface{}
 	ValidateCreate() error
 	ValidateUpdate(existingObject interface{}) error
 }
@@ -57,11 +57,18 @@ func Create(createConfig *CreateConfig) error {
 	// Using reflection to pull the db struct field annotations
 	columns := []string{}
 	values := []interface{}{}
-	val := reflect.ValueOf(createConfig.Object)
-	for i := 0; i < val.Type().NumField(); i++ {
-		columnName := val.Type().Field(i).Tag.Get("db")
-		columns = append(columns, columnName)
-		values = append(values, val.Field(i).Interface())
+	//reflectedPointer := reflect.ValueOf(createConfig.Object)
+	//reflectedStruct := reflect.Indirect(reflectedPointer)
+	//for i := 0; i < reflectedStruct.Type().NumField(); i++ {
+	//	columnName := reflectedStruct.Type().Field(i).Tag.Get("db")
+	//	if columnName != "id" {
+	//		columns = append(columns, columnName)
+	//		values = append(values, reflectedStruct.Field(i).Interface())
+	//	}
+	//}
+	for column, value := range createConfig.Object.GetCreateData() {
+		columns = append(columns, column)
+		values = append(values, value)
 	}
 	insertConfig := pgutils.InsertConfig{
 		Columns: columns,
@@ -113,7 +120,7 @@ func Update(updateConfig *UpdateConfig) error {
 	err = pgutils.SelectByID(&pgutils.SelectConfig{
 		ForClause: "FOR UPDATE",
 		Id:        updateConfig.Id,
-		Out:       &updateConfig.OldObject,
+		Out:       updateConfig.OldObject,
 		Table:     updateConfig.Table,
 		Tx:        tx,
 	})
@@ -125,17 +132,20 @@ func Update(updateConfig *UpdateConfig) error {
 	if err != nil {
 		return err
 	}
-	updates := map[string]interface{}{}
-	val := reflect.ValueOf(updateConfig.NewObject)
-	for i := 0; i < val.Type().NumField(); i++ {
-		columnName := val.Type().Field(i).Tag.Get("db")
-		updates[columnName] = val.Field(i).Interface()
-	}
+	//updates := map[string]interface{}{}
+	//reflectedPointer := reflect.ValueOf(updateConfig.NewObject)
+	//reflectedStruct := reflect.Indirect(reflectedPointer)
+	//for i := 0; i < reflectedStruct.Type().NumField(); i++ {
+	//	columnName := reflectedStruct.Type().Field(i).Tag.Get("db")
+	//	if columnName != "id" {
+	//		updates[columnName] = reflectedStruct.Field(i).Interface()
+	//	}
+	//}
 	err = pgutils.UpdateByID(&pgutils.UpdateConfig{
 		Id:      updateConfig.Id,
 		Table:   updateConfig.Table,
 		Tx:      tx,
-		Updates: updates,
+		Updates: updateConfig.NewObject.GetUpdateData(),
 	})
 	if err != nil {
 		return err
