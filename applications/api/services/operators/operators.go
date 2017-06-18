@@ -1,143 +1,85 @@
 package operators
 
 import (
-	"strconv"
-
 	"cloud.google.com/go/storage"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"github.com/stupschwartz/qubit/applications/api/lib/apiutils"
 	"github.com/stupschwartz/qubit/core/operator"
 	_ "github.com/stupschwartz/qubit/core/operators"
-	"github.com/stupschwartz/qubit/core/parameter"
 	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
 	operators_pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
 )
 
-// Server implements `service Health`.
+var operatorsTable = "operators"
+
 type Server struct {
 	PostgresClient *sqlx.DB
 	StorageClient  *storage.Client
 	ComputeClient  compute_pb.ComputeClient
 }
 
-func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest) (*operators_pb.ListOperatorsResponse, error) {
-	// TODO: Permissions
-	var ops operator.Operators
-	err := s.PostgresClient.Select(&ops, "SELECT id, scene_id, context, type, name FROM operators")
-	if err != nil {
-		return nil, errors.Wrap(err, "Could not select operators")
-	}
-	return &operators_pb.ListOperatorsResponse{Operators: ops.ToProto(), NextPageToken: ""}, nil
-}
-
-func (s *Server) Get(ctx context.Context, in *operators_pb.GetOperatorRequest) (*operators_pb.Operator, error) {
-	// TODO: Permissions
-	operatorId, err := strconv.ParseInt(in.GetId(), 10, 64)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
-	}
-	var op operator.Operator
-	err = s.PostgresClient.Get(&op, "SELECT id, scene_id, context, type, name FROM operators WHERE id=$1", operatorId)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Could not get operator with ID %v", operatorId)
-	}
-	return op.ToProto(), nil
+func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, storageClient *storage.Client, computeClient compute_pb.ComputeClient) {
+	operators_pb.RegisterOperatorsServer(grpcServer, &Server{
+		ComputeClient:  computeClient,
+		PostgresClient: postgresClient,
+		StorageClient:  storageClient,
+	})
 }
 
 func (s *Server) Create(ctx context.Context, in *operators_pb.CreateOperatorRequest) (*operators_pb.Operator, error) {
-	// TODO: Validation
-	query := `INSERT INTO operators (scene_id, context, type, name)
-			  VALUES (:scene_id, :context, :type, :name)
-			  RETURNING id`
-	stmt, err := s.PostgresClient.PrepareNamed(query)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to prepare statement, %s", query)
-	}
-	var id int64
-	err = stmt.Get(&id, map[string]interface{}{
-		"scene_id": in.Operator.SceneId,
-		"context":  in.Operator.Context,
-		"type":     in.Operator.Type,
-		"name":     in.Operator.Name,
+	newObject := operator.NewFromProto(in.Operator)
+	err := apiutils.Create(&apiutils.CreateConfig{
+		DB:     s.PostgresClient,
+		Object: &newObject,
+		Table:  operatorsTable,
 	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to create operator, %s", in.Operator.Name)
+		return nil, err
 	}
-	newOp := operator.Operator{
-		Id:         strconv.FormatInt(id, 10),
-		Context:    in.Operator.Context,
-		Type:       in.Operator.Type,
-		Name:       in.Operator.Name,
-		Parameters: parameter.NewParametersFromProto(in.Operator.Parameters),
-	}
-	return newOp.ToProto(), nil
-}
-
-func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequest) (*operators_pb.Operator, error) {
-	// TODO: Permissions & validation
-	operatorId, err := strconv.ParseInt(in.GetId(), 10, 64)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
-	}
-	tx, err := s.PostgresClient.Begin()
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to begin transaction for operator with ID %v", operatorId)
-	}
-	txStmt, err := tx.Prepare(`SELECT id, context, type, name FROM operators WHERE id=$1 FOR UPDATE`)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to select operator in tx %v", operatorId)
-	}
-	row := txStmt.QueryRow(operatorId)
-	if row == nil {
-		return nil, errors.Wrapf(err, "No operator with ID %v exists", operatorId)
-	}
-	var existingOperator operator.Operator
-	// TODO: Scan parameters
-	err = row.Scan(&existingOperator.Id, &existingOperator.Context, &existingOperator.Type, &existingOperator.Name)
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to load operator from row")
-	}
-	// TODO: Make update fields dynamic
-	newOperator := operator.NewFromProto(in.Operator)
-	// TODO: Handle parameters
-	if newOperator.Context != existingOperator.Context || newOperator.Type != existingOperator.Type || newOperator.Name != existingOperator.Name {
-		existingOperator.Context = newOperator.Context
-		existingOperator.Type = newOperator.Type
-		existingOperator.Name = newOperator.Name
-		_, err = tx.Exec(
-			`UPDATE operators SET context=$1, type=$2, name=$3 WHERE id=$4`,
-			newOperator.Context,
-			newOperator.Type,
-			newOperator.Name,
-			operatorId,
-		)
-		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to update operator with ID %v", operatorId)
-		}
-	}
-	err = tx.Commit()
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to update operator")
-	}
-	return existingOperator.ToProto(), nil
+	return newObject.ToProto(), nil
 }
 
 func (s *Server) Delete(ctx context.Context, in *operators_pb.DeleteOperatorRequest) (*empty.Empty, error) {
-	// TODO: Permissions
-	// TODO: Delete dependent entities with service calls
-	operatorId, err := strconv.ParseInt(in.GetId(), 10, 64)
+	err := apiutils.Delete(&apiutils.DeleteConfig{
+		DB:    s.PostgresClient,
+		Id:    in.GetId(),
+		Table: operatorsTable,
+	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not convert to integer %v", in.GetId())
-	}
-	_, err = s.PostgresClient.Queryx("DELETE FROM operators WHERE id=$1", operatorId)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to deleted operator by id: %v", operatorId)
+		return nil, err
 	}
 	return &empty.Empty{}, nil
+}
+
+func (s *Server) Get(ctx context.Context, in *operators_pb.GetOperatorRequest) (*operators_pb.Operator, error) {
+	var obj operator.Operator
+	err := apiutils.Get(&apiutils.GetConfig{
+		DB:    s.PostgresClient,
+		Id:    in.GetId(),
+		Out:   &obj,
+		Table: operatorsTable,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return obj.ToProto(), nil
+}
+
+func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest) (*operators_pb.ListOperatorsResponse, error) {
+	var objectList operator.Operators
+	err := apiutils.List(&apiutils.ListConfig{
+		DB:    s.PostgresClient,
+		Out:   &objectList,
+		Table: operatorsTable,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &operators_pb.ListOperatorsResponse{Operators: objectList.ToProto()}, nil
 }
 
 func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequest) (*operators_pb.RenderOperatorResponse, error) {
@@ -208,10 +150,17 @@ func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequ
 	return nil, nil
 }
 
-func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, storageClient *storage.Client, computeClient compute_pb.ComputeClient) {
-	operators_pb.RegisterOperatorsServer(grpcServer, &Server{
-		ComputeClient:  computeClient,
-		PostgresClient: postgresClient,
-		StorageClient:  storageClient,
+func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequest) (*operators_pb.Operator, error) {
+	newObject := operator.NewFromProto(in.Operator)
+	err := apiutils.Update(&apiutils.UpdateConfig{
+		DB:        s.PostgresClient,
+		Id:        in.GetId(),
+		NewObject: &newObject,
+		OldObject: &operator.Operator{},
+		Table:     operatorsTable,
 	})
+	if err != nil {
+		return nil, err
+	}
+	return newObject.ToProto(), nil
 }

@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 
+	"github.com/stupschwartz/qubit/applications/api/services/image_sequences"
 	"github.com/stupschwartz/qubit/applications/api/services/images"
 	"github.com/stupschwartz/qubit/applications/api/services/operators"
 	"github.com/stupschwartz/qubit/applications/api/services/organizations"
@@ -86,6 +87,7 @@ func main() {
 	projects.Register(grpcServer, postgresClient)
 	scenes.Register(grpcServer, postgresClient)
 	operators.Register(grpcServer, postgresClient, storageClient, computeClient)
-	images.Register(grpcServer, postgresClient, storageClient)
+	images.Register(grpcServer, postgresClient)
+	image_sequences.Register(grpcServer, postgresClient)
 	<-servingDone
 }

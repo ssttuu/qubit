@@ -25,15 +25,7 @@ type Operator struct {
 	Parameters parameter.Parameters `json:"parameters" db:"parameters"`
 }
 
-func (o *Operator) ToProto() *pb.Operator {
-	return &pb.Operator{
-		Id:      o.Id,
-		SceneId: o.SceneId,
-		Type:    o.Type,
-		Name:    o.Name,
-		Context: o.Context,
-	}
-}
+type Operators []Operator
 
 func NewFromProto(pb_op *pb.Operator) Operator {
 	return Operator{
@@ -45,7 +37,41 @@ func NewFromProto(pb_op *pb.Operator) Operator {
 	}
 }
 
-type Operators []Operator
+func (o *Operator) ToProto() *pb.Operator {
+	return &pb.Operator{
+		Id:      o.Id,
+		SceneId: o.SceneId,
+		Type:    o.Type,
+		Name:    o.Name,
+		Context: o.Context,
+	}
+}
+
+func (o *Operator) GetCreateData() map[string]interface{} {
+	return map[string]interface{}{
+		"scene_id": o.SceneId,
+		"context":  o.Context,
+		"type":     o.Type,
+		"name":     o.Name,
+	}
+}
+
+func (o *Operator) GetUpdateData() map[string]interface{} {
+	return map[string]interface{}{
+		"context": o.Context,
+		"type":    o.Type,
+		"name":    o.Name,
+	}
+}
+
+func (o *Operator) ValidateCreate() error {
+	return nil
+}
+
+func (o *Operator) ValidateUpdate(newObj interface{}) error {
+	//op := newObj.(*Operator)
+	return nil
+}
 
 func (o *Operators) ToProto() []*pb.Operator {
 	var pb_ops []*pb.Operator

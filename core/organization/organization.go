@@ -25,12 +25,24 @@ func (o *Organization) ToProto() *pb.Organization {
 	}
 }
 
+func (o *Organization) GetCreateData() map[string]interface{} {
+	return map[string]interface{}{
+		"name": o.Name,
+	}
+}
+
+func (o *Organization) GetUpdateData() map[string]interface{} {
+	return map[string]interface{}{
+		"name": o.Name,
+	}
+}
+
 func (o *Organization) ValidateCreate() error {
 	return nil
 }
 
-func (o *Organization) ValidateUpdate(newOrg interface{}) error {
-	//org := newOrg.(*Organization)
+func (o *Organization) ValidateUpdate(newObj interface{}) error {
+	//org := newObj.(*Organization)
 	return nil
 }
 
