@@ -72,9 +72,11 @@ func (s *Server) Get(ctx context.Context, in *operators_pb.GetOperatorRequest) (
 func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest) (*operators_pb.ListOperatorsResponse, error) {
 	var objectList operator.Operators
 	err := apiutils.List(&apiutils.ListConfig{
-		DB:    s.PostgresClient,
-		Out:   &objectList,
-		Table: operatorsTable,
+		// Don't load parameters for list because it's a large column
+		Columns: []string{"id", "scene_id", "context", "type", "name"},
+		DB:      s.PostgresClient,
+		Out:     &objectList,
+		Table:   operatorsTable,
 	})
 	if err != nil {
 		return nil, err

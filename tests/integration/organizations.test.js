@@ -32,6 +32,15 @@ describe('Organizations', () => {
                     resolve()
                 })
             });
+        }).then(() => {
+            let getRequest = new organizations_pb.GetOrganizationRequest();
+            getRequest.setId("-1");
+            return new Promise((resolve, reject) => {
+                ORGANIZATIONS_CLIENT.get(getRequest, (err, response) => {
+                    expect(err.message).toEqual("Not found");
+                    resolve()
+                })
+            });
         })
     });
 
