@@ -1,29 +1,15 @@
 package pgutils
 
 import (
-	"bytes"
 	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
+
+	"github.com/stupschwartz/qubit/applications/api/lib/stringutils"
 )
-
-func concat(strings ...string) string {
-	var buffer bytes.Buffer
-	for _, str := range strings {
-		buffer.WriteString(str)
-	}
-	return buffer.String()
-}
-
-func getColumnString(columns []string) string {
-	if len(columns) == 0 {
-		return "*"
-	}
-	return strings.Join(columns, ", ")
-}
 
 // DeleteConfig is a configuration for deleting rows
 type DeleteConfig struct {
@@ -63,6 +49,13 @@ type UpdateConfig struct {
 	Updates map[string]interface{}
 }
 
+func getColumnString(columns []string) string {
+	if len(columns) == 0 {
+		return "*"
+	}
+	return strings.Join(columns, ", ")
+}
+
 // DeleteByID deletes a record by ID
 func DeleteByID(deleteConfig *DeleteConfig) error {
 	objId, err := strconv.ParseInt(deleteConfig.Id, 10, 64)
@@ -88,11 +81,11 @@ func Insert(insertConfig *InsertConfig) error {
 	for i, rowData := range insertConfig.Values {
 		rowParams := []string{}
 		for j, value := range rowData {
-			param := concat("param_", strconv.Itoa(i), "_", strconv.Itoa(j))
+			param := stringutils.Concat("param_", strconv.Itoa(i), "_", strconv.Itoa(j))
 			valuesMap[param] = value
-			rowParams = append(rowParams, concat(":", param))
+			rowParams = append(rowParams, stringutils.Concat(":", param))
 		}
-		params = append(params, concat("(", strings.Join(rowParams, ", "), ")"))
+		params = append(params, stringutils.Concat("(", strings.Join(rowParams, ", "), ")"))
 	}
 	query := fmt.Sprintf(
 		`INSERT INTO %v (%v) VALUES (%v) RETURNING id`,
@@ -119,9 +112,9 @@ func InsertOne(insertConfig *InsertConfig) error {
 	valuesMap := map[string]interface{}{}
 	var params []string
 	for i, value := range insertConfig.Values[0] {
-		param := concat("param_", strconv.Itoa(i))
+		param := stringutils.Concat("param_", strconv.Itoa(i))
 		valuesMap[param] = value
-		params = append(params, concat(":", param))
+		params = append(params, stringutils.Concat(":", param))
 	}
 	query := fmt.Sprintf(
 		`INSERT INTO %v (%v) VALUES (%v) RETURNING id`,
@@ -182,7 +175,7 @@ func UpdateByID(updateConfig *UpdateConfig) error {
 	i := 1
 	for column, value := range updateConfig.Updates {
 		updateArgs = append(updateArgs, value)
-		updateFields = append(updateFields, concat(column, "=$", strconv.Itoa(i)))
+		updateFields = append(updateFields, stringutils.Concat(column, "=$", strconv.Itoa(i)))
 		i++
 	}
 	query := fmt.Sprintf(`UPDATE %v SET %v WHERE id=$%v`, updateConfig.Table, strings.Join(updateFields, ", "), i)

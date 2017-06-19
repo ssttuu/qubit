@@ -1,8 +1,12 @@
 package apiutils
 
 import (
+	"log"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 
 	"github.com/stupschwartz/qubit/applications/api/lib/pgutils"
 )
@@ -28,16 +32,18 @@ type DeleteConfig struct {
 }
 
 type GetConfig struct {
-	DB    *sqlx.DB
-	Id    string
-	Out   interface{}
-	Table string
+	Columns []string
+	DB      *sqlx.DB
+	Id      string
+	Out     interface{}
+	Table   string
 }
 
 type ListConfig struct {
-	DB    *sqlx.DB
-	Out   interface{}
-	Table string
+	Columns []string
+	DB      *sqlx.DB
+	Out     interface{}
+	Table   string
 }
 
 type UpdateConfig struct {
@@ -54,18 +60,8 @@ func Create(createConfig *CreateConfig) error {
 	if err != nil {
 		return err
 	}
-	// Using reflection to pull the db struct field annotations
 	columns := []string{}
 	values := []interface{}{}
-	//reflectedPointer := reflect.ValueOf(createConfig.Object)
-	//reflectedStruct := reflect.Indirect(reflectedPointer)
-	//for i := 0; i < reflectedStruct.Type().NumField(); i++ {
-	//	columnName := reflectedStruct.Type().Field(i).Tag.Get("db")
-	//	if columnName != "id" {
-	//		columns = append(columns, columnName)
-	//		values = append(values, reflectedStruct.Field(i).Interface())
-	//	}
-	//}
 	for column, value := range createConfig.Object.GetCreateData() {
 		columns = append(columns, column)
 		values = append(values, value)
@@ -85,6 +81,7 @@ func Create(createConfig *CreateConfig) error {
 func Delete(deleteConfig *DeleteConfig) error {
 	// TODO: Permissions
 	// TODO: Delete dependent entities with service calls
+	// TODO: Not found vs. unknown vs. whatever
 	return pgutils.DeleteByID(&pgutils.DeleteConfig{
 		DB:    deleteConfig.DB,
 		Table: deleteConfig.Table,
@@ -94,20 +91,27 @@ func Delete(deleteConfig *DeleteConfig) error {
 
 func Get(getConfig *GetConfig) error {
 	// TODO: Permissions
-	return pgutils.SelectByID(&pgutils.SelectConfig{
-		DB:    getConfig.DB,
-		Id:    getConfig.Id,
-		Out:   getConfig.Out,
-		Table: getConfig.Table,
+	err := pgutils.SelectByID(&pgutils.SelectConfig{
+		Columns: getConfig.Columns,
+		DB:      getConfig.DB,
+		Id:      getConfig.Id,
+		Out:     getConfig.Out,
+		Table:   getConfig.Table,
 	})
+	if err != nil {
+		log.Println(err)
+		return grpc.Errorf(codes.NotFound, "Not found")
+	}
+	return nil
 }
 
 func List(listConfig *ListConfig) error {
 	// TODO: Permissions
 	return pgutils.Select(&pgutils.SelectConfig{
-		DB:    listConfig.DB,
-		Out:   listConfig.Out,
-		Table: listConfig.Table,
+		Columns: listConfig.Columns,
+		DB:      listConfig.DB,
+		Out:     listConfig.Out,
+		Table:   listConfig.Table,
 	})
 }
 
@@ -124,23 +128,17 @@ func Update(updateConfig *UpdateConfig) error {
 		Table:     updateConfig.Table,
 		Tx:        tx,
 	})
-	// TODO: 404 if not found
 	if err != nil {
-		return err
+		tx.Rollback()
+		log.Println(err)
+		return grpc.Errorf(codes.NotFound, "Not found")
 	}
 	err = updateConfig.OldObject.ValidateUpdate(updateConfig.NewObject)
 	if err != nil {
-		return err
+		tx.Rollback()
+		log.Println(err)
+		return grpc.Errorf(codes.InvalidArgument, "Invalid argument")
 	}
-	//updates := map[string]interface{}{}
-	//reflectedPointer := reflect.ValueOf(updateConfig.NewObject)
-	//reflectedStruct := reflect.Indirect(reflectedPointer)
-	//for i := 0; i < reflectedStruct.Type().NumField(); i++ {
-	//	columnName := reflectedStruct.Type().Field(i).Tag.Get("db")
-	//	if columnName != "id" {
-	//		updates[columnName] = reflectedStruct.Field(i).Interface()
-	//	}
-	//}
 	err = pgutils.UpdateByID(&pgutils.UpdateConfig{
 		Id:      updateConfig.Id,
 		Table:   updateConfig.Table,
@@ -148,11 +146,14 @@ func Update(updateConfig *UpdateConfig) error {
 		Updates: updateConfig.NewObject.GetUpdateData(),
 	})
 	if err != nil {
-		return err
+		tx.Rollback()
+		log.Println(err)
+		return grpc.Errorf(codes.Internal, "Internal error")
 	}
 	err = tx.Commit()
 	if err != nil {
-		return errors.Wrap(err, "Failed to commit transaction")
+		log.Println(err)
+		return grpc.Errorf(codes.Internal, "Internal error")
 	}
 	return nil
 }
