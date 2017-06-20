@@ -26,19 +26,12 @@ goog.exportSymbol('proto.compute.RenderImageResponse', null, global);
  * @constructor
  */
 proto.compute.RenderImageRequest = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.compute.RenderImageRequest.repeatedFields_, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.compute.RenderImageRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   proto.compute.RenderImageRequest.displayName = 'proto.compute.RenderImageRequest';
 }
-/**
- * List of repeated fields within this message type.
- * @private {!Array<number>}
- * @const
- */
-proto.compute.RenderImageRequest.repeatedFields_ = [2];
-
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -68,9 +61,8 @@ proto.compute.RenderImageRequest.prototype.toObject = function(opt_includeInstan
 proto.compute.RenderImageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     operator: (f = msg.getOperator()) && operators_operators_pb.Operator.toObject(includeInstance, f),
-    parametersList: jspb.Message.toObjectList(msg.getParametersList(),
-    operators_operators_pb.Parameter.toObject, includeInstance),
-    boundingBox: (f = msg.getBoundingBox()) && geometry_geometry_pb.BoundingBox2D.toObject(includeInstance, f)
+    boundingBox: (f = msg.getBoundingBox()) && geometry_geometry_pb.BoundingBox2D.toObject(includeInstance, f),
+    time: +jspb.Message.getFieldWithDefault(msg, 3, 0.0)
   };
 
   if (includeInstance) {
@@ -113,14 +105,13 @@ proto.compute.RenderImageRequest.deserializeBinaryFromReader = function(msg, rea
       msg.setOperator(value);
       break;
     case 2:
-      var value = new operators_operators_pb.Parameter;
-      reader.readMessage(value,operators_operators_pb.Parameter.deserializeBinaryFromReader);
-      msg.addParameters(value);
-      break;
-    case 3:
       var value = new geometry_geometry_pb.BoundingBox2D;
       reader.readMessage(value,geometry_geometry_pb.BoundingBox2D.deserializeBinaryFromReader);
       msg.setBoundingBox(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setTime(value);
       break;
     default:
       reader.skipField();
@@ -168,20 +159,19 @@ proto.compute.RenderImageRequest.prototype.serializeBinaryToWriter = function (w
       operators_operators_pb.Operator.serializeBinaryToWriter
     );
   }
-  f = this.getParametersList();
-  if (f.length > 0) {
-    writer.writeRepeatedMessage(
-      2,
-      f,
-      operators_operators_pb.Parameter.serializeBinaryToWriter
-    );
-  }
   f = this.getBoundingBox();
   if (f != null) {
     writer.writeMessage(
-      3,
+      2,
       f,
       geometry_geometry_pb.BoundingBox2D.serializeBinaryToWriter
+    );
+  }
+  f = this.getTime();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      3,
+      f
     );
   }
 };
@@ -218,51 +208,18 @@ proto.compute.RenderImageRequest.prototype.hasOperator = function() {
 
 
 /**
- * repeated operators.Parameter parameters = 2;
- * If you change this array by adding, removing or replacing elements, or if you
- * replace the array itself, then you must call the setter to update it.
- * @return {!Array.<!proto.operators.Parameter>}
- */
-proto.compute.RenderImageRequest.prototype.getParametersList = function() {
-  return /** @type{!Array.<!proto.operators.Parameter>} */ (
-    jspb.Message.getRepeatedWrapperField(this, operators_operators_pb.Parameter, 2));
-};
-
-
-/** @param {!Array.<!proto.operators.Parameter>} value */
-proto.compute.RenderImageRequest.prototype.setParametersList = function(value) {
-  jspb.Message.setRepeatedWrapperField(this, 2, value);
-};
-
-
-/**
- * @param {!proto.operators.Parameter=} opt_value
- * @param {number=} opt_index
- * @return {!proto.operators.Parameter}
- */
-proto.compute.RenderImageRequest.prototype.addParameters = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 2, opt_value, proto.operators.Parameter, opt_index);
-};
-
-
-proto.compute.RenderImageRequest.prototype.clearParametersList = function() {
-  this.setParametersList([]);
-};
-
-
-/**
- * optional geometry.BoundingBox2D bounding_box = 3;
+ * optional geometry.BoundingBox2D bounding_box = 2;
  * @return {?proto.geometry.BoundingBox2D}
  */
 proto.compute.RenderImageRequest.prototype.getBoundingBox = function() {
   return /** @type{?proto.geometry.BoundingBox2D} */ (
-    jspb.Message.getWrapperField(this, geometry_geometry_pb.BoundingBox2D, 3));
+    jspb.Message.getWrapperField(this, geometry_geometry_pb.BoundingBox2D, 2));
 };
 
 
 /** @param {?proto.geometry.BoundingBox2D|undefined} value */
 proto.compute.RenderImageRequest.prototype.setBoundingBox = function(value) {
-  jspb.Message.setWrapperField(this, 3, value);
+  jspb.Message.setWrapperField(this, 2, value);
 };
 
 
@@ -276,7 +233,22 @@ proto.compute.RenderImageRequest.prototype.clearBoundingBox = function() {
  * @return {!boolean}
  */
 proto.compute.RenderImageRequest.prototype.hasBoundingBox = function() {
-  return jspb.Message.getField(this, 3) != null;
+  return jspb.Message.getField(this, 2) != null;
+};
+
+
+/**
+ * optional double time = 3;
+ * @return {number}
+ */
+proto.compute.RenderImageRequest.prototype.getTime = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 3, 0.0));
+};
+
+
+/** @param {number} value */
+proto.compute.RenderImageRequest.prototype.setTime = function(value) {
+  jspb.Message.setField(this, 3, value);
 };
 
 

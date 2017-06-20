@@ -13,8 +13,8 @@ service Compute {
 
 message RenderImageRequest {
     operators.Operator operator = 1;
-    repeated operators.Parameter parameters = 2;
-    geometry.BoundingBox2D bounding_box = 3;
+    geometry.BoundingBox2D bounding_box = 2;
+    double time = 3;
 }
 
 message RenderImageResponse {

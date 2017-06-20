@@ -2,6 +2,7 @@ API_LIB_FILES = $(shell find applications/api/lib -type f -name "*.go")
 API_SERVICES_FILES = $(shell find applications/api/services -type f -name "*.go")
 API_TASKS_FILES = $(shell find applications/api/tasks -type f -name "*.go")
 COMPUTE_SERVICES_FILES = $(shell find applications/compute/services -type f -name "*.go")
+CORE_FILES = $(shell find core -type f -name "*.go")
 
 # First target is default
 build-go: fmt build-api-go build-compute-go
@@ -14,7 +15,8 @@ configure:
 	go get -u github.com/jteeuwen/go-bindata/...
 
 fmt:
-	go fmt ./...
+	go fmt ./applications/...
+	go fmt ./core/...
 
 #############
 # Go binaries
@@ -25,13 +27,13 @@ applications/api/tasks/migrate/bindata.go: $(shell find applications/api/tasks/m
 	cd applications/api/tasks/migrate && go-bindata -pkg migrate -prefix "sql/" sql
 bindata: applications/api/tasks/migrate/bindata.go
 
-applications/api/services/run: $(API_SERVICES_FILES) $(API_LIB_FILES)
+applications/api/services/run: $(API_SERVICES_FILES) $(API_LIB_FILES) $(CORE_FILES)
 	cd applications/api/services && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
 applications/api/tasks/run: $(API_TASKS_FILES) $(API_LIB_FILES)
 	cd applications/api/tasks && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
 build-api-go: fmt applications/api/services/run applications/api/tasks/run
 
-applications/compute/services/run: $(COMPUTE_SERVICES_FILES)
+applications/compute/services/run: $(COMPUTE_SERVICES_FILES) $(CORE_FILES)
 	cd applications/compute/services && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
 build-compute-go: fmt applications/compute/services/run
 

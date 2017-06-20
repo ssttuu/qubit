@@ -8,15 +8,27 @@ import (
 
 const Name string = "Constant"
 
+var ParameterRoot parameter.Parameter = parameter.NewGroupParameter(
+	"root",
+	parameter.ParameterMap{
+		"color": parameter.NewRGBParameter(),
+	},
+	[]string{"color"},
+)
+
 type Constant struct{}
 
-func (c *Constant) Process(inputs []*image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) (*image.Plane, error) {
-	colorParam := p.GetByName("Color")
-	redValue := colorParam.GetValueByName("Red")
-	greenValue := colorParam.GetValueByName("Green")
-	blueValue := colorParam.GetValueByName("Blue")
-	width := endX - startX
-	height := endY - startY
+func (c *Constant) Process(imageContext *operator.RenderImageContext) (*image.Plane, error) {
+	colorRoot := imageContext.ParameterRoot.GetGroup()
+	colorGroup := colorRoot.GetGroup("color")
+	redParam := colorGroup.GetFloat64("red")
+	greenParam := colorGroup.GetFloat64("green")
+	blueParam := colorGroup.GetFloat64("blue")
+	redValue := redParam.GetValue(0.0)
+	greenValue := greenParam.GetValue(0.0)
+	blueValue := blueParam.GetValue(0.0)
+	width := imageContext.BoundingBox.EndX - imageContext.BoundingBox.StartX
+	height := imageContext.BoundingBox.EndY - imageContext.BoundingBox.StartY
 	redComponent := image.Channel{Rows: make([]*image.Row, height)}
 	greenComponent := image.Channel{Rows: make([]*image.Row, height)}
 	blueComponent := image.Channel{Rows: make([]*image.Row, height)}
@@ -33,10 +45,6 @@ func (c *Constant) Process(inputs []*image.Plane, p parameter.Parameters, startX
 
 }
 
-var Params parameter.Parameters = parameter.Parameters{
-	parameter.NewColorParameter("Color"),
-}
-
 func init() {
-	operator.RegisterOperation(Name, &Constant{}, Params)
+	operator.RegisterOperation(Name, &Constant{}, ParameterRoot)
 }

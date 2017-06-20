@@ -3,6 +3,8 @@ package operator
 import (
 	"github.com/pkg/errors"
 
+	"encoding/json"
+	"github.com/stupschwartz/qubit/core/geometry"
 	"github.com/stupschwartz/qubit/core/image"
 	"github.com/stupschwartz/qubit/core/parameter"
 	pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
@@ -21,38 +23,47 @@ type Operator struct {
 	Type    string `json:"type" db:"type"`
 	Name    string `json:"name" db:"name"`
 	// Array of IDs of input operators
-	Inputs     []string             `json:"inputs" db:"inputs"`
-	Parameters parameter.Parameters `json:"parameters" db:"parameters"`
+	Inputs        []string            `json:"inputs" db:"inputs"`
+	ParameterRoot parameter.Parameter `json:"parameter_root" db:"parameter_root"`
 }
 
 type Operators []Operator
 
 func NewFromProto(pb_op *pb.Operator) Operator {
+	var parameterRoot parameter.Parameter
+	_ = json.Unmarshal(pb_op.GetParameterRoot(), &parameterRoot)
 	return Operator{
-		Id:      pb_op.Id,
-		SceneId: pb_op.SceneId,
-		Type:    pb_op.Type,
-		Name:    pb_op.Name,
-		Context: pb_op.Context,
+		Id:            pb_op.Id,
+		SceneId:       pb_op.SceneId,
+		Type:          pb_op.Type,
+		Name:          pb_op.Name,
+		Context:       pb_op.Context,
+		ParameterRoot: parameterRoot,
 	}
 }
 
 func (o *Operator) ToProto() *pb.Operator {
+	// TODO: handle marshaling error
+	parameterRootBytes, _ := json.Marshal(o.ParameterRoot)
 	return &pb.Operator{
-		Id:      o.Id,
-		SceneId: o.SceneId,
-		Type:    o.Type,
-		Name:    o.Name,
-		Context: o.Context,
+		Id:            o.Id,
+		SceneId:       o.SceneId,
+		Type:          o.Type,
+		Name:          o.Name,
+		Context:       o.Context,
+		ParameterRoot: parameterRootBytes,
 	}
 }
 
 func (o *Operator) GetCreateData() map[string]interface{} {
+	// TODO: handle marshaling error
+	parameterRootBytes, _ := json.Marshal(o.ParameterRoot)
 	return map[string]interface{}{
-		"scene_id": o.SceneId,
-		"context":  o.Context,
-		"type":     o.Type,
-		"name":     o.Name,
+		"scene_id":       o.SceneId,
+		"context":        o.Context,
+		"type":           o.Type,
+		"name":           o.Name,
+		"parameter_root": parameterRootBytes,
 	}
 }
 
@@ -81,14 +92,21 @@ func (o *Operators) ToProto() []*pb.Operator {
 	return pb_ops
 }
 
+type RenderImageContext struct {
+	Inputs        []image.Plane
+	ParameterRoot *parameter.Parameter
+	BoundingBox   *geometry.BoundingBox2D
+	Time          float64
+}
+
 type Operable interface {
-	Process(inputs []*image.Plane, p parameter.Parameters, startX int32, startY int32, endX int32, endY int32) (*image.Plane, error)
+	Process(renderContext *RenderImageContext) (*image.Plane, error)
 }
 
 var OperatorsRegistry = make(map[string]Operable)
-var ParametersRegistry = make(map[string]parameter.Parameters)
+var ParametersRegistry = make(map[string]parameter.Parameter)
 
-func RegisterOperation(opType string, operation Operable, parameters parameter.Parameters) {
+func RegisterOperation(opType string, operation Operable, parameters parameter.Parameter) {
 	OperatorsRegistry[opType] = operation
 	ParametersRegistry[opType] = parameters
 }
@@ -100,9 +118,10 @@ func GetOperation(opType string) (Operable, error) {
 	return nil, errors.Errorf("Operation does not exist, %v", opType)
 }
 
-func GetParameters(opType string) (parameter.Parameters, error) {
-	if parameters, ok := ParametersRegistry[opType]; ok {
-		return parameters, nil
+func GetParameterRoot(opType string) (parameter.Parameter, error) {
+	var p parameter.Parameter
+	if p, ok := ParametersRegistry[opType]; ok {
+		return p, nil
 	}
-	return nil, errors.Errorf("Parameters do not exist for operation type, %v", opType)
+	return p, errors.Errorf("Parameters do not exist for operation type, %v", opType)
 }

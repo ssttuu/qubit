@@ -37,7 +37,7 @@ CREATE TABLE operators (
     context VARCHAR(10) NOT NULL,
     type VARCHAR(50) NOT NULL,
     "name" VARCHAR(100) NOT NULL,
-    parameters JSON NOT NULL,
+    parameter_root JSON NOT NULL,
     FOREIGN KEY (scene_id) REFERENCES scenes(id)
 );
 
