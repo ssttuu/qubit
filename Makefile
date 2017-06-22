@@ -1,15 +1,15 @@
 API_LIB_FILES = $(shell find applications/api/lib -type f -name "*.go")
-API_SERVICES_FILES = $(shell find applications/api/services -type f -name "*.go")
+API_SERVICES_FILES = $(shell find applications/api/services/web -type f -name "*.go")
 API_TASKS_FILES = $(shell find applications/api/tasks -type f -name "*.go")
-COMPUTE_SERVICES_FILES = $(shell find applications/compute/services -type f -name "*.go")
+COMPUTE_SERVICES_FILES = $(shell find applications/compute/services/web -type f -name "*.go")
 CORE_FILES = $(shell find core -type f -name "*.go")
 
 # First target is default
 build-go: fmt build-api-go build-compute-go
 
 clean:
-	touch applications/api/services/run && rm applications/api/services/run
-	touch applications/compute/services/run && rm applications/compute/services/run
+	touch applications/api/services/web/run && rm applications/api/services/web/run
+	touch applications/compute/services/web/run && rm applications/compute/services/web/run
 
 configure:
 	go get -u github.com/jteeuwen/go-bindata/...
@@ -27,15 +27,15 @@ applications/api/tasks/migrate/bindata.go: $(shell find applications/api/tasks/m
 	cd applications/api/tasks/migrate && go-bindata -pkg migrate -prefix "sql/" sql
 bindata: applications/api/tasks/migrate/bindata.go
 
-applications/api/services/run: $(API_SERVICES_FILES) $(API_LIB_FILES) $(CORE_FILES)
-	cd applications/api/services && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
+applications/api/services/web/run: $(API_SERVICES_FILES) $(API_LIB_FILES) $(CORE_FILES)
+	cd applications/api/services/web && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
 applications/api/tasks/run: $(API_TASKS_FILES) $(API_LIB_FILES)
 	cd applications/api/tasks && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
-build-api-go: fmt applications/api/services/run applications/api/tasks/run
+build-api-go: fmt applications/api/services/web/run applications/api/tasks/run
 
-applications/compute/services/run: $(COMPUTE_SERVICES_FILES) $(CORE_FILES)
-	cd applications/compute/services && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
-build-compute-go: fmt applications/compute/services/run
+applications/compute/services/web/run: $(COMPUTE_SERVICES_FILES) $(CORE_FILES)
+	cd applications/compute/services/web && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
+build-compute-go: fmt applications/compute/services/web/run
 
 ###############
 # Docker images

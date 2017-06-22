@@ -37,7 +37,7 @@ jobs:
             - run:
                 name: API - Start Go Build
                 command: |
-                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/applications/api/services --name go-api-build-volumes alpine:3.4 /bin/true
+                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/applications/api/services/web --name go-api-build-volumes alpine:3.4 /bin/true
             - run:
                 name: API - Copy Source to Container
                 command: |
@@ -45,15 +45,15 @@ jobs:
             - run:
                 name: API - Build Go Code
                 command: |
-                    docker run --volumes-from go-api-build-volumes -w /go/src/github.com/stupschwartz/qubit/applications/api/services golang:1.8 bash -c "go get ./...; go build -o run"
+                    docker run --volumes-from go-api-build-volumes -w /go/src/github.com/stupschwartz/qubit/applications/api/services/web golang:1.8 bash -c "go get ./...; go build -o run"
             - run:
                 name: API - Copy Back Artifacts
                 command: |
-                    docker cp go-api-build-volumes:/go/src/github.com/stupschwartz/qubit/applications/api/services/run `pwd`/applications/api/services/run
+                    docker cp go-api-build-volumes:/go/src/github.com/stupschwartz/qubit/applications/api/services/web/run `pwd`/applications/api/services/web/run
             - run:
                 name: API - Build Container
                 command: |
-                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/api:${CIRCLE_SHA1} ./applications/api/services
+                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/api:${CIRCLE_SHA1} ./applications/api/services/web
             - run:
                 name: API - Push Container
                 command: |
@@ -74,7 +74,7 @@ jobs:
             - run:
                 name: Compute - Start Go Build
                 command: |
-                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/applications/compute/services --name go-compute-build-volumes alpine:3.4 /bin/true
+                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/applications/compute/services/web --name go-compute-build-volumes alpine:3.4 /bin/true
             - run:
                 name: Compute - Copy Source to Container
                 command: |
@@ -82,15 +82,15 @@ jobs:
             - run:
                 name: Compute - Build Go Code
                 command: |
-                    docker run --volumes-from go-compute-build-volumes -w /go/src/github.com/stupschwartz/qubit/applications/compute/services golang:1.8 bash -c "go get ./...; go build -o run"
+                    docker run --volumes-from go-compute-build-volumes -w /go/src/github.com/stupschwartz/qubit/applications/compute/services/web golang:1.8 bash -c "go get ./...; go build -o run"
             - run:
                 name: Compute - Copy Back Artifacts
                 command: |
-                    docker cp go-compute-build-volumes:/go/src/github.com/stupschwartz/qubit/applications/compute/services/run `pwd`/applications/compute/services/run
+                    docker cp go-compute-build-volumes:/go/src/github.com/stupschwartz/qubit/applications/compute/services/web/run `pwd`/applications/compute/services/web/run
             - run:
                 name: Compute - Build Container
                 command: |
-                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/compute:${CIRCLE_SHA1} ./applications/compute/services
+                    gcloud docker -- build -t ${EXTERNALREGISTRYENDPOINT}/compute:${CIRCLE_SHA1} ./applications/compute/services/web
             - run:
                 name: Compute - Push Container
                 command: |
