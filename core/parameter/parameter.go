@@ -265,6 +265,17 @@ type Multi struct {
 	Array      ParameterArray
 }
 
+func (m *Multi) Iterator() <-chan Parameter {
+	ch := make(chan Parameter)
+	go func() {
+		for _, p := range m.Array {
+			ch <- p
+		}
+		close(ch)
+	}()
+	return ch
+}
+
 func (m *Multi) GetParameterByIndex(index int32) Parameter {
 	return m.Array[index]
 }
@@ -435,6 +446,17 @@ type ParameterArray []Parameter
 ///////////////////////
 // Parameter Helpers //
 ///////////////////////
+
+func NewPosition2DParameter() Parameter {
+	return NewGroupParameter(
+		"position2d",
+		ParameterMap{
+			"x": NewFloat64Parameter(0.0),
+			"y": NewFloat64Parameter(0.0),
+		},
+		[]string{"x", "y"},
+	)
+}
 
 func NewRGBParameter() Parameter {
 	return NewGroupParameter(
