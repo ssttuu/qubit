@@ -63,7 +63,7 @@ bootstrap-postgres: build-api
 
 .PHONY: protoman
 protoman:
-	docker build -t stupschwartz/protoman -f protoman/Dockerfile protoman
+	docker build -t us.gcr.io/qubit-161916/protoman ./protoman
 
 all-protos: $(PROTO_FILES)
 	./scripts/generate-protos.sh
