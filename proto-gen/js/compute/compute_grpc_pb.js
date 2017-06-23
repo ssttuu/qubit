@@ -5,26 +5,15 @@ var grpc = require('grpc');
 var compute_compute_pb = require('../compute/compute_pb.js');
 var operators_operators_pb = require('../operators/operators_pb.js');
 
-function serialize_compute_ComputationStatusRequest(arg) {
-  if (!(arg instanceof compute_compute_pb.ComputationStatusRequest)) {
-    throw new Error('Expected argument of type compute.ComputationStatusRequest');
+function serialize_compute_Computation(arg) {
+  if (!(arg instanceof compute_compute_pb.Computation)) {
+    throw new Error('Expected argument of type compute.Computation');
   }
   return new Buffer(arg.serializeBinary());
 }
 
-function deserialize_compute_ComputationStatusRequest(buffer_arg) {
-  return compute_compute_pb.ComputationStatusRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_compute_ComputationStatusResponse(arg) {
-  if (!(arg instanceof compute_compute_pb.ComputationStatusResponse)) {
-    throw new Error('Expected argument of type compute.ComputationStatusResponse');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_compute_ComputationStatusResponse(buffer_arg) {
-  return compute_compute_pb.ComputationStatusResponse.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_compute_Computation(buffer_arg) {
+  return compute_compute_pb.Computation.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_compute_CreateComputationRequest(arg) {
@@ -38,6 +27,17 @@ function deserialize_compute_CreateComputationRequest(buffer_arg) {
   return compute_compute_pb.CreateComputationRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_compute_GetComputationRequest(arg) {
+  if (!(arg instanceof compute_compute_pb.GetComputationRequest)) {
+    throw new Error('Expected argument of type compute.GetComputationRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_compute_GetComputationRequest(buffer_arg) {
+  return compute_compute_pb.GetComputationRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 
 var ComputeService = exports.ComputeService = {
   createComputation: {
@@ -45,22 +45,22 @@ var ComputeService = exports.ComputeService = {
     requestStream: false,
     responseStream: false,
     requestType: compute_compute_pb.CreateComputationRequest,
-    responseType: compute_compute_pb.ComputationStatusResponse,
+    responseType: compute_compute_pb.Computation,
     requestSerialize: serialize_compute_CreateComputationRequest,
     requestDeserialize: deserialize_compute_CreateComputationRequest,
-    responseSerialize: serialize_compute_ComputationStatusResponse,
-    responseDeserialize: deserialize_compute_ComputationStatusResponse,
+    responseSerialize: serialize_compute_Computation,
+    responseDeserialize: deserialize_compute_Computation,
   },
-  getComputationStatus: {
-    path: '/compute.Compute/GetComputationStatus',
+  getComputation: {
+    path: '/compute.Compute/GetComputation',
     requestStream: false,
     responseStream: false,
-    requestType: compute_compute_pb.ComputationStatusRequest,
-    responseType: compute_compute_pb.ComputationStatusResponse,
-    requestSerialize: serialize_compute_ComputationStatusRequest,
-    requestDeserialize: deserialize_compute_ComputationStatusRequest,
-    responseSerialize: serialize_compute_ComputationStatusResponse,
-    responseDeserialize: deserialize_compute_ComputationStatusResponse,
+    requestType: compute_compute_pb.GetComputationRequest,
+    responseType: compute_compute_pb.Computation,
+    requestSerialize: serialize_compute_GetComputationRequest,
+    requestDeserialize: deserialize_compute_GetComputationRequest,
+    responseSerialize: serialize_compute_Computation,
+    responseDeserialize: deserialize_compute_Computation,
   },
 };
 

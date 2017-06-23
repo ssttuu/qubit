@@ -5,20 +5,22 @@ package compute;
 import "operators/operators.proto";
 
 service Compute {
-    rpc CreateComputation (CreateComputationRequest) returns (ComputationStatusResponse) {}
-    rpc GetComputationStatus (ComputationStatusRequest) returns (ComputationStatusResponse) {}
+    rpc CreateComputation (CreateComputationRequest) returns (Computation) {}
+    rpc GetComputation (GetComputationRequest) returns (Computation) {}
+}
+
+message Computation {
+    string id = 1;
+    string status = 2;
+    string root_operator_id = 3;
+    map<string, operators.Operator> operator_map = 4;
+    string resource_id = 5; // Location in GCS
 }
 
 message CreateComputationRequest {
-    string root_operator_id = 1;
-    map<string, operators.Operator> operator_map = 2;
+    Computation computation = 1;
 }
 
-message ComputationStatusRequest {
-    string computation_id = 1;
-}
-
-message ComputationStatusResponse {
-    string computation_id = 1;
-    string status = 2;
+message GetComputationRequest {
+    string id = 1;
 }

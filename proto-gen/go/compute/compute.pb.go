@@ -8,9 +8,9 @@ It is generated from these files:
 	compute/compute.proto
 
 It has these top-level messages:
+	Computation
 	CreateComputationRequest
-	ComputationStatusRequest
-	ComputationStatusResponse
+	GetComputationRequest
 */
 package compute
 
@@ -35,74 +35,90 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type CreateComputationRequest struct {
-	RootOperatorId string                         `protobuf:"bytes,1,opt,name=root_operator_id,json=rootOperatorId" json:"root_operator_id,omitempty"`
-	OperatorMap    map[string]*operators.Operator `protobuf:"bytes,2,rep,name=operator_map,json=operatorMap" json:"operator_map,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+type Computation struct {
+	Id             string                         `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+	Status         string                         `protobuf:"bytes,2,opt,name=status" json:"status,omitempty"`
+	RootOperatorId string                         `protobuf:"bytes,3,opt,name=root_operator_id,json=rootOperatorId" json:"root_operator_id,omitempty"`
+	OperatorMap    map[string]*operators.Operator `protobuf:"bytes,4,rep,name=operator_map,json=operatorMap" json:"operator_map,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	ResourceId     string                         `protobuf:"bytes,5,opt,name=resource_id,json=resourceId" json:"resource_id,omitempty"`
 }
 
-func (m *CreateComputationRequest) Reset()                    { *m = CreateComputationRequest{} }
-func (m *CreateComputationRequest) String() string            { return proto.CompactTextString(m) }
-func (*CreateComputationRequest) ProtoMessage()               {}
-func (*CreateComputationRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (m *Computation) Reset()                    { *m = Computation{} }
+func (m *Computation) String() string            { return proto.CompactTextString(m) }
+func (*Computation) ProtoMessage()               {}
+func (*Computation) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *CreateComputationRequest) GetRootOperatorId() string {
+func (m *Computation) GetId() string {
 	if m != nil {
-		return m.RootOperatorId
+		return m.Id
 	}
 	return ""
 }
 
-func (m *CreateComputationRequest) GetOperatorMap() map[string]*operators.Operator {
-	if m != nil {
-		return m.OperatorMap
-	}
-	return nil
-}
-
-type ComputationStatusRequest struct {
-	ComputationId string `protobuf:"bytes,1,opt,name=computation_id,json=computationId" json:"computation_id,omitempty"`
-}
-
-func (m *ComputationStatusRequest) Reset()                    { *m = ComputationStatusRequest{} }
-func (m *ComputationStatusRequest) String() string            { return proto.CompactTextString(m) }
-func (*ComputationStatusRequest) ProtoMessage()               {}
-func (*ComputationStatusRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
-
-func (m *ComputationStatusRequest) GetComputationId() string {
-	if m != nil {
-		return m.ComputationId
-	}
-	return ""
-}
-
-type ComputationStatusResponse struct {
-	ComputationId string `protobuf:"bytes,1,opt,name=computation_id,json=computationId" json:"computation_id,omitempty"`
-	Status        string `protobuf:"bytes,2,opt,name=status" json:"status,omitempty"`
-}
-
-func (m *ComputationStatusResponse) Reset()                    { *m = ComputationStatusResponse{} }
-func (m *ComputationStatusResponse) String() string            { return proto.CompactTextString(m) }
-func (*ComputationStatusResponse) ProtoMessage()               {}
-func (*ComputationStatusResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
-
-func (m *ComputationStatusResponse) GetComputationId() string {
-	if m != nil {
-		return m.ComputationId
-	}
-	return ""
-}
-
-func (m *ComputationStatusResponse) GetStatus() string {
+func (m *Computation) GetStatus() string {
 	if m != nil {
 		return m.Status
 	}
 	return ""
 }
 
+func (m *Computation) GetRootOperatorId() string {
+	if m != nil {
+		return m.RootOperatorId
+	}
+	return ""
+}
+
+func (m *Computation) GetOperatorMap() map[string]*operators.Operator {
+	if m != nil {
+		return m.OperatorMap
+	}
+	return nil
+}
+
+func (m *Computation) GetResourceId() string {
+	if m != nil {
+		return m.ResourceId
+	}
+	return ""
+}
+
+type CreateComputationRequest struct {
+	Computation *Computation `protobuf:"bytes,1,opt,name=computation" json:"computation,omitempty"`
+}
+
+func (m *CreateComputationRequest) Reset()                    { *m = CreateComputationRequest{} }
+func (m *CreateComputationRequest) String() string            { return proto.CompactTextString(m) }
+func (*CreateComputationRequest) ProtoMessage()               {}
+func (*CreateComputationRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+
+func (m *CreateComputationRequest) GetComputation() *Computation {
+	if m != nil {
+		return m.Computation
+	}
+	return nil
+}
+
+type GetComputationRequest struct {
+	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+}
+
+func (m *GetComputationRequest) Reset()                    { *m = GetComputationRequest{} }
+func (m *GetComputationRequest) String() string            { return proto.CompactTextString(m) }
+func (*GetComputationRequest) ProtoMessage()               {}
+func (*GetComputationRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+func (m *GetComputationRequest) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
 func init() {
+	proto.RegisterType((*Computation)(nil), "compute.Computation")
 	proto.RegisterType((*CreateComputationRequest)(nil), "compute.CreateComputationRequest")
-	proto.RegisterType((*ComputationStatusRequest)(nil), "compute.ComputationStatusRequest")
-	proto.RegisterType((*ComputationStatusResponse)(nil), "compute.ComputationStatusResponse")
+	proto.RegisterType((*GetComputationRequest)(nil), "compute.GetComputationRequest")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -116,8 +132,8 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for Compute service
 
 type ComputeClient interface {
-	CreateComputation(ctx context.Context, in *CreateComputationRequest, opts ...grpc.CallOption) (*ComputationStatusResponse, error)
-	GetComputationStatus(ctx context.Context, in *ComputationStatusRequest, opts ...grpc.CallOption) (*ComputationStatusResponse, error)
+	CreateComputation(ctx context.Context, in *CreateComputationRequest, opts ...grpc.CallOption) (*Computation, error)
+	GetComputation(ctx context.Context, in *GetComputationRequest, opts ...grpc.CallOption) (*Computation, error)
 }
 
 type computeClient struct {
@@ -128,8 +144,8 @@ func NewComputeClient(cc *grpc.ClientConn) ComputeClient {
 	return &computeClient{cc}
 }
 
-func (c *computeClient) CreateComputation(ctx context.Context, in *CreateComputationRequest, opts ...grpc.CallOption) (*ComputationStatusResponse, error) {
-	out := new(ComputationStatusResponse)
+func (c *computeClient) CreateComputation(ctx context.Context, in *CreateComputationRequest, opts ...grpc.CallOption) (*Computation, error) {
+	out := new(Computation)
 	err := grpc.Invoke(ctx, "/compute.Compute/CreateComputation", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -137,9 +153,9 @@ func (c *computeClient) CreateComputation(ctx context.Context, in *CreateComputa
 	return out, nil
 }
 
-func (c *computeClient) GetComputationStatus(ctx context.Context, in *ComputationStatusRequest, opts ...grpc.CallOption) (*ComputationStatusResponse, error) {
-	out := new(ComputationStatusResponse)
-	err := grpc.Invoke(ctx, "/compute.Compute/GetComputationStatus", in, out, c.cc, opts...)
+func (c *computeClient) GetComputation(ctx context.Context, in *GetComputationRequest, opts ...grpc.CallOption) (*Computation, error) {
+	out := new(Computation)
+	err := grpc.Invoke(ctx, "/compute.Compute/GetComputation", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -149,8 +165,8 @@ func (c *computeClient) GetComputationStatus(ctx context.Context, in *Computatio
 // Server API for Compute service
 
 type ComputeServer interface {
-	CreateComputation(context.Context, *CreateComputationRequest) (*ComputationStatusResponse, error)
-	GetComputationStatus(context.Context, *ComputationStatusRequest) (*ComputationStatusResponse, error)
+	CreateComputation(context.Context, *CreateComputationRequest) (*Computation, error)
+	GetComputation(context.Context, *GetComputationRequest) (*Computation, error)
 }
 
 func RegisterComputeServer(s *grpc.Server, srv ComputeServer) {
@@ -175,20 +191,20 @@ func _Compute_CreateComputation_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Compute_GetComputationStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ComputationStatusRequest)
+func _Compute_GetComputation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetComputationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ComputeServer).GetComputationStatus(ctx, in)
+		return srv.(ComputeServer).GetComputation(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/compute.Compute/GetComputationStatus",
+		FullMethod: "/compute.Compute/GetComputation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ComputeServer).GetComputationStatus(ctx, req.(*ComputationStatusRequest))
+		return srv.(ComputeServer).GetComputation(ctx, req.(*GetComputationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -202,8 +218,8 @@ var _Compute_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Compute_CreateComputation_Handler,
 		},
 		{
-			MethodName: "GetComputationStatus",
-			Handler:    _Compute_GetComputationStatus_Handler,
+			MethodName: "GetComputation",
+			Handler:    _Compute_GetComputation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -213,24 +229,25 @@ var _Compute_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("compute/compute.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 304 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0x12, 0x4d, 0xce, 0xcf, 0x2d,
-	0x28, 0x2d, 0x49, 0xd5, 0x87, 0xd2, 0x7a, 0x05, 0x45, 0xf9, 0x25, 0xf9, 0x42, 0xec, 0x50, 0xae,
-	0x94, 0x64, 0x7e, 0x41, 0x6a, 0x51, 0x62, 0x49, 0x7e, 0x51, 0xb1, 0x3e, 0x9c, 0x05, 0x51, 0xa3,
-	0xf4, 0x81, 0x91, 0x4b, 0xc2, 0xb9, 0x28, 0x35, 0xb1, 0x24, 0xd5, 0x19, 0xac, 0x38, 0xb1, 0x24,
-	0x33, 0x3f, 0x2f, 0x28, 0xb5, 0xb0, 0x34, 0xb5, 0xb8, 0x44, 0x48, 0x83, 0x4b, 0xa0, 0x28, 0x3f,
-	0xbf, 0x24, 0x1e, 0xa6, 0x29, 0x3e, 0x33, 0x45, 0x82, 0x51, 0x81, 0x51, 0x83, 0x33, 0x88, 0x0f,
-	0x24, 0xee, 0x0f, 0x15, 0xf6, 0x4c, 0x11, 0x0a, 0xe5, 0xe2, 0x81, 0x2b, 0xca, 0x4d, 0x2c, 0x90,
-	0x60, 0x52, 0x60, 0xd6, 0xe0, 0x36, 0x32, 0xd2, 0x83, 0x39, 0x08, 0x97, 0x15, 0x7a, 0x30, 0x33,
-	0x7c, 0x13, 0x0b, 0x5c, 0xf3, 0x4a, 0x8a, 0x2a, 0x83, 0xb8, 0xf3, 0x11, 0x22, 0x52, 0xc1, 0x5c,
-	0x02, 0xe8, 0x0a, 0x84, 0x04, 0xb8, 0x98, 0xb3, 0x53, 0x2b, 0xa1, 0xee, 0x00, 0x31, 0x85, 0x34,
-	0xb9, 0x58, 0xcb, 0x12, 0x73, 0x4a, 0x53, 0x81, 0xb6, 0x32, 0x02, 0x6d, 0x15, 0xd6, 0x43, 0x78,
-	0x12, 0xa6, 0x3b, 0x08, 0xa2, 0xc2, 0x8a, 0xc9, 0x82, 0x51, 0xc9, 0x11, 0xe8, 0x63, 0x84, 0x43,
-	0x82, 0x81, 0x54, 0x69, 0x31, 0xcc, 0xc7, 0xaa, 0x5c, 0x7c, 0xc9, 0x08, 0x39, 0x84, 0x7f, 0x79,
-	0x91, 0x44, 0x3d, 0x53, 0x94, 0xa2, 0xb8, 0x24, 0xb1, 0x18, 0x51, 0x5c, 0x90, 0x9f, 0x57, 0x9c,
-	0x4a, 0xa4, 0x19, 0x42, 0x62, 0x5c, 0x6c, 0xc5, 0x60, 0x8d, 0x60, 0x67, 0x73, 0x06, 0x41, 0x79,
-	0x46, 0x27, 0x18, 0xb9, 0xd8, 0x21, 0x86, 0xa7, 0x0a, 0xc5, 0x70, 0x09, 0x62, 0x84, 0x9c, 0x90,
-	0x22, 0xc1, 0x50, 0x95, 0x52, 0x42, 0x28, 0xc1, 0xe5, 0x4c, 0x25, 0x06, 0xa1, 0x78, 0x2e, 0x11,
-	0xf7, 0xd4, 0x12, 0x0c, 0x15, 0xc8, 0x16, 0xe0, 0x08, 0x27, 0xe2, 0x2c, 0x48, 0x62, 0x03, 0xa7,
-	0x31, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xe4, 0xfc, 0x7c, 0x65, 0xa0, 0x02, 0x00, 0x00,
+	// 320 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x74, 0x92, 0xcf, 0x4e, 0xc2, 0x40,
+	0x10, 0xc6, 0x6d, 0x11, 0x88, 0xb3, 0x86, 0xe0, 0x28, 0xa6, 0x72, 0x50, 0x6c, 0x62, 0xc4, 0x4b,
+	0x49, 0x6a, 0x62, 0x8c, 0x57, 0x62, 0x94, 0x83, 0x9a, 0xac, 0x0f, 0x40, 0x56, 0x98, 0x03, 0x51,
+	0xd8, 0xba, 0xdd, 0x9a, 0xf0, 0x34, 0x1e, 0x7c, 0x51, 0xdb, 0xed, 0x5f, 0xb1, 0x9c, 0x3a, 0xfb,
+	0xf5, 0x37, 0xf3, 0x7d, 0xb3, 0x2d, 0xf4, 0x66, 0x72, 0x19, 0x44, 0x9a, 0x46, 0xd9, 0xd3, 0x0b,
+	0x94, 0xd4, 0x12, 0xdb, 0xd9, 0xb1, 0x7f, 0x22, 0x03, 0x52, 0x42, 0x4b, 0x15, 0x8e, 0x8a, 0x2a,
+	0x65, 0xdc, 0x6f, 0x1b, 0xd8, 0xd8, 0x60, 0x42, 0x2f, 0xe4, 0x0a, 0x3b, 0x60, 0x2f, 0xe6, 0x8e,
+	0x35, 0xb0, 0x86, 0x7b, 0x3c, 0xae, 0xf0, 0x18, 0x5a, 0x61, 0xfc, 0x2a, 0x0a, 0x1d, 0xdb, 0x68,
+	0xd9, 0x09, 0x87, 0xd0, 0x55, 0x52, 0xea, 0x69, 0x3e, 0x6f, 0x1a, 0x77, 0x35, 0x0c, 0xd1, 0x49,
+	0xf4, 0x97, 0x4c, 0x9e, 0xcc, 0xf1, 0x11, 0xf6, 0x0b, 0x68, 0x29, 0x02, 0x67, 0x77, 0xd0, 0x18,
+	0x32, 0xff, 0xc2, 0xcb, 0xb3, 0x56, 0xdc, 0xbd, 0xbc, 0xed, 0x49, 0x04, 0xf7, 0x2b, 0xad, 0xd6,
+	0x9c, 0xc9, 0x52, 0xc1, 0x33, 0x60, 0x8a, 0x42, 0x19, 0xa9, 0x19, 0x25, 0x76, 0x4d, 0x63, 0x07,
+	0xb9, 0x34, 0x99, 0xf7, 0x5f, 0xa1, 0xbb, 0x39, 0x01, 0xbb, 0xd0, 0x78, 0xa7, 0x75, 0xb6, 0x51,
+	0x52, 0xe2, 0x15, 0x34, 0xbf, 0xc4, 0x47, 0x44, 0x66, 0x23, 0xe6, 0x1f, 0x7a, 0xe5, 0x9d, 0xe4,
+	0xdd, 0x3c, 0x25, 0xee, 0xec, 0x5b, 0xcb, 0xe5, 0xe0, 0x8c, 0x15, 0x09, 0x4d, 0x95, 0xa0, 0x9c,
+	0x3e, 0x23, 0x0a, 0x35, 0xde, 0x00, 0x9b, 0x95, 0xaa, 0x31, 0x61, 0xfe, 0x51, 0xdd, 0x6a, 0xbc,
+	0x0a, 0xba, 0x97, 0xd0, 0x7b, 0x20, 0x5d, 0x33, 0x70, 0xe3, 0xfa, 0xfd, 0x1f, 0x0b, 0xda, 0x29,
+	0x46, 0xf8, 0x0c, 0x07, 0xff, 0x82, 0xe0, 0x79, 0x69, 0xb6, 0x25, 0x64, 0xbf, 0x36, 0x8f, 0xbb,
+	0x13, 0x7f, 0x98, 0xce, 0xdf, 0x10, 0x78, 0x5a, 0x90, 0xb5, 0xe9, 0xb6, 0x4d, 0x7a, 0x6b, 0x99,
+	0x7f, 0xe9, 0xfa, 0x37, 0x00, 0x00, 0xff, 0xff, 0x65, 0x50, 0x0b, 0x1b, 0x88, 0x02, 0x00, 0x00,
 }
