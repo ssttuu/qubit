@@ -14,12 +14,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 
-	"github.com/stupschwartz/qubit/applications/api/services/image_sequences"
-	"github.com/stupschwartz/qubit/applications/api/services/images"
-	"github.com/stupschwartz/qubit/applications/api/services/operators"
-	"github.com/stupschwartz/qubit/applications/api/services/organizations"
-	"github.com/stupschwartz/qubit/applications/api/services/projects"
-	"github.com/stupschwartz/qubit/applications/api/services/scenes"
+	"github.com/stupschwartz/qubit/applications/api/services/web/image_sequences"
+	"github.com/stupschwartz/qubit/applications/api/services/web/images"
+	"github.com/stupschwartz/qubit/applications/api/services/web/operators"
+	"github.com/stupschwartz/qubit/applications/api/services/web/organizations"
+	"github.com/stupschwartz/qubit/applications/api/services/web/projects"
+	"github.com/stupschwartz/qubit/applications/api/services/web/scenes"
 	"github.com/stupschwartz/qubit/proto-gen/go/compute"
 )
 

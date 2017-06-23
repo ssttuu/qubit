@@ -5,7 +5,7 @@ volumes:
 services:
   api-services:
     image: us.gcr.io/qubit-161916/api
-    build: ./applications/api/services
+    build: ./applications/api/services/web
     environment:
       - API_SERVICE_ADDRESS=api.qubit.site:9000
       - APP_ENV=development
@@ -35,7 +35,7 @@ services:
 
   compute-services:
     image: us.gcr.io/qubit-161916/compute
-    build: ./applications/compute/services
+    build: ./applications/compute/services/web
     environment:
       - APP_ENV=development
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json

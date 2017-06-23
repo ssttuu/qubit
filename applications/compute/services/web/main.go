@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 
-	"github.com/stupschwartz/qubit/applications/compute/services/compute"
+	"github.com/stupschwartz/qubit/applications/compute/services/web/compute"
 )
 
 func serve(server *grpc.Server, listener net.Listener, done chan bool) {
@@ -21,17 +21,13 @@ func main() {
 	if port == "" {
 		log.Fatal(`You need to set the environment variable "PORT"`)
 	}
-
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		grpclog.Fatalf("failed to listen: %v", err)
 	}
-
 	grpcServer := grpc.NewServer()
 	servingDone := make(chan bool)
 	go serve(grpcServer, lis, servingDone)
-
 	compute.Register(grpcServer)
-
 	<-servingDone
 }
