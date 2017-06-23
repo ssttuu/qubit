@@ -3,13 +3,13 @@ volumes:
   qubit-api-postgres:
     external: true
 services:
-  api-services:
+  api-web:
     image: us.gcr.io/qubit-161916/api
     build: ./applications/api/services/web
     environment:
-      - API_SERVICE_ADDRESS=api.qubit.site:9000
+      - API_SERVICE_ADDRESS=web.api.qubit.site:9000
       - APP_ENV=development
-      - COMPUTE_SERVICE_ADDRESS=compute.qubit.site:9000
+      - COMPUTE_SERVICE_ADDRESS=web.compute.qubit.site:9000
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
       - GOOGLE_PROJECT_ID=qubit-161916
       - PORT=9000
@@ -20,10 +20,10 @@ services:
     networks:
       default:
         aliases:
-          - api.qubit.site
+          - web.api.qubit.site
     depends_on:
       - postgres
-      - compute-services
+      - compute-web
   postgres:
     image: postgres:9.6
     volumes:
@@ -33,7 +33,7 @@ services:
         aliases:
           - postgres.api.qubit.site
 
-  compute-services:
+  compute-web:
     image: us.gcr.io/qubit-161916/compute
     build: ./applications/compute/services/web
     environment:
@@ -47,4 +47,4 @@ services:
     networks:
       default:
         aliases:
-          - compute.qubit.site
+          - web.compute.qubit.site
