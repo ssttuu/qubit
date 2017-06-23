@@ -4,6 +4,7 @@ set -euo pipefail
 
 proto_name=${1:-}
 proto_type=${2:-}
+DOCKER=${DOCKER:-true}
 
 base_protoc_command="/usr/bin/protoc -I/protobuf -I/googleapis -I./protos/"
 protoc_command=
@@ -61,4 +62,9 @@ for f in $(find protos -type f -name "*.proto"); do
     fi
 done
 
-docker run --rm -v ${PWD}:/workspace stupschwartz/protoman /bin/bash -c "${protoc_command}"
+if [ "${DOCKER}" = "true" ]; then
+    docker run --rm -v ${PWD}:/workspace us.gcr.io/qubit-161916/protoman /bin/bash -c "${protoc_command}"
+else
+    ${protoc_command}
+fi
+

@@ -12,15 +12,68 @@ jobs:
                 command: |
                     docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
                     docker pull ${DOCKER_USER}/qubit-builder || echo "Getting qubit-builder"
-#            - run:
-#                name: Build
-#                command: |
-#                    docker build --no-cache -t ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1} -t ${DOCKER_USER}/qubit-builder:latest ./builder/
-#            - run:
-#                name: Push
-#                command: |
-#                    docker push ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1}
-#                    docker push ${DOCKER_USER}/qubit-builder:latest
+            - run:
+                name: Build
+                command: |
+                    docker build -t ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1} -t ${DOCKER_USER}/qubit-builder:latest ./builder/
+            - run:
+                name: Push
+                command: |
+                    docker push ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1}
+                    docker push ${DOCKER_USER}/qubit-builder:latest
+
+    build_protoman:
+        docker:
+            - image: docker:17
+        working_directory: /workspace
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run:
+                name: Pull
+                command: |
+                    docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
+                    docker pull ${DOCKER_USER}/protoman || echo "Getting protoman"
+            - run:
+                name: Build
+                command: |
+                    docker build -t ${DOCKER_USER}/protoman:${CIRCLE_SHA1} -t ${DOCKER_USER}/protoman:latest ./protoman/
+            - run:
+                name: Push
+                command: |
+                    docker push ${DOCKER_USER}/protoman:${CIRCLE_SHA1}
+                    docker push ${DOCKER_USER}/protoman:latest
+
+    build_protos:
+        docker:
+            - image: stuschwartz/qubit-builder:latest
+        working_directory: /workspace
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run:
+                name: Authenticate GCloud
+                command: scripts/auth-gcloud.sh
+            - run:
+                name: Protos - Create Volume
+                command: |
+                    docker create -v /go -w /go/src/github.com/stupschwartz/qubit/ --name proto-volume alpine:3.4 /bin/true
+            - run:
+                name: Protos - Copy Source to Container
+                command: |
+                    docker cp ./ proto-volume:/go/src/github.com/stupschwartz/qubit
+            - run:
+                name: Protos - Compile
+                command: |
+                    docker run --volumes-from proto-volume -w /go/src/github.com/stupschwartz/qubit ${DOCKER_USER}/protoman:${CIRCLE_SHA1} bash -c "DOCKER=false ./scripts/generate-protos.sh"
+            - run:
+                name: Protos - Copy Back Artifacts
+                command: |
+                    docker cp proto-volume:/go/src/github.com/stupschwartz/qubit/proto-gen `pwd`/proto-gen
+
+        persist_to_workspace:
+            paths:
+                - /go/src/github.com/stupschwartz/qubit/proto-gen
 
     build_api:
         docker:
@@ -31,6 +84,8 @@ jobs:
         steps:
             - checkout
             - setup_remote_docker
+            - attach_workspace:
+                at: /go/src/github.com/stupschwartz/qubit/proto-gen
             - run:
                 name: Authenticate GCloud
                 command: scripts/auth-gcloud.sh
@@ -68,6 +123,8 @@ jobs:
         steps:
             - checkout
             - setup_remote_docker
+            - attach_workspace:
+                at: /go/src/github.com/stupschwartz/qubit/proto-gen
             - run:
                 name: Authenticate GCloud
                 command: scripts/auth-gcloud.sh
@@ -167,12 +224,18 @@ workflows:
     build_test_deploy:
         jobs:
             - build_base
+            - build_protoman
+            - build_protos:
+                requires:
+                    - build_protoman
             - build_api:
                 requires:
                     - build_base
+                    - build_protos
             - build_compute:
                 requires:
                     - build_base
+                    - build_protos
             - test_api:
                 requires:
                     - build_api
