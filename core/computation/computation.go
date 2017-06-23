@@ -7,6 +7,7 @@ import (
 )
 
 var Kind string = "computation"
+var PubsubTopicID string = "computations"
 
 type Computation struct {
 	Id             string
