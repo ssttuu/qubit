@@ -30,6 +30,8 @@ node_modules/
 test-results/
 jest_*/
 
+/proto-gen
+
 run
 
 .fmt
