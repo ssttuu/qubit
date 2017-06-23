@@ -1,3 +1,4 @@
+APP_FILES = $(shell find applications -type f -name "*.go")
 API_LIB_FILES = $(shell find applications/api/lib -type f -name "*.go")
 API_WEB_FILES = $(shell find applications/api/services/web -type f -name "*.go")
 API_TASKS_FILES = $(shell find applications/api/tasks -type f -name "*.go")
@@ -15,9 +16,11 @@ clean:
 configure:
 	go get -u github.com/jteeuwen/go-bindata/...
 
-fmt:
+.fmt: $(APP_FILES) $(CORE_FILES)
 	go fmt ./applications/...
 	go fmt ./core/...
+	touch .fmt
+fmt: .fmt
 
 #############
 # Go binaries
