@@ -1,40 +1,47 @@
 package compute
 
 import (
-	"encoding/json"
-
+	"cloud.google.com/go/datastore"
+	"cloud.google.com/go/pubsub"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"github.com/stupschwartz/qubit/core/geometry"
-	"github.com/stupschwartz/qubit/core/operator"
-	"github.com/stupschwartz/qubit/core/parameter"
+	"github.com/stupschwartz/qubit/core/computation"
 	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
 )
 
 type Server struct {
+	DatastoreClient *datastore.Client
+	PubSubClient    *pubsub.Client
 }
 
-func (s *Server) RenderImage(ctx context.Context, in *compute_pb.RenderImageRequest) (*compute_pb.RenderImageResponse, error) {
-	op, err := operator.GetOperation(in.Operator.Type)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to get Operation for rendering, %v", in.Operator.Type)
-	}
-	var p parameter.Parameter
-	err = json.Unmarshal(in.Operator.ParameterRoot, &p)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to unmarshal ParameterRoot for rendering, %v", in.Operator.Type)
-	}
-	renderContext := operator.RenderImageContext{
-		ParameterRoot: &p,
-		BoundingBox:   geometry.NewBoundingBoxFromProto(in.BoundingBox),
-		Time:          in.Time,
-	}
-	imagePlane, err := op.Process(&renderContext)
-	return &compute_pb.RenderImageResponse{ImagePlane: imagePlane.ToProto()}, nil
+func Register(grpcServer *grpc.Server, datastoreClient *datastore.Client, pubSubClient *pubsub.Client) {
+	compute_pb.RegisterComputeServer(grpcServer, &Server{
+		DatastoreClient: datastoreClient,
+		PubSubClient:    pubSubClient,
+	})
 }
 
-func Register(grpcServer *grpc.Server) {
-	compute_pb.RegisterComputeServer(grpcServer, &Server{})
+func (s *Server) CreateComputation(ctx context.Context, in *compute_pb.CreateComputationRequest) (*compute_pb.Computation, error) {
+	newComputation := computation.NewFromProto(in.Computation)
+	incompleteKey := datastore.IncompleteKey(computation.Kind, nil)
+	completeKeys, err := s.DatastoreClient.AllocateIDs(ctx, []*datastore.Key{incompleteKey})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to allocate IDs for new computation %v", newComputation)
+	} else if len(completeKeys) != 1 {
+		return nil, errors.Wrapf(err, "Allocated %v keys instead of one key for new computation %v", len(completeKeys), newComputation)
+	}
+	compKey := completeKeys[0]
+	// TODO: Enum?
+	newComputation.Status = "created"
+	if _, err := s.DatastoreClient.Put(ctx, compKey, &newComputation); err != nil {
+		return nil, errors.Wrapf(err, "Failed to create new computation %v", newComputation)
+	}
+	// TODO: Publish message to PubSub
+	return newComputation.ToProto(), nil
+}
+
+func (s *Server) GetComputation(ctx context.Context, in *compute_pb.GetComputationRequest) (*compute_pb.Computation, error) {
+	return &compute_pb.Computation{}, nil
 }

@@ -290,68 +290,19 @@ func (m *DeleteSceneRequest) String() string { return (*scenes.DeleteSceneReques
 func (*DeleteSceneRequest) ProtoMessage()    {}
 func (m *DeleteSceneRequest) GetId() string  { return (*scenes.DeleteSceneRequest)(m).GetId() }
 
-// Component from public import operators/operators.proto
-type Component operators.Component
-
-func (m *Component) Reset()            { (*operators.Component)(m).Reset() }
-func (m *Component) String() string    { return (*operators.Component)(m).String() }
-func (*Component) ProtoMessage()       {}
-func (m *Component) GetName() string   { return (*operators.Component)(m).GetName() }
-func (m *Component) GetValue() float64 { return (*operators.Component)(m).GetValue() }
-
-// Parameter from public import operators/operators.proto
-type Parameter operators.Parameter
-
-func (m *Parameter) Reset()          { (*operators.Parameter)(m).Reset() }
-func (m *Parameter) String() string  { return (*operators.Parameter)(m).String() }
-func (*Parameter) ProtoMessage()     {}
-func (m *Parameter) GetName() string { return (*operators.Parameter)(m).GetName() }
-func (m *Parameter) GetLabels() map[string]string {
-	o := (*operators.Parameter)(m).GetLabels()
-	if o == nil {
-		return nil
-	}
-	s := make(map[string]string, len(o))
-	for k, v := range o {
-		s[k] = (string)(v)
-	}
-	return s
-}
-func (m *Parameter) GetComponents() []*Component {
-	o := (*operators.Parameter)(m).GetComponents()
-	if o == nil {
-		return nil
-	}
-	s := make([]*Component, len(o))
-	for i, x := range o {
-		s[i] = (*Component)(x)
-	}
-	return s
-}
-
 // Operator from public import operators/operators.proto
 type Operator operators.Operator
 
-func (m *Operator) Reset()              { (*operators.Operator)(m).Reset() }
-func (m *Operator) String() string      { return (*operators.Operator)(m).String() }
-func (*Operator) ProtoMessage()         {}
-func (m *Operator) GetId() string       { return (*operators.Operator)(m).GetId() }
-func (m *Operator) GetSceneId() string  { return (*operators.Operator)(m).GetSceneId() }
-func (m *Operator) GetType() string     { return (*operators.Operator)(m).GetType() }
-func (m *Operator) GetName() string     { return (*operators.Operator)(m).GetName() }
-func (m *Operator) GetContext() string  { return (*operators.Operator)(m).GetContext() }
-func (m *Operator) GetInputs() []string { return (*operators.Operator)(m).GetInputs() }
-func (m *Operator) GetParameters() []*Parameter {
-	o := (*operators.Operator)(m).GetParameters()
-	if o == nil {
-		return nil
-	}
-	s := make([]*Parameter, len(o))
-	for i, x := range o {
-		s[i] = (*Parameter)(x)
-	}
-	return s
-}
+func (m *Operator) Reset()                   { (*operators.Operator)(m).Reset() }
+func (m *Operator) String() string           { return (*operators.Operator)(m).String() }
+func (*Operator) ProtoMessage()              {}
+func (m *Operator) GetId() string            { return (*operators.Operator)(m).GetId() }
+func (m *Operator) GetSceneId() string       { return (*operators.Operator)(m).GetSceneId() }
+func (m *Operator) GetType() string          { return (*operators.Operator)(m).GetType() }
+func (m *Operator) GetName() string          { return (*operators.Operator)(m).GetName() }
+func (m *Operator) GetContext() string       { return (*operators.Operator)(m).GetContext() }
+func (m *Operator) GetInputs() []string      { return (*operators.Operator)(m).GetInputs() }
+func (m *Operator) GetParameterRoot() []byte { return (*operators.Operator)(m).GetParameterRoot() }
 
 // ListOperatorsRequest from public import operators/operators.proto
 type ListOperatorsRequest operators.ListOperatorsRequest

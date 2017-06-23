@@ -8,16 +8,15 @@ It is generated from these files:
 	compute/compute.proto
 
 It has these top-level messages:
-	RenderImageRequest
-	RenderImageResponse
+	Computation
+	CreateComputationRequest
+	GetComputationRequest
 */
 package compute
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import geometry "github.com/stupschwartz/qubit/proto-gen/go/geometry"
-import images "github.com/stupschwartz/qubit/proto-gen/go/images"
 import operators "github.com/stupschwartz/qubit/proto-gen/go/operators"
 
 import (
@@ -36,57 +35,90 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type RenderImageRequest struct {
-	Operator    *operators.Operator     `protobuf:"bytes,1,opt,name=operator" json:"operator,omitempty"`
-	BoundingBox *geometry.BoundingBox2D `protobuf:"bytes,2,opt,name=bounding_box,json=boundingBox" json:"bounding_box,omitempty"`
-	Time        float64                 `protobuf:"fixed64,3,opt,name=time" json:"time,omitempty"`
+type Computation struct {
+	Id             string                         `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+	Status         string                         `protobuf:"bytes,2,opt,name=status" json:"status,omitempty"`
+	RootOperatorId string                         `protobuf:"bytes,3,opt,name=root_operator_id,json=rootOperatorId" json:"root_operator_id,omitempty"`
+	OperatorMap    map[string]*operators.Operator `protobuf:"bytes,4,rep,name=operator_map,json=operatorMap" json:"operator_map,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	ResourceId     string                         `protobuf:"bytes,5,opt,name=resource_id,json=resourceId" json:"resource_id,omitempty"`
 }
 
-func (m *RenderImageRequest) Reset()                    { *m = RenderImageRequest{} }
-func (m *RenderImageRequest) String() string            { return proto.CompactTextString(m) }
-func (*RenderImageRequest) ProtoMessage()               {}
-func (*RenderImageRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (m *Computation) Reset()                    { *m = Computation{} }
+func (m *Computation) String() string            { return proto.CompactTextString(m) }
+func (*Computation) ProtoMessage()               {}
+func (*Computation) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *RenderImageRequest) GetOperator() *operators.Operator {
+func (m *Computation) GetId() string {
 	if m != nil {
-		return m.Operator
+		return m.Id
+	}
+	return ""
+}
+
+func (m *Computation) GetStatus() string {
+	if m != nil {
+		return m.Status
+	}
+	return ""
+}
+
+func (m *Computation) GetRootOperatorId() string {
+	if m != nil {
+		return m.RootOperatorId
+	}
+	return ""
+}
+
+func (m *Computation) GetOperatorMap() map[string]*operators.Operator {
+	if m != nil {
+		return m.OperatorMap
 	}
 	return nil
 }
 
-func (m *RenderImageRequest) GetBoundingBox() *geometry.BoundingBox2D {
+func (m *Computation) GetResourceId() string {
 	if m != nil {
-		return m.BoundingBox
+		return m.ResourceId
+	}
+	return ""
+}
+
+type CreateComputationRequest struct {
+	Computation *Computation `protobuf:"bytes,1,opt,name=computation" json:"computation,omitempty"`
+}
+
+func (m *CreateComputationRequest) Reset()                    { *m = CreateComputationRequest{} }
+func (m *CreateComputationRequest) String() string            { return proto.CompactTextString(m) }
+func (*CreateComputationRequest) ProtoMessage()               {}
+func (*CreateComputationRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+
+func (m *CreateComputationRequest) GetComputation() *Computation {
+	if m != nil {
+		return m.Computation
 	}
 	return nil
 }
 
-func (m *RenderImageRequest) GetTime() float64 {
-	if m != nil {
-		return m.Time
-	}
-	return 0
+type GetComputationRequest struct {
+	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
 }
 
-type RenderImageResponse struct {
-	ImagePlane *images.Plane `protobuf:"bytes,1,opt,name=image_plane,json=imagePlane" json:"image_plane,omitempty"`
-}
+func (m *GetComputationRequest) Reset()                    { *m = GetComputationRequest{} }
+func (m *GetComputationRequest) String() string            { return proto.CompactTextString(m) }
+func (*GetComputationRequest) ProtoMessage()               {}
+func (*GetComputationRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
-func (m *RenderImageResponse) Reset()                    { *m = RenderImageResponse{} }
-func (m *RenderImageResponse) String() string            { return proto.CompactTextString(m) }
-func (*RenderImageResponse) ProtoMessage()               {}
-func (*RenderImageResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
-
-func (m *RenderImageResponse) GetImagePlane() *images.Plane {
+func (m *GetComputationRequest) GetId() string {
 	if m != nil {
-		return m.ImagePlane
+		return m.Id
 	}
-	return nil
+	return ""
 }
 
 func init() {
-	proto.RegisterType((*RenderImageRequest)(nil), "compute.RenderImageRequest")
-	proto.RegisterType((*RenderImageResponse)(nil), "compute.RenderImageResponse")
+	proto.RegisterType((*Computation)(nil), "compute.Computation")
+	proto.RegisterType((*CreateComputationRequest)(nil), "compute.CreateComputationRequest")
+	proto.RegisterType((*GetComputationRequest)(nil), "compute.GetComputationRequest")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -100,7 +132,8 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for Compute service
 
 type ComputeClient interface {
-	RenderImage(ctx context.Context, in *RenderImageRequest, opts ...grpc.CallOption) (*RenderImageResponse, error)
+	CreateComputation(ctx context.Context, in *CreateComputationRequest, opts ...grpc.CallOption) (*Computation, error)
+	GetComputation(ctx context.Context, in *GetComputationRequest, opts ...grpc.CallOption) (*Computation, error)
 }
 
 type computeClient struct {
@@ -111,9 +144,18 @@ func NewComputeClient(cc *grpc.ClientConn) ComputeClient {
 	return &computeClient{cc}
 }
 
-func (c *computeClient) RenderImage(ctx context.Context, in *RenderImageRequest, opts ...grpc.CallOption) (*RenderImageResponse, error) {
-	out := new(RenderImageResponse)
-	err := grpc.Invoke(ctx, "/compute.Compute/RenderImage", in, out, c.cc, opts...)
+func (c *computeClient) CreateComputation(ctx context.Context, in *CreateComputationRequest, opts ...grpc.CallOption) (*Computation, error) {
+	out := new(Computation)
+	err := grpc.Invoke(ctx, "/compute.Compute/CreateComputation", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *computeClient) GetComputation(ctx context.Context, in *GetComputationRequest, opts ...grpc.CallOption) (*Computation, error) {
+	out := new(Computation)
+	err := grpc.Invoke(ctx, "/compute.Compute/GetComputation", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -123,27 +165,46 @@ func (c *computeClient) RenderImage(ctx context.Context, in *RenderImageRequest,
 // Server API for Compute service
 
 type ComputeServer interface {
-	RenderImage(context.Context, *RenderImageRequest) (*RenderImageResponse, error)
+	CreateComputation(context.Context, *CreateComputationRequest) (*Computation, error)
+	GetComputation(context.Context, *GetComputationRequest) (*Computation, error)
 }
 
 func RegisterComputeServer(s *grpc.Server, srv ComputeServer) {
 	s.RegisterService(&_Compute_serviceDesc, srv)
 }
 
-func _Compute_RenderImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RenderImageRequest)
+func _Compute_CreateComputation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateComputationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ComputeServer).RenderImage(ctx, in)
+		return srv.(ComputeServer).CreateComputation(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/compute.Compute/RenderImage",
+		FullMethod: "/compute.Compute/CreateComputation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ComputeServer).RenderImage(ctx, req.(*RenderImageRequest))
+		return srv.(ComputeServer).CreateComputation(ctx, req.(*CreateComputationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Compute_GetComputation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetComputationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ComputeServer).GetComputation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/compute.Compute/GetComputation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ComputeServer).GetComputation(ctx, req.(*GetComputationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -153,8 +214,12 @@ var _Compute_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*ComputeServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "RenderImage",
-			Handler:    _Compute_RenderImage_Handler,
+			MethodName: "CreateComputation",
+			Handler:    _Compute_CreateComputation_Handler,
+		},
+		{
+			MethodName: "GetComputation",
+			Handler:    _Compute_GetComputation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -164,21 +229,25 @@ var _Compute_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("compute/compute.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 254 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x6c, 0x50, 0xc1, 0x4a, 0xc4, 0x30,
-	0x10, 0xb5, 0x2a, 0xae, 0x4c, 0xf5, 0x92, 0x22, 0x5b, 0xab, 0x07, 0xe9, 0xc9, 0x53, 0x02, 0xf5,
-	0xe6, 0x71, 0xd5, 0x83, 0x5e, 0x94, 0x80, 0xe7, 0xa5, 0x75, 0x87, 0x52, 0xb0, 0x99, 0x98, 0xa4,
-	0xb0, 0x7e, 0x88, 0xff, 0xab, 0x9b, 0xa4, 0x5d, 0xc5, 0x3d, 0xe5, 0xcd, 0xcc, 0x7b, 0xe1, 0xbd,
-	0x07, 0x67, 0x6f, 0xd4, 0xeb, 0xc1, 0xa1, 0x88, 0x2f, 0xd7, 0x86, 0x1c, 0xb1, 0x59, 0x1c, 0x8b,
-	0x79, 0x8b, 0xd4, 0xa3, 0x33, 0x9f, 0x62, 0x04, 0x81, 0x51, 0x64, 0x5d, 0x5f, 0xb7, 0x68, 0x45,
-	0x78, 0xe2, 0xf2, 0x9c, 0x34, 0x9a, 0xda, 0x91, 0xb1, 0x62, 0x42, 0xe1, 0x54, 0x7e, 0x25, 0xc0,
-	0x24, 0xaa, 0x15, 0x9a, 0xc7, 0x8d, 0x42, 0xe2, 0xc7, 0x80, 0xd6, 0x31, 0x01, 0xc7, 0x23, 0x33,
-	0x4f, 0xae, 0x92, 0xeb, 0xb4, 0xca, 0xf8, 0x56, 0xfa, 0x1c, 0x91, 0x9c, 0x48, 0xec, 0x16, 0x4e,
-	0x1a, 0x1a, 0xd4, 0xaa, 0x53, 0xed, 0xb2, 0xa1, 0x75, 0xbe, 0xef, 0x45, 0x73, 0x3e, 0xd9, 0x5b,
-	0xc4, 0xeb, 0x82, 0xd6, 0xd5, 0xbd, 0x4c, 0x9b, 0xed, 0xc8, 0x18, 0x1c, 0xba, 0xae, 0xc7, 0xfc,
-	0xe0, 0x47, 0x93, 0x48, 0x8f, 0xcb, 0x07, 0xc8, 0xfe, 0xd8, 0xb2, 0x9a, 0x94, 0x45, 0xc6, 0x21,
-	0xf5, 0xc9, 0x96, 0xfa, 0xbd, 0x56, 0x18, 0xad, 0x9d, 0xf2, 0x98, 0xf6, 0x65, 0xb3, 0x94, 0xe0,
-	0x27, 0x8f, 0xab, 0x57, 0x98, 0xdd, 0x85, 0xca, 0xd8, 0x13, 0xa4, 0xbf, 0x7e, 0x64, 0x17, 0x7c,
-	0xac, 0xf6, 0x7f, 0xfc, 0xe2, 0x72, 0xf7, 0x31, 0x98, 0x28, 0xf7, 0x9a, 0x23, 0x5f, 0xde, 0xcd,
-	0x77, 0x00, 0x00, 0x00, 0xff, 0xff, 0x8f, 0x07, 0x23, 0xce, 0xa7, 0x01, 0x00, 0x00,
+	// 320 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x74, 0x92, 0xcf, 0x4e, 0xc2, 0x40,
+	0x10, 0xc6, 0x6d, 0x11, 0x88, 0xb3, 0x86, 0xe0, 0x28, 0xa6, 0x72, 0x50, 0x6c, 0x62, 0xc4, 0x4b,
+	0x49, 0x6a, 0x62, 0x8c, 0x57, 0x62, 0x94, 0x83, 0x9a, 0xac, 0x0f, 0x40, 0x56, 0x98, 0x03, 0x51,
+	0xd8, 0xba, 0xdd, 0x9a, 0xf0, 0x34, 0x1e, 0x7c, 0x51, 0xdb, 0xed, 0x5f, 0xb1, 0x9c, 0x3a, 0xfb,
+	0xf5, 0x37, 0xf3, 0x7d, 0xb3, 0x2d, 0xf4, 0x66, 0x72, 0x19, 0x44, 0x9a, 0x46, 0xd9, 0xd3, 0x0b,
+	0x94, 0xd4, 0x12, 0xdb, 0xd9, 0xb1, 0x7f, 0x22, 0x03, 0x52, 0x42, 0x4b, 0x15, 0x8e, 0x8a, 0x2a,
+	0x65, 0xdc, 0x6f, 0x1b, 0xd8, 0xd8, 0x60, 0x42, 0x2f, 0xe4, 0x0a, 0x3b, 0x60, 0x2f, 0xe6, 0x8e,
+	0x35, 0xb0, 0x86, 0x7b, 0x3c, 0xae, 0xf0, 0x18, 0x5a, 0x61, 0xfc, 0x2a, 0x0a, 0x1d, 0xdb, 0x68,
+	0xd9, 0x09, 0x87, 0xd0, 0x55, 0x52, 0xea, 0x69, 0x3e, 0x6f, 0x1a, 0x77, 0x35, 0x0c, 0xd1, 0x49,
+	0xf4, 0x97, 0x4c, 0x9e, 0xcc, 0xf1, 0x11, 0xf6, 0x0b, 0x68, 0x29, 0x02, 0x67, 0x77, 0xd0, 0x18,
+	0x32, 0xff, 0xc2, 0xcb, 0xb3, 0x56, 0xdc, 0xbd, 0xbc, 0xed, 0x49, 0x04, 0xf7, 0x2b, 0xad, 0xd6,
+	0x9c, 0xc9, 0x52, 0xc1, 0x33, 0x60, 0x8a, 0x42, 0x19, 0xa9, 0x19, 0x25, 0x76, 0x4d, 0x63, 0x07,
+	0xb9, 0x34, 0x99, 0xf7, 0x5f, 0xa1, 0xbb, 0x39, 0x01, 0xbb, 0xd0, 0x78, 0xa7, 0x75, 0xb6, 0x51,
+	0x52, 0xe2, 0x15, 0x34, 0xbf, 0xc4, 0x47, 0x44, 0x66, 0x23, 0xe6, 0x1f, 0x7a, 0xe5, 0x9d, 0xe4,
+	0xdd, 0x3c, 0x25, 0xee, 0xec, 0x5b, 0xcb, 0xe5, 0xe0, 0x8c, 0x15, 0x09, 0x4d, 0x95, 0xa0, 0x9c,
+	0x3e, 0x23, 0x0a, 0x35, 0xde, 0x00, 0x9b, 0x95, 0xaa, 0x31, 0x61, 0xfe, 0x51, 0xdd, 0x6a, 0xbc,
+	0x0a, 0xba, 0x97, 0xd0, 0x7b, 0x20, 0x5d, 0x33, 0x70, 0xe3, 0xfa, 0xfd, 0x1f, 0x0b, 0xda, 0x29,
+	0x46, 0xf8, 0x0c, 0x07, 0xff, 0x82, 0xe0, 0x79, 0x69, 0xb6, 0x25, 0x64, 0xbf, 0x36, 0x8f, 0xbb,
+	0x13, 0x7f, 0x98, 0xce, 0xdf, 0x10, 0x78, 0x5a, 0x90, 0xb5, 0xe9, 0xb6, 0x4d, 0x7a, 0x6b, 0x99,
+	0x7f, 0xe9, 0xfa, 0x37, 0x00, 0x00, 0xff, 0xff, 0x65, 0x50, 0x0b, 0x1b, 0x88, 0x02, 0x00, 0x00,
 }

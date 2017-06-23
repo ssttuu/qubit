@@ -1,8 +1,9 @@
 API_LIB_FILES = $(shell find applications/api/lib -type f -name "*.go")
-API_SERVICES_FILES = $(shell find applications/api/services/web -type f -name "*.go")
+API_WEB_FILES = $(shell find applications/api/services/web -type f -name "*.go")
 API_TASKS_FILES = $(shell find applications/api/tasks -type f -name "*.go")
-COMPUTE_SERVICES_FILES = $(shell find applications/compute/services/web -type f -name "*.go")
+COMPUTE_WEB_FILES = $(shell find applications/compute/services/web -type f -name "*.go")
 CORE_FILES = $(shell find core -type f -name "*.go")
+PROTO_FILES = $(shell find protos -type f -name "*.proto")
 
 # First target is default
 build-go: fmt build-api-go build-compute-go
@@ -27,13 +28,13 @@ applications/api/tasks/migrate/bindata.go: $(shell find applications/api/tasks/m
 	cd applications/api/tasks/migrate && go-bindata -pkg migrate -prefix "sql/" sql
 bindata: applications/api/tasks/migrate/bindata.go
 
-applications/api/services/web/run: $(API_SERVICES_FILES) $(API_LIB_FILES) $(CORE_FILES)
+applications/api/services/web/run: $(API_WEB_FILES) $(API_LIB_FILES) $(CORE_FILES)
 	cd applications/api/services/web && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
 applications/api/tasks/run: $(API_TASKS_FILES) $(API_LIB_FILES)
 	cd applications/api/tasks && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
 build-api-go: fmt applications/api/services/web/run applications/api/tasks/run
 
-applications/compute/services/web/run: $(COMPUTE_SERVICES_FILES) $(CORE_FILES)
+applications/compute/services/web/run: $(COMPUTE_WEB_FILES) $(CORE_FILES)
 	cd applications/compute/services/web && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
 build-compute-go: fmt applications/compute/services/web/run
 
@@ -61,7 +62,7 @@ bootstrap-postgres: build-api
 protoman:
 	docker build -t stupschwartz/protoman -f protoman/Dockerfile protoman
 
-all-protos: $(shell find protos -type f -name "*.proto")
+all-protos: $(PROTO_FILES)
 	./scripts/generate-protos.sh
 
 proto-gen/services/%.pb: protos/%.proto

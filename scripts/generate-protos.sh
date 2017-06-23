@@ -19,7 +19,7 @@ for f in $(find protos -type f -name "*.proto"); do
     if [ -z "${proto_type}" ] || [ "${proto_type}" = "service" ]; then
         service_descriptor_path=./proto-gen/services/${proto}.pb
         mkdir -p $(dirname ${service_descriptor_path})
-        protoc_command="${base_protoc_command} \
+        protoc_command="${protoc_command}${base_protoc_command} \
             --include_imports \
             --include_source_info \
             ${proto_path} \
@@ -61,4 +61,4 @@ for f in $(find protos -type f -name "*.proto"); do
     fi
 done
 
-docker run --rm -v `pwd`:/workspace stupschwartz/protoman /bin/bash -c "${protoc_command}"
+docker run --rm -v ${PWD}:/workspace stupschwartz/protoman /bin/bash -c "${protoc_command}"
