@@ -10,11 +10,11 @@ var Kind string = "computation"
 var PubsubTopicID string = "computations"
 
 type Computation struct {
-	Id             string
-	Status         string
-	RootOperatorId string
-	OperatorMap    map[string]operator.Operator
-	ResourceId     string
+	Id             string                       `db:"id"`
+	Status         string                       `db:"status"`
+	RootOperatorId string                       `db:"root_operator_id"`
+	OperatorMap    map[string]operator.Operator `db:"operator_map"`
+	ResourceId     string                       `db:"resource_id"`
 }
 
 type Computations []Computation
@@ -45,6 +45,29 @@ func (o *Computation) ToProto() *pb.Computation {
 		OperatorMap:    opProtoMap,
 		ResourceId:     o.ResourceId,
 	}
+}
+
+func (o *Computation) GetCreateData() map[string]interface{} {
+	return map[string]interface{}{
+		"root_operator_id": o.RootOperatorId,
+		"operator_map":     o.OperatorMap,
+	}
+}
+
+func (o *Computation) GetUpdateData() map[string]interface{} {
+	return map[string]interface{}{
+		"root_operator_id": o.RootOperatorId,
+		"operator_map":     o.OperatorMap,
+	}
+}
+
+func (o *Computation) ValidateCreate() error {
+	return nil
+}
+
+func (o *Computation) ValidateUpdate(newObj interface{}) error {
+	//org := newObj.(*Computation)
+	return nil
 }
 
 func (o *Computations) ToProto() []*pb.Computation {
