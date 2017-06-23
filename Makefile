@@ -3,6 +3,7 @@ API_SERVICES_FILES = $(shell find applications/api/services/web -type f -name "*
 API_TASKS_FILES = $(shell find applications/api/tasks -type f -name "*.go")
 COMPUTE_SERVICES_FILES = $(shell find applications/compute/services/web -type f -name "*.go")
 CORE_FILES = $(shell find core -type f -name "*.go")
+PROTO_FILES = $(shell find protos -type f -name "*.proto")
 
 # First target is default
 build-go: fmt build-api-go build-compute-go
@@ -61,7 +62,7 @@ bootstrap-postgres: build-api
 protoman:
 	docker build -t stupschwartz/protoman -f protoman/Dockerfile protoman
 
-all-protos: $(shell find protos -type f -name "*.proto")
+all-protos: $(PROTO_FILES)
 	./scripts/generate-protos.sh
 
 proto-gen/services/%.pb: protos/%.proto

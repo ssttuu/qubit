@@ -2,21 +2,23 @@ syntax = "proto3";
 
 package compute;
 
-import "geometry/geometry.proto";
-import "images/images.proto";
 import "operators/operators.proto";
 
 service Compute {
-    rpc RenderImage (RenderImageRequest) returns (RenderImageResponse) {}
-//    rpc RenderImageStream (RenderImageRequest) returns (stream RenderImageResponse) {}
+    rpc CreateComputation (CreateComputationRequest) returns (ComputationStatusResponse) {}
+    rpc GetComputationStatus (ComputationStatusRequest) returns (ComputationStatusResponse) {}
 }
 
-message RenderImageRequest {
-    operators.Operator operator = 1;
-    geometry.BoundingBox2D bounding_box = 2;
-    double time = 3;
+message CreateComputationRequest {
+    string root_operator_id = 1;
+    map<string, operators.Operator> operator_map = 2;
 }
 
-message RenderImageResponse {
-    images.Plane image_plane = 1;
+message ComputationStatusRequest {
+    string computation_id = 1;
+}
+
+message ComputationStatusResponse {
+    string computation_id = 1;
+    string status = 2;
 }
