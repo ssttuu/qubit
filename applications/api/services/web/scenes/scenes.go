@@ -11,8 +11,6 @@ import (
 	scenes_pb "github.com/stupschwartz/qubit/proto-gen/go/scenes"
 )
 
-var scenesTable = "scenes"
-
 type Server struct {
 	PostgresClient *sqlx.DB
 }
@@ -26,7 +24,7 @@ func (s *Server) Create(ctx context.Context, in *scenes_pb.CreateSceneRequest) (
 	err := apiutils.Create(&apiutils.CreateConfig{
 		DB:     s.PostgresClient,
 		Object: &newObject,
-		Table:  scenesTable,
+		Table:  scene.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -38,7 +36,7 @@ func (s *Server) Delete(ctx context.Context, in *scenes_pb.DeleteSceneRequest) (
 	err := apiutils.Delete(&apiutils.DeleteConfig{
 		DB:    s.PostgresClient,
 		Id:    in.GetId(),
-		Table: scenesTable,
+		Table: scene.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -52,7 +50,7 @@ func (s *Server) Get(ctx context.Context, in *scenes_pb.GetSceneRequest) (*scene
 		DB:    s.PostgresClient,
 		Id:    in.GetId(),
 		Out:   &obj,
-		Table: scenesTable,
+		Table: scene.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -65,7 +63,7 @@ func (s *Server) List(ctx context.Context, in *scenes_pb.ListScenesRequest) (*sc
 	err := apiutils.List(&apiutils.ListConfig{
 		DB:    s.PostgresClient,
 		Out:   &objectList,
-		Table: scenesTable,
+		Table: scene.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -80,7 +78,7 @@ func (s *Server) Update(ctx context.Context, in *scenes_pb.UpdateSceneRequest) (
 		Id:        in.GetId(),
 		NewObject: &newObject,
 		OldObject: &scene.Scene{},
-		Table:     scenesTable,
+		Table:     scene.TableName,
 	})
 	if err != nil {
 		return nil, err

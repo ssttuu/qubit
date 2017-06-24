@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package computations;
+
+import "operators/operators.proto";
+
+service Computations {
+    rpc CreateComputation (CreateComputationRequest) returns (ComputationStatus) {}
+    rpc GetComputationStatus (GetComputationStatusRequest) returns (ComputationStatus) {}
+}
+
+message Computation {
+    string id = 1;
+    string root_operator_id = 2;
+    map<string, operators.Operator> operator_map = 3;
+    string resource_id = 4; // Location in GCS
+}
+
+message ComputationStatus {
+    string id = 1;
+    string computation_id = 2;
+    // TODO: Enum type?
+    string status = 3;
+    int64 created_at = 4;
+}
+
+message CreateComputationRequest {
+    Computation computation = 1;
+}
+
+message GetComputationStatusRequest {
+    string computation_id = 1;
+}

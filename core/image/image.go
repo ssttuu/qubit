@@ -4,6 +4,8 @@ import (
 	pb "github.com/stupschwartz/qubit/proto-gen/go/images"
 )
 
+const TableName = "images"
+
 type Image struct {
 	Id              string            `json:"id" db:"id"`
 	ImageSequenceId string            `json:"image_sequence_id" db:"image_sequence_id"`

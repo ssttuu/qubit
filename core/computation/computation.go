@@ -2,16 +2,17 @@ package computation
 
 import (
 	"github.com/stupschwartz/qubit/core/operator"
-	pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
+	pb "github.com/stupschwartz/qubit/proto-gen/go/computations"
 	operators_pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
 )
 
-var PubsubTopicID string = "computations"
-var TableName = "computations"
+const (
+	PubsubTopicID = "computations"
+	TableName     = "computations"
+)
 
 type Computation struct {
 	Id             string                       `db:"id"`
-	Status         string                       `db:"status"`
 	RootOperatorId string                       `db:"root_operator_id"`
 	OperatorMap    map[string]operator.Operator `db:"operator_map"`
 	ResourceId     string                       `db:"resource_id"`
@@ -19,61 +20,59 @@ type Computation struct {
 
 type Computations []Computation
 
-func NewFromProto(pbcomputation *pb.Computation) Computation {
+func NewFromProto(pbComputation *pb.Computation) Computation {
 	operatorMap := map[string]operator.Operator{}
-	for key, op := range pbcomputation.GetOperatorMap() {
+	for key, op := range pbComputation.GetOperatorMap() {
 		operatorMap[key] = operator.NewFromProto(op)
 	}
 	return Computation{
-		Id:             pbcomputation.GetId(),
-		Status:         pbcomputation.GetStatus(),
-		RootOperatorId: pbcomputation.GetRootOperatorId(),
+		Id:             pbComputation.GetId(),
+		RootOperatorId: pbComputation.GetRootOperatorId(),
 		OperatorMap:    operatorMap,
-		ResourceId:     pbcomputation.GetResourceId(),
+		ResourceId:     pbComputation.GetResourceId(),
 	}
 }
 
-func (o *Computation) ToProto() *pb.Computation {
+func (c *Computation) ToProto() *pb.Computation {
 	opProtoMap := map[string]*operators_pb.Operator{}
-	for key, op := range o.OperatorMap {
+	for key, op := range c.OperatorMap {
 		opProtoMap[key] = op.ToProto()
 	}
 	return &pb.Computation{
-		Id:             o.Id,
-		Status:         o.Status,
-		RootOperatorId: o.RootOperatorId,
+		Id:             c.Id,
+		RootOperatorId: c.RootOperatorId,
 		OperatorMap:    opProtoMap,
-		ResourceId:     o.ResourceId,
+		ResourceId:     c.ResourceId,
 	}
 }
 
-func (o *Computation) GetCreateData() map[string]interface{} {
+func (c *Computation) GetCreateData() map[string]interface{} {
 	return map[string]interface{}{
-		"root_operator_id": o.RootOperatorId,
-		"operator_map":     o.OperatorMap,
+		"root_operator_id": c.RootOperatorId,
+		"operator_map":     c.OperatorMap,
 	}
 }
 
-func (o *Computation) GetUpdateData() map[string]interface{} {
+func (c *Computation) GetUpdateData() map[string]interface{} {
 	return map[string]interface{}{
-		"root_operator_id": o.RootOperatorId,
-		"operator_map":     o.OperatorMap,
+		"root_operator_id": c.RootOperatorId,
+		"operator_map":     c.OperatorMap,
 	}
 }
 
-func (o *Computation) ValidateCreate() error {
+func (c *Computation) ValidateCreate() error {
 	return nil
 }
 
-func (o *Computation) ValidateUpdate(newObj interface{}) error {
+func (c *Computation) ValidateUpdate(newObj interface{}) error {
 	//org := newObj.(*Computation)
 	return nil
 }
 
-func (o *Computations) ToProto() []*pb.Computation {
-	var pbcomputations []*pb.Computation
-	for _, computation := range *o {
-		pbcomputations = append(pbcomputations, computation.ToProto())
+func (c *Computations) ToProto() []*pb.Computation {
+	var pbComputations []*pb.Computation
+	for _, computation := range *c {
+		pbComputations = append(pbComputations, computation.ToProto())
 	}
-	return pbcomputations
+	return pbComputations
 }

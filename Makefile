@@ -76,6 +76,10 @@ protoman:
 	docker build -t stupschwartz/protoman -f protoman/Dockerfile protoman
 
 all-protos: $(PROTO_FILES)
+	rm -rf proto-gen || :
+	mkdir -p proto-gen/services
+	mkdir -p proto-gen/go
+	mkdir -p proto-gen/js
 	./scripts/generate-protos.sh
 
 proto-gen/services/%.pb: protos/%.proto

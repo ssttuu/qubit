@@ -11,8 +11,6 @@ import (
 	images_pb "github.com/stupschwartz/qubit/proto-gen/go/images"
 )
 
-var imagesTable = "images"
-
 type Server struct {
 	PostgresClient *sqlx.DB
 }
@@ -26,7 +24,7 @@ func (s *Server) Create(ctx context.Context, in *images_pb.CreateImageRequest) (
 	err := apiutils.Create(&apiutils.CreateConfig{
 		DB:     s.PostgresClient,
 		Object: &newObject,
-		Table:  imagesTable,
+		Table:  image.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -38,7 +36,7 @@ func (s *Server) Delete(ctx context.Context, in *images_pb.DeleteImageRequest) (
 	err := apiutils.Delete(&apiutils.DeleteConfig{
 		DB:    s.PostgresClient,
 		Id:    in.GetId(),
-		Table: imagesTable,
+		Table: image.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -52,7 +50,7 @@ func (s *Server) Get(ctx context.Context, in *images_pb.GetImageRequest) (*image
 		DB:    s.PostgresClient,
 		Id:    in.GetId(),
 		Out:   &obj,
-		Table: imagesTable,
+		Table: image.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -65,7 +63,7 @@ func (s *Server) List(ctx context.Context, in *images_pb.ListImagesRequest) (*im
 	err := apiutils.List(&apiutils.ListConfig{
 		DB:    s.PostgresClient,
 		Out:   &objectList,
-		Table: imagesTable,
+		Table: image.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -80,7 +78,7 @@ func (s *Server) Update(ctx context.Context, in *images_pb.UpdateImageRequest) (
 		Id:        in.GetId(),
 		NewObject: &newObject,
 		OldObject: &image.Image{},
-		Table:     imagesTable,
+		Table:     image.TableName,
 	})
 	if err != nil {
 		return nil, err

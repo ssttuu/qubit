@@ -10,23 +10,21 @@ import (
 	"github.com/stupschwartz/qubit/applications/lib/apiutils"
 	"github.com/stupschwartz/qubit/core/operator"
 	_ "github.com/stupschwartz/qubit/core/operators"
-	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
+	computations_pb "github.com/stupschwartz/qubit/proto-gen/go/computations"
 	operators_pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
 )
 
-var operatorsTable = "operators"
-
 type Server struct {
-	PostgresClient *sqlx.DB
-	StorageClient  *storage.Client
-	ComputeClient  compute_pb.ComputeClient
+	PostgresClient     *sqlx.DB
+	StorageClient      *storage.Client
+	ComputationsClient computations_pb.ComputationsClient
 }
 
-func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, storageClient *storage.Client, computeClient compute_pb.ComputeClient) {
+func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, storageClient *storage.Client, computationsClient computations_pb.ComputationsClient) {
 	operators_pb.RegisterOperatorsServer(grpcServer, &Server{
-		ComputeClient:  computeClient,
-		PostgresClient: postgresClient,
-		StorageClient:  storageClient,
+		ComputationsClient: computationsClient,
+		PostgresClient:     postgresClient,
+		StorageClient:      storageClient,
 	})
 }
 
@@ -35,7 +33,7 @@ func (s *Server) Create(ctx context.Context, in *operators_pb.CreateOperatorRequ
 	err := apiutils.Create(&apiutils.CreateConfig{
 		DB:     s.PostgresClient,
 		Object: &newObject,
-		Table:  operatorsTable,
+		Table:  operator.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -47,7 +45,7 @@ func (s *Server) Delete(ctx context.Context, in *operators_pb.DeleteOperatorRequ
 	err := apiutils.Delete(&apiutils.DeleteConfig{
 		DB:    s.PostgresClient,
 		Id:    in.GetId(),
-		Table: operatorsTable,
+		Table: operator.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -61,7 +59,7 @@ func (s *Server) Get(ctx context.Context, in *operators_pb.GetOperatorRequest) (
 		DB:    s.PostgresClient,
 		Id:    in.GetId(),
 		Out:   &obj,
-		Table: operatorsTable,
+		Table: operator.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -76,7 +74,7 @@ func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest
 		Columns: []string{"id", "scene_id", "context", "type", "name"},
 		DB:      s.PostgresClient,
 		Out:     &objectList,
-		Table:   operatorsTable,
+		Table:   operator.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -159,7 +157,7 @@ func (s *Server) Update(ctx context.Context, in *operators_pb.UpdateOperatorRequ
 		Id:        in.GetId(),
 		NewObject: &newObject,
 		OldObject: &operator.Operator{},
-		Table:     operatorsTable,
+		Table:     operator.TableName,
 	})
 	if err != nil {
 		return nil, err

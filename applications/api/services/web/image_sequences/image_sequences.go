@@ -11,8 +11,6 @@ import (
 	image_sequences_pb "github.com/stupschwartz/qubit/proto-gen/go/image_sequences"
 )
 
-var image_sequencesTable = "image_sequences"
-
 type Server struct {
 	PostgresClient *sqlx.DB
 }
@@ -26,7 +24,7 @@ func (s *Server) Create(ctx context.Context, in *image_sequences_pb.CreateImageS
 	err := apiutils.Create(&apiutils.CreateConfig{
 		DB:     s.PostgresClient,
 		Object: &newObject,
-		Table:  image_sequencesTable,
+		Table:  image_sequence.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -38,7 +36,7 @@ func (s *Server) Delete(ctx context.Context, in *image_sequences_pb.DeleteImageS
 	err := apiutils.Delete(&apiutils.DeleteConfig{
 		DB:    s.PostgresClient,
 		Id:    in.GetId(),
-		Table: image_sequencesTable,
+		Table: image_sequence.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -52,7 +50,7 @@ func (s *Server) Get(ctx context.Context, in *image_sequences_pb.GetImageSequenc
 		DB:    s.PostgresClient,
 		Id:    in.GetId(),
 		Out:   &obj,
-		Table: image_sequencesTable,
+		Table: image_sequence.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -65,7 +63,7 @@ func (s *Server) List(ctx context.Context, in *image_sequences_pb.ListImageSeque
 	err := apiutils.List(&apiutils.ListConfig{
 		DB:    s.PostgresClient,
 		Out:   &objectList,
-		Table: image_sequencesTable,
+		Table: image_sequence.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -80,7 +78,7 @@ func (s *Server) Update(ctx context.Context, in *image_sequences_pb.UpdateImageS
 		Id:        in.GetId(),
 		NewObject: &newObject,
 		OldObject: &image_sequence.ImageSequence{},
-		Table:     image_sequencesTable,
+		Table:     image_sequence.TableName,
 	})
 	if err != nil {
 		return nil, err

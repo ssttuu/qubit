@@ -20,7 +20,7 @@ import (
 	"github.com/stupschwartz/qubit/applications/api/services/web/organizations"
 	"github.com/stupschwartz/qubit/applications/api/services/web/projects"
 	"github.com/stupschwartz/qubit/applications/api/services/web/scenes"
-	"github.com/stupschwartz/qubit/proto-gen/go/compute"
+	"github.com/stupschwartz/qubit/proto-gen/go/computations"
 )
 
 func runServer(server *grpc.Server, listener net.Listener, done chan bool) {
@@ -70,7 +70,7 @@ func main() {
 	servingDone := make(chan bool)
 	grpcServer := grpc.NewServer()
 	go runServer(grpcServer, lis, servingDone)
-	computeClient := compute.NewComputeClient(computeConn)
+	computationsClient := computations.NewComputationsClient(computeConn)
 	postgresURL := os.Getenv("POSTGRES_URL")
 	if postgresURL == "" {
 		log.Fatal(`You need to set the environment variable "POSTGRES_URL"`)
@@ -86,7 +86,7 @@ func main() {
 	organizations.Register(grpcServer, postgresClient)
 	projects.Register(grpcServer, postgresClient)
 	scenes.Register(grpcServer, postgresClient)
-	operators.Register(grpcServer, postgresClient, storageClient, computeClient)
+	operators.Register(grpcServer, postgresClient, storageClient, computationsClient)
 	images.Register(grpcServer, postgresClient)
 	image_sequences.Register(grpcServer, postgresClient)
 	<-servingDone

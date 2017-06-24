@@ -4,6 +4,8 @@ import (
 	pb "github.com/stupschwartz/qubit/proto-gen/go/organizations"
 )
 
+const TableName = "organizations"
+
 type Organization struct {
 	Id   string `json:"id" db:"id"`
 	Name string `json:"name" db:"name"`
