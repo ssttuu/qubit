@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	PubsubTopicID = "computations"
+	PubSubTopicID = "computations"
 	TableName     = "computations"
 )
 
