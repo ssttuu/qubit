@@ -45,7 +45,7 @@ func main() {
 		time.Sleep(100 * time.Millisecond)
 		pubSubClient, err = pubsub.NewClient(ctx, projID, serviceCredentials)
 	}
-	topic, _ := pubSubClient.CreateTopic(ctx, computation.PubsubTopicID)
+	topic, _ := pubSubClient.CreateTopic(ctx, computation.PubSubTopicID)
 	subscriptionID := "coordinator"
 	// Default of 10 second ack deadline
 	subscription, _ := pubSubClient.CreateSubscription(ctx, subscriptionID, pubsub.SubscriptionConfig{

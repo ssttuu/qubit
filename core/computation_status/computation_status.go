@@ -1,6 +1,8 @@
 package computation_status
 
 import (
+	"time"
+
 	pb "github.com/stupschwartz/qubit/proto-gen/go/computations"
 )
 
@@ -15,11 +17,10 @@ const (
 )
 
 type ComputationStatus struct {
-	Id            string `db:"id"`
-	Status        string `db:"status"`
-	ComputationId string `db:"computation_id"`
-	// TODO: This should be a timestamp
-	CreatedAt int64 `db:"created_at"`
+	Id            string    `db:"id"`
+	Status        string    `db:"status"`
+	ComputationId string    `db:"computation_id"`
+	CreatedAt     time.Time `db:"created_at"`
 }
 
 type ComputationStatuses []ComputationStatus
@@ -29,7 +30,7 @@ func NewFromProto(pbComputationStatus *pb.ComputationStatus) ComputationStatus {
 		Id:            pbComputationStatus.GetId(),
 		ComputationId: pbComputationStatus.GetComputationId(),
 		Status:        pbComputationStatus.GetStatus(),
-		CreatedAt:     pbComputationStatus.GetCreatedAt(),
+		CreatedAt:     time.Unix(pbComputationStatus.GetCreatedAt(), 0),
 	}
 }
 
@@ -38,7 +39,7 @@ func (cs *ComputationStatus) ToProto() *pb.ComputationStatus {
 		Id:            cs.Id,
 		ComputationId: cs.ComputationId,
 		Status:        cs.Status,
-		CreatedAt:     cs.CreatedAt,
+		CreatedAt:     cs.CreatedAt.Unix(),
 	}
 }
 

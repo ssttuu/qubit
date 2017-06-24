@@ -5,8 +5,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/stupschwartz/qubit/applications/lib/pgutils"
 )
@@ -43,11 +43,14 @@ type GetConfig struct {
 }
 
 type ListConfig struct {
-	Columns []string
-	DB      *sqlx.DB
-	Out     interface{}
-	Table   string
-	Tx      *sqlx.Tx
+	Columns     []string
+	DB          *sqlx.DB
+	Limit       int
+	Offset      int
+	Out         interface{}
+	Table       string
+	Tx          *sqlx.Tx
+	WhereClause string
 }
 
 type UpdateConfig struct {
@@ -108,7 +111,7 @@ func Get(getConfig *GetConfig) error {
 	})
 	if err != nil {
 		log.Println(err)
-		return grpc.Errorf(codes.NotFound, "Not found")
+		return status.Errorf(codes.NotFound, "Not found")
 	}
 	return nil
 }
@@ -116,11 +119,14 @@ func Get(getConfig *GetConfig) error {
 func List(listConfig *ListConfig) error {
 	// TODO: Permissions
 	return pgutils.Select(&pgutils.SelectConfig{
-		Columns: listConfig.Columns,
-		DB:      listConfig.DB,
-		Out:     listConfig.Out,
-		Table:   listConfig.Table,
-		Tx:      listConfig.Tx,
+		Columns:     listConfig.Columns,
+		DB:          listConfig.DB,
+		Limit:       listConfig.Limit,
+		Offset:      listConfig.Offset,
+		Out:         listConfig.Out,
+		Table:       listConfig.Table,
+		Tx:          listConfig.Tx,
+		WhereClause: listConfig.WhereClause,
 	})
 }
 
@@ -137,47 +143,47 @@ func Update(updateConfig *UpdateConfig) error {
 		}
 		closeTx = true
 	}
-	err = pgutils.SelectByID(&pgutils.SelectConfig{
-		ForClause: "FOR UPDATE",
-		Id:        updateConfig.Id,
-		Out:       updateConfig.OldObject,
-		Table:     updateConfig.Table,
-		Tx:        tx,
-	})
+	err = func() error {
+		err = pgutils.SelectByID(&pgutils.SelectConfig{
+			ForClause: "UPDATE",
+			Id:        updateConfig.Id,
+			Out:       updateConfig.OldObject,
+			Table:     updateConfig.Table,
+			Tx:        tx,
+		})
+		if err != nil {
+			log.Println(err)
+			return status.Errorf(codes.NotFound, "Not found")
+		}
+		err = updateConfig.OldObject.ValidateUpdate(updateConfig.NewObject)
+		if err != nil {
+			log.Println(err)
+			return status.Errorf(codes.InvalidArgument, "Invalid argument")
+		}
+		err = pgutils.UpdateByID(&pgutils.UpdateConfig{
+			Id:      updateConfig.Id,
+			Table:   updateConfig.Table,
+			Tx:      tx,
+			Updates: updateConfig.NewObject.GetUpdateData(),
+		})
+		if err != nil {
+			log.Println(err)
+			return status.Errorf(codes.Internal, "Internal error")
+		}
+		return nil
+	}()
 	if err != nil {
 		if closeTx {
 			tx.Rollback()
 		}
-		log.Println(err)
-		return grpc.Errorf(codes.NotFound, "Not found")
-	}
-	err = updateConfig.OldObject.ValidateUpdate(updateConfig.NewObject)
-	if err != nil {
-		if closeTx {
-			tx.Rollback()
-		}
-		log.Println(err)
-		return grpc.Errorf(codes.InvalidArgument, "Invalid argument")
-	}
-	err = pgutils.UpdateByID(&pgutils.UpdateConfig{
-		Id:      updateConfig.Id,
-		Table:   updateConfig.Table,
-		Tx:      tx,
-		Updates: updateConfig.NewObject.GetUpdateData(),
-	})
-	if err != nil {
-		if closeTx {
-			tx.Rollback()
-		}
-		log.Println(err)
-		return grpc.Errorf(codes.Internal, "Internal error")
+		return err
 	}
 	if closeTx {
 		err = tx.Commit()
-	}
-	if err != nil {
-		log.Println(err)
-		return grpc.Errorf(codes.Internal, "Internal error")
+		if err != nil {
+			log.Println(err)
+			return status.Errorf(codes.Internal, "Internal error")
+		}
 	}
 	return nil
 }

@@ -31,13 +31,17 @@ type InsertConfig struct {
 
 // SelectConfig is a configuration for selecting rows
 type SelectConfig struct {
-	Columns   []string
-	DB        *sqlx.DB
-	ForClause string
-	Id        string
-	Out       interface{}
-	Table     string
-	Tx        *sqlx.Tx
+	Args        []interface{}
+	Columns     []string
+	DB          *sqlx.DB
+	ForClause   string
+	Id          string
+	Limit       int
+	Offset      int
+	Out         interface{}
+	Table       string
+	Tx          *sqlx.Tx
+	WhereClause string
 }
 
 // UpdateConfig is a configuration for updating rows
@@ -136,12 +140,41 @@ func InsertOne(insertConfig *InsertConfig) error {
 // Select selects records from a table
 func Select(selectConfig *SelectConfig) error {
 	columnString := getColumnString(selectConfig.Columns)
-	query := fmt.Sprintf("SELECT %v FROM %v %v", columnString, selectConfig.Table, selectConfig.ForClause)
+	var whereClause string
+	if selectConfig.WhereClause != "" {
+		whereClause = fmt.Sprintf("WHERE %v", selectConfig.WhereClause)
+	}
+	var limitClause string
+	if selectConfig.Limit != 0 {
+		limitClause = fmt.Sprintf("LIMIT %v", selectConfig.Limit)
+	}
+	var offsetClause string
+	if selectConfig.Offset != 0 {
+		offsetClause = fmt.Sprintf("OFFSET %v", selectConfig.Offset)
+	}
+	var forClause string
+	if selectConfig.ForClause != "" {
+		forClause = fmt.Sprintf("FOR %v", selectConfig.ForClause)
+	}
+	query := fmt.Sprintf(
+		`SELECT %v
+		FROM %v
+		%v
+		%v
+		%v
+		%v`,
+		columnString,
+		selectConfig.Table,
+		whereClause,
+		limitClause,
+		offsetClause,
+		forClause,
+	)
 	var err error
 	if selectConfig.Tx == nil {
-		err = selectConfig.DB.Select(selectConfig.Out, query)
+		err = selectConfig.DB.Select(selectConfig.Out, query, selectConfig.Args)
 	} else {
-		err = selectConfig.Tx.Select(selectConfig.Out, query)
+		err = selectConfig.Tx.Select(selectConfig.Out, query, selectConfig.Args)
 	}
 	if err != nil {
 		return errors.Wrapf(err, "Could not select from table %v", selectConfig.Table)
@@ -156,7 +189,11 @@ func SelectByID(selectConfig *SelectConfig) error {
 	if err != nil {
 		return errors.Wrapf(err, "Could not convert %v to integer", selectConfig.Id)
 	}
-	query := fmt.Sprintf("SELECT %v FROM %v WHERE id=$1 %v", columnString, selectConfig.Table, selectConfig.ForClause)
+	forClause := ""
+	if selectConfig.ForClause != "" {
+		forClause = fmt.Sprintf("FOR %v", selectConfig.ForClause)
+	}
+	query := fmt.Sprintf("SELECT %v FROM %v WHERE id=$1 %v", columnString, selectConfig.Table, forClause)
 	if selectConfig.Tx == nil {
 		err = selectConfig.DB.Get(selectConfig.Out, query, objId)
 	} else {
