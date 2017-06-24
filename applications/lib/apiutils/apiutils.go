@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 
-	"github.com/stupschwartz/qubit/applications/api/lib/pgutils"
+	"github.com/stupschwartz/qubit/applications/lib/pgutils"
 )
 
 // APIModel is an interface for objects passed to apiutils functions
