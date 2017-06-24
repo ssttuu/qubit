@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -9,12 +8,19 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/bmizerany/pq"
+	"github.com/golang/protobuf/proto"
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
+	"google.golang.org/grpc/status"
 
 	"github.com/stupschwartz/qubit/core/computation"
+	"github.com/stupschwartz/qubit/core/computation_status"
+	computations_pb "github.com/stupschwartz/qubit/proto-gen/go/computations"
 )
+
+const pubSubCoordinatorSubscriptionID = "coordinator"
 
 func main() {
 	port := os.Getenv("PORT")
@@ -45,30 +51,52 @@ func main() {
 		time.Sleep(100 * time.Millisecond)
 		pubSubClient, err = pubsub.NewClient(ctx, projID, serviceCredentials)
 	}
-	topic, _ := pubSubClient.CreateTopic(ctx, computation.PubSubTopicID)
-	subscriptionID := "coordinator"
+	topic, err := pubSubClient.CreateTopic(ctx, computation.PubSubTopicID)
+	if err != nil {
+		// 409 ALREADY_EXISTS is an inevitable and harmless error
+		// https://cloud.google.com/pubsub/docs/reference/error-codes
+		if statusErr, ok := status.FromError(err); !ok || statusErr.Code() != 409 {
+			return nil, errors.Wrapf(err, "Failed to get-or-create topic %v", computation.PubSubTopicID)
+		}
+	}
 	// Default of 10 second ack deadline
-	subscription, _ := pubSubClient.CreateSubscription(ctx, subscriptionID, pubsub.SubscriptionConfig{
+	subscription, err := pubSubClient.CreateSubscription(ctx, pubSubCoordinatorSubscriptionID, pubsub.SubscriptionConfig{
 		Topic: topic,
 	})
+	if err != nil {
+		// 409 ALREADY_EXISTS is an inevitable and harmless error
+		// https://cloud.google.com/pubsub/docs/reference/error-codes
+		if statusErr, ok := status.FromError(err); !ok || statusErr.Code() != 409 {
+			return nil, errors.Wrapf(err, "Failed to get-or-create subscription %v", pubSubCoordinatorSubscriptionID)
+		}
+	}
 	err = subscription.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		var messageData map[string]string
-		// TODO: Use gRPC for serialization of messages instead of JSON
-		if err := json.Unmarshal(msg.Data, &messageData); err != nil {
-			log.Printf("could not decode message data: %#v", msg)
+		var msgPBCompStatus computations_pb.ComputationStatus
+		err := proto.Unmarshal(msg.Data, &msgPBCompStatus)
+		if err != nil {
+			log.Println(err)
 			msg.Ack()
 			return
 		}
-		log.Println("ACK:", messageData)
-		var comp computation.Computation
-		err = postgresClient.Get(&comp, fmt.Sprintf("SELECT * FROM %v WHERE id=$1", computation.TableName), messageData["computation_id"])
+		msgCompStatus := computation_status.NewFromProto(msgPBCompStatus)
+		// TODO: Where to ack?
+		log.Println("ACK:", msgCompStatus)
+		msg.Ack()
+		// TODO: Use transaction
+		var compStatus computation_status.ComputationStatus
+		err = postgresClient.Get(&compStatus, fmt.Sprintf("SELECT * FROM %v WHERE id=$1", computation_status.TableName), msgCompStatus.Id)
 		if err != nil {
-			log.Printf("could not get computation with ID: %v", messageData["computation_id"])
-			msg.Ack()
+			log.Printf("could not get computation status with ID: %v", msgCompStatus.Id)
+			return
+		}
+		var comp computation.Computation
+		err = postgresClient.Get(&comp, fmt.Sprintf("SELECT * FROM %v WHERE id=$1", computation.TableName), compStatus.ComputationId)
+		if err != nil {
+			log.Printf("could not get computation with ID: %v", compStatus.ComputationId)
 			return
 		}
 		log.Println("COMPUTATION:", comp)
-		msg.Ack()
+		// TODO: Business logic
 	})
 	if err != nil {
 		log.Fatal(err)

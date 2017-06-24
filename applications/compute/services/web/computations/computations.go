@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/pubsub"
+	"github.com/golang/protobuf/proto"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
@@ -32,18 +33,21 @@ func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, pubSubClient *pu
 }
 
 func (s *Server) CreateComputation(ctx context.Context, in *computations_pb.CreateComputationRequest) (*computations_pb.ComputationStatus, error) {
+	newComp := computation.NewFromProto(in.Computation)
+	// TODO: Validation
 	topic, err := s.PubSubClient.CreateTopic(ctx, computation.PubSubTopicID)
 	if err != nil {
 		// 409 ALREADY_EXISTS is an inevitable and harmless error
 		// https://cloud.google.com/pubsub/docs/reference/error-codes
 		if statusErr, ok := status.FromError(err); !ok || statusErr.Code() != 409 {
-			return nil, errors.Wrapf(err, "Failed to create topic %v", computation.PubSubTopicID)
+			log.Println(err)
+			return nil, status.Errorf(codes.Internal, "Internal error")
 		}
 	}
-	newComp := computation.NewFromProto(in.Computation)
 	tx, err := s.PostgresClient.Beginx()
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to begin transaction")
+		log.Println(err)
+		return nil, status.Errorf(codes.Internal, "Internal error")
 	}
 	newCompStatus := computation_status.ComputationStatus{
 		Status:    computation_status.ComputationStatusCreated,
@@ -68,8 +72,12 @@ func (s *Server) CreateComputation(ctx context.Context, in *computations_pb.Crea
 		if err != nil {
 			return err
 		}
-		pcCompStatus := newCompStatus.ToProto()
-		result := topic.Publish(ctx, &pubsub.Message{Data: []byte(pcCompStatus.String())})
+		pbCompStatus := newCompStatus.ToProto()
+		pbCompStatusData, err := proto.Marshal(pbCompStatus)
+		if err != nil {
+			return errors.Wrapf(err, "Failed to marshal computation status %v", pbCompStatus)
+		}
+		result := topic.Publish(ctx, &pubsub.Message{Data: pbCompStatusData})
 		// Wait for server confirmation
 		if _, err := result.Get(ctx); err != nil {
 			// TODO: Retry?
@@ -79,14 +87,16 @@ func (s *Server) CreateComputation(ctx context.Context, in *computations_pb.Crea
 	}()
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		log.Println(err)
+		return nil, status.Errorf(codes.Internal, "Internal error")
 	}
 	// Committing after publishing means that a message may be published referencing
 	// a missing record. However, the client will get a failure properly, so this
 	// is an acceptable failure mode.
 	err = tx.Commit()
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to commit transaction")
+		log.Println(err)
+		return nil, status.Errorf(codes.Internal, "Internal error")
 	}
 	return newCompStatus.ToProto(), nil
 }
