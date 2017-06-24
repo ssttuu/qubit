@@ -6,7 +6,7 @@ volumes:
     external: true
 services:
   api-web:
-    image: us.gcr.io/qubit-161916/api
+    image: us.gcr.io/qubit-161916/api-web
     build: ./applications/api/services/web
     environment:
       - API_SERVICE_ADDRESS=web.api.qubit.site:9000
@@ -36,7 +36,7 @@ services:
           - postgres.api.qubit.site
 
   compute-web:
-    image: us.gcr.io/qubit-161916/compute
+    image: us.gcr.io/qubit-161916/compute-web
     build: ./applications/compute/services/web
     environment:
       - APP_ENV=development
