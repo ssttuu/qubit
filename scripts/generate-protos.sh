@@ -4,6 +4,7 @@ set -euo pipefail
 
 proto_name=${1:-}
 proto_type=${2:-}
+DOCKER=${DOCKER:-true}
 
 base_protoc_command="/usr/bin/protoc -I/protobuf -I/googleapis -I./protos/"
 protoc_command=
@@ -17,6 +18,7 @@ for f in $(find protos -type f -name "*.proto"); do
     proto_path=./protos/${proto}.proto
 
     if [ -z "${proto_type}" ] || [ "${proto_type}" = "service" ]; then
+        mkdir -p ./proto-gen/services
         service_descriptor_path=./proto-gen/services/${proto}.pb
         mkdir -p $(dirname ${service_descriptor_path})
         protoc_command="${protoc_command}${base_protoc_command} \
@@ -29,6 +31,7 @@ for f in $(find protos -type f -name "*.proto"); do
     fi
 
     if [ -z "${proto_type}" ] || [ "${proto_type}" = "go" ]; then
+        mkdir -p ./proto-gen/go
         modules=(
             computations/computations.proto=github.com/stupschwartz/qubit/proto-gen/go/computations
             geometry/geometry.proto=github.com/stupschwartz/qubit/proto-gen/go/geometry
@@ -51,18 +54,21 @@ for f in $(find protos -type f -name "*.proto"); do
     fi
 
     if [ -z "${proto_type}" ] || [ "${proto_type}" = "js" ]; then
+        mkdir -p ./proto-gen/js
         protoc_command="${protoc_command}${base_protoc_command} \
             --js_out=import_style=commonjs,binary:./proto-gen/js/ \
             --plugin=protoc-gen-grpc=/usr/lib/node_modules/grpc-tools/bin/grpc_node_plugin \
             --grpc_out=./proto-gen/js/ \
             ${proto_path}
-        ${base_protoc_command} \
-            --js_out=import_style=commonjs,binary:./tests/integration/protos/ \
-            --plugin=protoc-gen-grpc=/usr/lib/node_modules/grpc-tools/bin/grpc_node_plugin \
-            --grpc_out=./tests/integration/protos/ \
-            ${proto_path}
         "
     fi
 done
 
-docker run --rm -v ${PWD}:/workspace stupschwartz/protoman /bin/bash -c "${protoc_command}"
+if [ "${DOCKER}" = "true" ]; then
+    docker run --rm -v ${PWD}:/workspace us.gcr.io/qubit-161916/protoman /bin/bash -c "${protoc_command}"
+    docker run --rm -v ${PWD}:/workspace us.gcr.io/qubit-161916/protoman /bin/bash -c "chmod 777 -R proto-gen"
+else
+    ${protoc_command}
+    chmod 777 -R proto-gen
+fi
+
