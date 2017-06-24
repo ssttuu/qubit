@@ -1,8 +1,9 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
-	"net"
 	"os"
 	"time"
 
@@ -11,16 +12,9 @@ import (
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
 
-	"github.com/stupschwartz/qubit/applications/compute/services/web/computations"
+	"github.com/stupschwartz/qubit/core/computation"
 )
-
-func serve(server *grpc.Server, listener net.Listener, done chan bool) {
-	server.Serve(listener)
-	done <- true
-}
 
 func main() {
 	port := os.Getenv("PORT")
@@ -51,13 +45,32 @@ func main() {
 		time.Sleep(100 * time.Millisecond)
 		pubSubClient, err = pubsub.NewClient(ctx, projID, serviceCredentials)
 	}
-	lis, err := net.Listen("tcp", ":"+port)
+	topic, _ := pubSubClient.CreateTopic(ctx, computation.PubsubTopicID)
+	subscriptionID := "coordinator"
+	// Default of 10 second ack deadline
+	subscription, _ := pubSubClient.CreateSubscription(ctx, subscriptionID, pubsub.SubscriptionConfig{
+		Topic: topic,
+	})
+	err = subscription.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+		var messageData map[string]string
+		// TODO: Use gRPC for serialization of messages instead of JSON
+		if err := json.Unmarshal(msg.Data, &messageData); err != nil {
+			log.Printf("could not decode message data: %#v", msg)
+			msg.Ack()
+			return
+		}
+		log.Println("ACK:", messageData)
+		var comp computation.Computation
+		err = postgresClient.Get(&comp, fmt.Sprintf("SELECT * FROM %v WHERE id=$1", computation.TableName), messageData["computation_id"])
+		if err != nil {
+			log.Printf("could not get computation with ID: %v", messageData["computation_id"])
+			msg.Ack()
+			return
+		}
+		log.Println("COMPUTATION:", comp)
+		msg.Ack()
+	})
 	if err != nil {
-		grpclog.Fatalf("failed to listen: %v", err)
+		log.Fatal(err)
 	}
-	grpcServer := grpc.NewServer()
-	servingDone := make(chan bool)
-	go serve(grpcServer, lis, servingDone)
-	computations.Register(grpcServer, postgresClient, pubSubClient)
-	<-servingDone
 }

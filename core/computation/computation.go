@@ -6,8 +6,8 @@ import (
 	operators_pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
 )
 
-var Kind string = "computation"
 var PubsubTopicID string = "computations"
+var TableName = "computations"
 
 type Computation struct {
 	Id             string                       `db:"id"`

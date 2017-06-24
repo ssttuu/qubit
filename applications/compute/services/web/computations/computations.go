@@ -1,4 +1,4 @@
-package compute
+package computations
 
 import (
 	"encoding/json"
@@ -13,8 +13,6 @@ import (
 	"github.com/stupschwartz/qubit/core/computation"
 	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
 )
-
-var computationsTable = "computations"
 
 type Server struct {
 	PostgresClient *sqlx.DB
@@ -45,7 +43,7 @@ func (s *Server) CreateComputation(ctx context.Context, in *compute_pb.CreateCom
 	err := apiutils.Create(&apiutils.CreateConfig{
 		DB:     s.PostgresClient,
 		Object: &newObject,
-		Table:  computationsTable,
+		Table:  computation.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -76,7 +74,7 @@ func (s *Server) GetComputation(ctx context.Context, in *compute_pb.GetComputati
 		DB:    s.PostgresClient,
 		Id:    in.GetId(),
 		Out:   &obj,
-		Table: computationsTable,
+		Table: computation.TableName,
 	})
 	if err != nil {
 		return nil, err
