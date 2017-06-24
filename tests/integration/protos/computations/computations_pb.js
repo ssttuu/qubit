@@ -295,7 +295,7 @@ proto.computations.ComputationStatus.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     computationId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    status: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    status: jspb.Message.getFieldWithDefault(msg, 3, 0),
     createdAt: jspb.Message.getFieldWithDefault(msg, 4, 0)
   };
 
@@ -342,7 +342,7 @@ proto.computations.ComputationStatus.deserializeBinaryFromReader = function(msg,
       msg.setComputationId(value);
       break;
     case 3:
-      var value = /** @type {string} */ (reader.readString());
+      var value = /** @type {number} */ (reader.readInt32());
       msg.setStatus(value);
       break;
     case 4:
@@ -402,8 +402,8 @@ proto.computations.ComputationStatus.prototype.serializeBinaryToWriter = functio
     );
   }
   f = this.getStatus();
-  if (f.length > 0) {
-    writer.writeString(
+  if (f !== 0) {
+    writer.writeInt32(
       3,
       f
     );
@@ -449,15 +449,15 @@ proto.computations.ComputationStatus.prototype.setComputationId = function(value
 
 
 /**
- * optional string status = 3;
- * @return {string}
+ * optional int32 status = 3;
+ * @return {number}
  */
 proto.computations.ComputationStatus.prototype.getStatus = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
-/** @param {string} value */
+/** @param {number} value */
 proto.computations.ComputationStatus.prototype.setStatus = function(value) {
   jspb.Message.setField(this, 3, value);
 };

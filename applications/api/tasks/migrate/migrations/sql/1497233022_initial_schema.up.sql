@@ -48,3 +48,10 @@ CREATE TABLE operator_inputs (
     FOREIGN KEY (operator_id) REFERENCES operators(id),
     FOREIGN KEY (input_id) REFERENCES operators(id)
 );
+
+CREATE TABLE parameters (
+    operator_id BIGINT PRIMARY KEY,
+    children JSON NOT NULL,
+    "order" VARCHAR(2048),
+    FOREIGN KEY (operator_id) REFERENCES operators(id)
+);

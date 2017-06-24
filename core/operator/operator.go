@@ -102,11 +102,11 @@ type Operable interface {
 }
 
 var OperatorsRegistry = make(map[string]Operable)
-var ParametersRegistry = make(map[string]parameter.Parameter)
+var ParameterRootRegistry = make(map[string]parameter.ParameterRoot)
 
-func RegisterOperation(opType string, operation Operable, parameters parameter.Parameter) {
+func RegisterOperation(opType string, operation Operable, parameterRoot parameter.ParameterRoot) {
 	OperatorsRegistry[opType] = operation
-	ParametersRegistry[opType] = parameters
+	ParameterRootRegistry[opType] = parameterRoot
 }
 
 func GetOperation(opType string) (Operable, error) {
@@ -116,9 +116,9 @@ func GetOperation(opType string) (Operable, error) {
 	return nil, errors.Errorf("Operation does not exist, %v", opType)
 }
 
-func GetParameterRoot(opType string) (parameter.Parameter, error) {
-	var p parameter.Parameter
-	if p, ok := ParametersRegistry[opType]; ok {
+func GetParameterRoot(opType string) (parameter.ParameterRoot, error) {
+	var p parameter.ParameterRoot
+	if p, ok := ParameterRootRegistry[opType]; ok {
 		return p, nil
 	}
 	return p, errors.Errorf("Parameters do not exist for operation type, %v", opType)

@@ -26,7 +26,7 @@ config_version: 3
 #
 # Name of the service configuration.
 #
-name: compute.endpoints.qubit-161916.cloud.goog
+name: compute-web.endpoints.qubit-161916.cloud.goog
 
 #
 # API title to appear in the user interface (Google Cloud Console).

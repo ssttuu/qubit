@@ -8,13 +8,12 @@ import (
 
 const Name string = "Constant"
 
-var ParameterRoot parameter.Parameter = parameter.NewGroupParameter(
-	"root",
-	parameter.ParameterMap{
+var ParameterRoot parameter.ParameterRoot = parameter.ParameterRoot{
+	Children: parameter.ParameterMap{
 		"color": parameter.NewRGBParameter(),
 	},
-	[]string{"color"},
-)
+	Order: []string{"color"},
+}
 
 type Constant struct{}
 

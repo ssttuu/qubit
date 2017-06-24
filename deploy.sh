@@ -11,7 +11,7 @@ deployService() {
     app=${1}
     svc=${2}
 
-    deploy_cmd="gcloud service-management deploy applications/${app}/services/${svc}/api_config.yaml proto-gen/services/${app}/${app}.pb --format json"
+    deploy_cmd="gcloud service-management deploy applications/${app}/services/${svc}/api_config.yaml proto-gen/services/${app}-${svc}/${app}-${svc}.pb --format json"
     if [ "${TEST}" = "true" ]; then
       deploy_cmd="${deploy_cmd} --validate-only"
     fi

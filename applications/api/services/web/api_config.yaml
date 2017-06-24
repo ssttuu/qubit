@@ -26,7 +26,7 @@ config_version: 3
 #
 # Name of the service configuration.
 #
-name: api.endpoints.qubit-161916.cloud.goog
+name: api-web.endpoints.qubit-161916.cloud.goog
 
 #
 # API title to appear in the user interface (Google Cloud Console).
@@ -36,6 +36,7 @@ apis:
 - name: image_sequences.ImageSequences
 - name: images.Images
 - name: operators.Operators
+- name: parameters.Parameters
 - name: organizations.Organizations
 - name: projects.Projects
 - name: scenes.Scenes

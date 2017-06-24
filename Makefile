@@ -91,9 +91,12 @@ proto-gen/go/%.pb.go: protos/%.proto
 proto-gen/js/%_pb.js proto-gen/js/%_grpc_pb.js: protos/%.proto
 	./scripts/generate-protos.sh $* js
 
+tests/integration/protos/%_pb.js tests/integration/protos/%_grpc_pb.js: protos/%.proto
+	./scripts/generate-protos.sh $* js-test
+
 protonames = $(shell find protos -type f -name "*.proto" | xargs -n1 basename | awk '{split($$0,a,"."); print a[1]}')
 
-protos: $(foreach protoname,$(protonames),$(subst NAME,$(protoname),proto-gen/services/NAME/NAME.pb proto-gen/go/NAME/NAME.pb.go proto-gen/js/NAME/NAME_pb.js))
+protos: $(foreach protoname,$(protonames),$(subst NAME,$(protoname),proto-gen/services/NAME/NAME.pb proto-gen/go/NAME/NAME.pb.go proto-gen/js/NAME/NAME_pb.js tests/integration/protos/NAME/NAME_pb.js))
 
 ################
 # Run containers
