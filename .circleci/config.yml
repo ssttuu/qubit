@@ -2,25 +2,21 @@ version: 2
 jobs:
     build_base:
         docker:
-            - image: docker:17
+            - image: stuschwartz/docker-git:latest
         working_directory: /workspace
         steps:
             - checkout
             - setup_remote_docker
             - run:
-                name: Pull
+                name: Pull - Build - Push
                 command: |
                     docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
-                    docker pull ${DOCKER_USER}/qubit-builder || echo "Getting qubit-builder"
-            - run:
-                name: Build
-                command: |
-                    docker build -t ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1} -t ${DOCKER_USER}/qubit-builder:latest ./builder/
-            - run:
-                name: Push
-                command: |
-                    docker push ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1}
-                    docker push ${DOCKER_USER}/qubit-builder:latest
+                    if [ "$(ash scripts/files-changed.sh ${CIRCLE_BRANCH} builder)" != "0" ]; then
+                        docker pull ${DOCKER_USER}/qubit-builder || echo "Getting qubit-builder"
+                        docker build -t ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1} -t ${DOCKER_USER}/qubit-builder:latest ./builder/
+                        docker push ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1}
+                        docker push ${DOCKER_USER}/qubit-builder:latest
+                    fi
 
     build_api:
         docker:
