@@ -2,86 +2,85 @@ package compute
 
 import (
 	"encoding/json"
-	"strconv"
 
-	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/pubsub"
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"github.com/stupschwartz/qubit/applications/api/lib/apiutils"
 	"github.com/stupschwartz/qubit/core/computation"
 	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
 )
 
+var computationsTable = "computations"
+
 type Server struct {
-	DatastoreClient *datastore.Client
-	PubSubClient    *pubsub.Client
+	PostgresClient *sqlx.DB
+	PubSubClient   *pubsub.Client
 }
 
-func Register(grpcServer *grpc.Server, datastoreClient *datastore.Client, pubSubClient *pubsub.Client) {
+func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, pubSubClient *pubsub.Client) {
 	compute_pb.RegisterComputeServer(grpcServer, &Server{
-		DatastoreClient: datastoreClient,
-		PubSubClient:    pubSubClient,
+		PostgresClient: postgresClient,
+		PubSubClient:   pubSubClient,
 	})
 }
 
 func (s *Server) CreateComputation(ctx context.Context, in *compute_pb.CreateComputationRequest) (*compute_pb.Computation, error) {
-	newComputation := computation.NewFromProto(in.Computation)
-	incompleteKey := datastore.IncompleteKey(computation.Kind, nil)
-	completeKeys, err := s.DatastoreClient.AllocateIDs(ctx, []*datastore.Key{incompleteKey})
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to allocate IDs for new computation %v", newComputation)
-	} else if len(completeKeys) != 1 {
-		return nil, errors.Wrapf(err, "Allocated %v keys instead of one key for new computation %v", len(completeKeys), newComputation)
-	}
-	compKey := completeKeys[0]
-	newComputation.Id = strconv.FormatInt(compKey.ID, 10)
-	// TODO: Enum?
-	newComputation.Status = "created"
-	// TODO: Use gRPC for serialization of messages instead of JSON
-	msg := map[string]string{"computation_id": newComputation.Id}
-	messageData, err := json.Marshal(msg)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to Marshal JSON %v", msg)
-	}
 	// Ignore returned errors, which will be "already exists". If they're fatal
 	// errors, subsequent calls will also fail.
 	topic, _ := s.PubSubClient.CreateTopic(ctx, computation.PubsubTopicID)
+	newObject := computation.NewFromProto(in.Computation)
+	// TODO: Enum?
+	newObject.Status = "created"
 	/*
 		Begin Critical section:
-		    - Create computation in Datastore
+		    - Create computation in Postgres
 		    - Publish computation message in PubSub
 	*/
 	// TODO: Maybe operators should not be stored directly in computation
 	// TODO: to avoid responding with operator data
-	if _, err := s.DatastoreClient.Put(ctx, compKey, &newComputation); err != nil {
-		return nil, errors.Wrapf(err, "Failed to create new computation %v", newComputation)
+	err := apiutils.Create(&apiutils.CreateConfig{
+		DB:     s.PostgresClient,
+		Object: &newObject,
+		Table:  computationsTable,
+	})
+	if err != nil {
+		return nil, err
+	}
+	// TODO: Use gRPC for serialization of messages instead of JSON
+	msg := map[string]string{"computation_id": newObject.Id}
+	messageData, err := json.Marshal(msg)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to Marshal JSON %v", msg)
 	}
 	result := topic.Publish(ctx, &pubsub.Message{Data: messageData})
 	// Wait for server confirmation
-	// TODO: Retry?
 	if _, err := result.Get(ctx); err != nil {
-		return nil, errors.Wrapf(err, "Failed to publish message for new computation %v", newComputation)
+		// TODO: Retry?
+		return nil, errors.Wrapf(err, "Failed to publish message for new computation %v", newObject)
 	}
-	// TODO: Update Datastore with indication that message was published? If so, use transaction for both operations
+	// TODO: Update Postgres with indication that message was published? If so, use transaction for both operations
 	/*
 		End Critical section
 	*/
 	// TODO: Don't return operators
-	return newComputation.ToProto(), nil
+	return newObject.ToProto(), nil
 }
 
 func (s *Server) GetComputation(ctx context.Context, in *compute_pb.GetComputationRequest) (*compute_pb.Computation, error) {
-	objId, err := strconv.ParseInt(in.GetId(), 10, 64)
+	var obj computation.Computation
+	err := apiutils.Get(&apiutils.GetConfig{
+		DB:    s.PostgresClient,
+		Id:    in.GetId(),
+		Out:   &obj,
+		Table: computationsTable,
+	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not convert %v to integer", in.GetId())
-	}
-	compKey := datastore.IDKey(computation.Kind, objId, nil)
-	var comp computation.Computation
-	if err := s.DatastoreClient.Get(ctx, compKey, &comp); err != nil {
-		return nil, errors.Wrapf(err, "Failed to get computation ID %v", objId)
+		return nil, err
 	}
 	// TODO: Don't return operators
-	return comp.ToProto(), nil
+	return obj.ToProto(), nil
 }
