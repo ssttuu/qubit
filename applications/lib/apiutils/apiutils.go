@@ -23,12 +23,14 @@ type CreateConfig struct {
 	DB     *sqlx.DB
 	Object APIModel
 	Table  string
+	Tx     *sqlx.Tx
 }
 
 type DeleteConfig struct {
 	DB    *sqlx.DB
 	Id    string
 	Table string
+	Tx    *sqlx.Tx
 }
 
 type GetConfig struct {
@@ -37,6 +39,7 @@ type GetConfig struct {
 	Id      string
 	Out     interface{}
 	Table   string
+	Tx      *sqlx.Tx
 }
 
 type ListConfig struct {
@@ -44,6 +47,7 @@ type ListConfig struct {
 	DB      *sqlx.DB
 	Out     interface{}
 	Table   string
+	Tx      *sqlx.Tx
 }
 
 type UpdateConfig struct {
@@ -52,6 +56,7 @@ type UpdateConfig struct {
 	NewObject APIModel
 	OldObject APIModel
 	Table     string
+	Tx        *sqlx.Tx
 }
 
 func Create(createConfig *CreateConfig) error {
@@ -71,6 +76,7 @@ func Create(createConfig *CreateConfig) error {
 		DB:      createConfig.DB,
 		Out:     createConfig.Object,
 		Table:   createConfig.Table,
+		Tx:      createConfig.Tx,
 		Values: [][]interface{}{
 			values,
 		},
@@ -84,8 +90,9 @@ func Delete(deleteConfig *DeleteConfig) error {
 	// TODO: Not found vs. unknown vs. whatever
 	return pgutils.DeleteByID(&pgutils.DeleteConfig{
 		DB:    deleteConfig.DB,
-		Table: deleteConfig.Table,
 		Id:    deleteConfig.Id,
+		Table: deleteConfig.Table,
+		Tx:    deleteConfig.Tx,
 	})
 }
 
@@ -97,6 +104,7 @@ func Get(getConfig *GetConfig) error {
 		Id:      getConfig.Id,
 		Out:     getConfig.Out,
 		Table:   getConfig.Table,
+		Tx:      getConfig.Tx,
 	})
 	if err != nil {
 		log.Println(err)
@@ -112,14 +120,22 @@ func List(listConfig *ListConfig) error {
 		DB:      listConfig.DB,
 		Out:     listConfig.Out,
 		Table:   listConfig.Table,
+		Tx:      listConfig.Tx,
 	})
 }
 
 func Update(updateConfig *UpdateConfig) error {
 	// TODO: Permissions
-	tx, err := updateConfig.DB.Beginx()
-	if err != nil {
-		return errors.Wrap(err, "Failed to begin transaction")
+	var tx *sqlx.Tx
+	var err error
+	// If caller passes in a transaction, don't commit or rollback
+	var closeTx bool
+	if updateConfig.Tx == nil {
+		tx, err = updateConfig.DB.Beginx()
+		if err != nil {
+			return errors.Wrap(err, "Failed to begin transaction")
+		}
+		closeTx = true
 	}
 	err = pgutils.SelectByID(&pgutils.SelectConfig{
 		ForClause: "FOR UPDATE",
@@ -129,13 +145,17 @@ func Update(updateConfig *UpdateConfig) error {
 		Tx:        tx,
 	})
 	if err != nil {
-		tx.Rollback()
+		if closeTx {
+			tx.Rollback()
+		}
 		log.Println(err)
 		return grpc.Errorf(codes.NotFound, "Not found")
 	}
 	err = updateConfig.OldObject.ValidateUpdate(updateConfig.NewObject)
 	if err != nil {
-		tx.Rollback()
+		if closeTx {
+			tx.Rollback()
+		}
 		log.Println(err)
 		return grpc.Errorf(codes.InvalidArgument, "Invalid argument")
 	}
@@ -146,11 +166,15 @@ func Update(updateConfig *UpdateConfig) error {
 		Updates: updateConfig.NewObject.GetUpdateData(),
 	})
 	if err != nil {
-		tx.Rollback()
+		if closeTx {
+			tx.Rollback()
+		}
 		log.Println(err)
 		return grpc.Errorf(codes.Internal, "Internal error")
 	}
-	err = tx.Commit()
+	if closeTx {
+		err = tx.Commit()
+	}
 	if err != nil {
 		log.Println(err)
 		return grpc.Errorf(codes.Internal, "Internal error")

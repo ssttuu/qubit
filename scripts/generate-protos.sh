@@ -30,11 +30,15 @@ for f in $(find protos -type f -name "*.proto"); do
 
     if [ -z "${proto_type}" ] || [ "${proto_type}" = "go" ]; then
         modules=(
-            google/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations
+            computations/computations.proto=github.com/stupschwartz/qubit/proto-gen/go/computations
             geometry/geometry.proto=github.com/stupschwartz/qubit/proto-gen/go/geometry
-            operators/operators.proto=github.com/stupschwartz/qubit/proto-gen/go/operators
-            parameters/parameters.proto=github.com/stupschwartz/qubit/proto-gen/go/parameters
+            google/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations
             images/images.proto=github.com/stupschwartz/qubit/proto-gen/go/images
+            image_sequences/image_sequences.proto=github.com/stupschwartz/qubit/proto-gen/go/image_sequences
+            operators/operators.proto=github.com/stupschwartz/qubit/proto-gen/go/operators
+            organizations/organizations.proto=github.com/stupschwartz/qubit/proto-gen/go/organizations
+            parameters/parameters.proto=github.com/stupschwartz/qubit/proto-gen/go/parameters
+            scenes/scenes.proto=github.com/stupschwartz/qubit/proto-gen/go/scenes
         )
         module_string=
         for m in "${modules[@]}"; do

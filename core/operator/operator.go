@@ -1,19 +1,17 @@
 package operator
 
 import (
+	"encoding/json"
+
 	"github.com/pkg/errors"
 
-	"encoding/json"
 	"github.com/stupschwartz/qubit/core/geometry"
 	"github.com/stupschwartz/qubit/core/image"
 	"github.com/stupschwartz/qubit/core/parameter"
 	pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
 )
 
-const (
-	IMAGE    string = "image"
-	GEOMETRY string = "geometry"
-)
+const TableName = "operators"
 
 type Operator struct {
 	Id      string `json:"id" db:"id"`

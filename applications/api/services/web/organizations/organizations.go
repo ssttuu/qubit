@@ -11,8 +11,6 @@ import (
 	organizations_pb "github.com/stupschwartz/qubit/proto-gen/go/organizations"
 )
 
-var organizationsTable = "organizations"
-
 type Server struct {
 	PostgresClient *sqlx.DB
 }
@@ -26,7 +24,7 @@ func (s *Server) Create(ctx context.Context, in *organizations_pb.CreateOrganiza
 	err := apiutils.Create(&apiutils.CreateConfig{
 		DB:     s.PostgresClient,
 		Object: &newObject,
-		Table:  organizationsTable,
+		Table:  organization.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -38,7 +36,7 @@ func (s *Server) Delete(ctx context.Context, in *organizations_pb.DeleteOrganiza
 	err := apiutils.Delete(&apiutils.DeleteConfig{
 		DB:    s.PostgresClient,
 		Id:    in.GetId(),
-		Table: organizationsTable,
+		Table: organization.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -52,7 +50,7 @@ func (s *Server) Get(ctx context.Context, in *organizations_pb.GetOrganizationRe
 		DB:    s.PostgresClient,
 		Id:    in.GetId(),
 		Out:   &obj,
-		Table: organizationsTable,
+		Table: organization.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -65,7 +63,7 @@ func (s *Server) List(ctx context.Context, in *organizations_pb.ListOrganization
 	err := apiutils.List(&apiutils.ListConfig{
 		DB:    s.PostgresClient,
 		Out:   &objectList,
-		Table: organizationsTable,
+		Table: organization.TableName,
 	})
 	if err != nil {
 		return nil, err
@@ -80,7 +78,7 @@ func (s *Server) Update(ctx context.Context, in *organizations_pb.UpdateOrganiza
 		Id:        in.GetId(),
 		NewObject: &newObject,
 		OldObject: &organization.Organization{},
-		Table:     organizationsTable,
+		Table:     organization.TableName,
 	})
 	if err != nil {
 		return nil, err

@@ -4,6 +4,8 @@ import (
 	pb "github.com/stupschwartz/qubit/proto-gen/go/scenes"
 )
 
+const TableName = "scenes"
+
 type Scene struct {
 	Id        string `json:"id" db:"id"`
 	ProjectId string `json:"project_id" db:"project_id"`
