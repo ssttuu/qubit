@@ -31,8 +31,9 @@ name: api.endpoints.qubit-161916.cloud.goog
 #
 # API title to appear in the user interface (Google Cloud Console).
 #
-title: API
+title: API - Web
 apis:
+- name: image_sequences.ImageSequences
 - name: images.Images
 - name: operators.Operators
 - name: organizations.Organizations

@@ -31,9 +31,9 @@ name: compute.endpoints.qubit-161916.cloud.goog
 #
 # API title to appear in the user interface (Google Cloud Console).
 #
-title: Compute
+title: Compute - Web
 apis:
-- name: compute.Compute
+- name: computations.Computations
 
 #
 # API usage restrictions.
