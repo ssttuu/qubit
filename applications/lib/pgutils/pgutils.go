@@ -8,7 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
-	"github.com/stupschwartz/qubit/applications/api/lib/stringutils"
+	"github.com/stupschwartz/qubit/applications/lib/stringutils"
 )
 
 // DeleteConfig is a configuration for deleting rows

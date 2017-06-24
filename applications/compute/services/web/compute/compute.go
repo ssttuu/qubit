@@ -9,7 +9,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"github.com/stupschwartz/qubit/applications/api/lib/apiutils"
+	"github.com/stupschwartz/qubit/applications/lib/apiutils"
 	"github.com/stupschwartz/qubit/core/computation"
 	compute_pb "github.com/stupschwartz/qubit/proto-gen/go/compute"
 )
