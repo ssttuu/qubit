@@ -1,0 +1,17 @@
+
+syntax = "proto3";
+
+package renders;
+
+service Renders {
+    rpc DoRender (RenderRequest) returns (RenderResponse) {}
+}
+
+message RenderRequest {
+    string operator_id = 1;
+    // TODO: time, boundingbox, etc. ?
+}
+
+message RenderResponse {
+    bytes data = 1;
+}

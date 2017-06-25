@@ -67,7 +67,7 @@ func validateLastComputationStatus(tx *sqlx.Tx, computationId string, lastComput
 func (c *Coordinator) heartbeat(tkr *time.Ticker, firstCompStatus *computation_status.ComputationStatus) {
 	computationId := firstCompStatus.ComputationId
 	// Keep a reference to the last computation status created from heartbeat
-	lastCompStatus := firstCompStatus
+	lastCompStatus := *firstCompStatus
 	// First tick occurs after duration
 	for range tkr.C {
 		tx, err := c.PostgresClient.Beginx()
@@ -102,6 +102,7 @@ func (c *Coordinator) heartbeat(tkr *time.Ticker, firstCompStatus *computation_s
 			log.Println(errors.Wrap(err, "Failed to commit transaction"))
 			continue
 		}
+		// Use the new computation status in the next tick iteration
 		lastCompStatus = newCompStatus
 	}
 }
@@ -114,7 +115,7 @@ func (c *Coordinator) subscriptionHandler(ctx context.Context, msg *pubsub.Messa
 		msg.Ack()
 		return
 	}
-	msgCompStatus := computation_status.NewFromProto(msgPBCompStatus)
+	msgCompStatus := computation_status.NewFromProto(&msgPBCompStatus)
 	// Only proceed for created or requeued computation statuses
 	if msgCompStatus.Status != computation_status.ComputationStatusCreated &&
 		msgCompStatus.Status != computation_status.ComputationStatusRequeued {
@@ -173,10 +174,6 @@ func (c *Coordinator) subscriptionHandler(ctx context.Context, msg *pubsub.Messa
 }
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		log.Fatal(`You need to set the environment variable "PORT"`)
-	}
 	projID := os.Getenv("GOOGLE_PROJECT_ID")
 	if projID == "" {
 		log.Fatal(`You need to set the environment variable "GOOGLE_PROJECT_ID"`)
@@ -206,7 +203,7 @@ func main() {
 		// 409 ALREADY_EXISTS is an inevitable and harmless error
 		// https://cloud.google.com/pubsub/docs/reference/error-codes
 		if statusErr, ok := status.FromError(err); !ok || statusErr.Code() != 409 {
-			return nil, errors.Wrapf(err, "Failed to get-or-create topic %v", computation_status.PubSubTopicID)
+			log.Fatal(errors.Wrapf(err, "Failed to get-or-create topic %v", computation_status.PubSubTopicID))
 		}
 	}
 	subscription, err := pubSubClient.CreateSubscription(ctx, pubSubCoordinatorSubscriptionID, pubsub.SubscriptionConfig{
@@ -217,7 +214,7 @@ func main() {
 		// 409 ALREADY_EXISTS is an inevitable and harmless error
 		// https://cloud.google.com/pubsub/docs/reference/error-codes
 		if statusErr, ok := status.FromError(err); !ok || statusErr.Code() != 409 {
-			return nil, errors.Wrapf(err, "Failed to get-or-create subscription %v", pubSubCoordinatorSubscriptionID)
+			log.Fatal(errors.Wrapf(err, "Failed to get-or-create subscription %v", pubSubCoordinatorSubscriptionID))
 		}
 	}
 	coordinator := Coordinator{PostgresClient: postgresClient}

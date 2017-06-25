@@ -13,6 +13,8 @@ build-go: fmt bindata build-api-go build-compute-go
 clean:
 	touch applications/api/services/web/run && rm applications/api/services/web/run
 	touch applications/compute/services/web/run && rm applications/compute/services/web/run
+	touch applications/compute/services/coordinator/run && rm applications/compute/services/coordinator/run
+	touch applications/compute/services/processor/run && rm applications/compute/services/processor/run
 
 configure:
 	go get -u github.com/jteeuwen/go-bindata/...
@@ -43,13 +45,25 @@ applications/api/services/web/run: $(API_SERVICE_FILES) $(LIB_FILES) $(CORE_FILE
 	cd applications/api/services/web && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
 applications/api/tasks/migrate/run: $(API_TASK_FILES) $(LIB_FILES)
 	cd applications/api/tasks/migrate && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
-build-api-go: fmt applications/api/services/web/run applications/api/tasks/migrate/run
+build-api-go: \
+	fmt \
+	applications/api/services/web/run \
+	applications/api/tasks/migrate/run
 
 applications/compute/services/web/run: $(COMPUTE_SERVICE_FILES) $(LIB_FILES) $(CORE_FILES)
 	cd applications/compute/services/web && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
+applications/compute/services/coordinator/run: $(COMPUTE_SERVICE_FILES) $(LIB_FILES) $(CORE_FILES)
+	cd applications/compute/services/coordinator && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
+applications/compute/services/processor/run: $(COMPUTE_SERVICE_FILES) $(LIB_FILES) $(CORE_FILES)
+	cd applications/compute/services/processor && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
 applications/compute/tasks/migrate/run: $(COMPUTE_TASK_FILES) $(LIB_FILES)
 	cd applications/compute/tasks/migrate && go get ./... && GOOS=linux GOARCH=amd64 go build -o run
-build-compute-go: fmt applications/compute/services/web/run applications/compute/tasks/migrate/run
+build-compute-go: \
+	fmt \
+	applications/compute/services/web/run \
+	applications/compute/services/coordinator/run \
+	applications/compute/services/processor/run \
+	applications/compute/tasks/migrate/run
 
 ###############
 # Docker images
