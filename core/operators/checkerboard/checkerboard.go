@@ -8,13 +8,12 @@ import (
 
 const Name string = "CheckerBoard"
 
-var ParameterRoot parameter.Parameter = parameter.NewGroupParameter(
-	"root",
-	parameter.ParameterMap{
+var ParameterRoot parameter.ParameterRoot = parameter.ParameterRoot{
+	Children: parameter.ParameterMap{
 		"size": parameter.NewFloat64Parameter(256.0),
 	},
-	[]string{"size"},
-)
+	Order: []string{"size"},
+}
 
 type CheckerBoard struct{}
 

@@ -41,6 +41,7 @@ for f in $(find protos -type f -name "*.proto"); do
             operators/operators.proto=github.com/stupschwartz/qubit/proto-gen/go/operators
             organizations/organizations.proto=github.com/stupschwartz/qubit/proto-gen/go/organizations
             parameters/parameters.proto=github.com/stupschwartz/qubit/proto-gen/go/parameters
+            projects/projects.proto=github.com/stupschwartz/qubit/proto-gen/go/projects
             scenes/scenes.proto=github.com/stupschwartz/qubit/proto-gen/go/scenes
         )
         module_string=
@@ -62,13 +63,23 @@ for f in $(find protos -type f -name "*.proto"); do
             ${proto_path}
         "
     fi
+
+    if [ -z "${proto_type}" ] || [ "${proto_type}" = "js-test" ]; then
+        mkdir -p ./tests/integration/protos/
+        protoc_command="${protoc_command}${base_protoc_command} \
+            --js_out=import_style=commonjs,binary:./tests/integration/protos/ \
+            --plugin=protoc-gen-grpc=/usr/lib/node_modules/grpc-tools/bin/grpc_node_plugin \
+            --grpc_out=./tests/integration/protos/ \
+            ${proto_path}
+        "
+    fi
 done
 
 if [ "${DOCKER}" = "true" ]; then
     docker run --rm -v ${PWD}:/workspace us.gcr.io/qubit-161916/protoman /bin/bash -c "${protoc_command}"
-    docker run --rm -v ${PWD}:/workspace us.gcr.io/qubit-161916/protoman /bin/bash -c "chmod 777 -R proto-gen"
+    docker run --rm -v ${PWD}:/workspace us.gcr.io/qubit-161916/protoman /bin/bash -c "chmod 777 -R proto-gen && chmod 777 -R tests/integration/protos"
 else
     ${protoc_command}
-    chmod 777 -R proto-gen
+    chmod 777 -R proto-gen && chmod 777 -R tests/integration/protos
 fi
 

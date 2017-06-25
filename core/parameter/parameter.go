@@ -2,6 +2,9 @@ package parameter
 
 import (
 	"encoding/json"
+	"github.com/pkg/errors"
+	pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
+	"strings"
 )
 
 /////////////////////
@@ -442,6 +445,66 @@ func (p *Parameter) UnmarshalJSON(b []byte) error {
 
 type ParameterMap map[string]Parameter
 type ParameterArray []Parameter
+
+///////////////////
+// ParameterRoot //
+///////////////////
+
+const TableName = "parameters"
+
+type ParameterRoot struct {
+	OperatorId string       `json:"operator_id" db:"operator_id"`
+	Children   ParameterMap `json:"children" db:"children"`
+	Order      []string     `json:"order" db:"order"`
+}
+
+func (p *ParameterRoot) ToProto() (*pb.ParameterRoot, error) {
+	childrenJson, err := json.Marshal(p.Children)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.ParameterRoot{
+		OperatorId: p.OperatorId,
+		Children:   childrenJson,
+		Order:      p.Order,
+	}, nil
+}
+
+func (p *ParameterRoot) GetCreateData() map[string]interface{} {
+	// TODO: handle marshaling error
+	childrenBytes, _ := json.Marshal(p.Children)
+	return map[string]interface{}{
+		"operator_id": p.OperatorId,
+		"children":    childrenBytes,
+		"order":       strings.Join(p.Order, " "),
+	}
+}
+
+func (p *ParameterRoot) GetUpdateData() map[string]interface{} {
+	// TODO: handle marshaling error
+	childrenBytes, _ := json.Marshal(p.Children)
+	return map[string]interface{}{
+		"children": childrenBytes,
+		"order":    strings.Join(p.Order, " "),
+	}
+}
+
+func (o *ParameterRoot) ValidateCreate() error {
+	return nil
+}
+
+func (p *ParameterRoot) ValidateUpdate(newObj interface{}) error {
+	return nil
+}
+
+func NewRootFromProto(pbParam *pb.ParameterRoot) (ParameterRoot, error) {
+	var p ParameterRoot
+	err := json.Unmarshal(pbParam.GetChildren(), p.Children)
+	if err != nil {
+		return p, errors.Wrap(err, "Failed to unmarshal parameter root children")
+	}
+	return p, nil
+}
 
 ///////////////////////
 // Parameter Helpers //

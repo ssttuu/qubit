@@ -1,3 +1,5 @@
+DROP TABLE parameters;
+
 DROP TABLE operator_inputs;
 
 DROP TABLE operators;

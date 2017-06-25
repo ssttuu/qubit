@@ -79,8 +79,9 @@ func (m *Computation) GetResourceId() string {
 type ComputationStatus struct {
 	Id            string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
 	ComputationId string `protobuf:"bytes,2,opt,name=computation_id,json=computationId" json:"computation_id,omitempty"`
-	Status        int32  `protobuf:"varint,3,opt,name=status" json:"status,omitempty"`
-	CreatedAt     int64  `protobuf:"varint,4,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
+	// TODO: Enum type?
+	Status    int32 `protobuf:"varint,3,opt,name=status" json:"status,omitempty"`
+	CreatedAt int64 `protobuf:"varint,4,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
 }
 
 func (m *ComputationStatus) Reset()                    { *m = ComputationStatus{} }

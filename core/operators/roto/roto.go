@@ -9,9 +9,8 @@ import (
 
 const Name string = "Roto"
 
-var ParameterRoot parameter.Parameter = parameter.NewGroupParameter(
-	"root",
-	parameter.ParameterMap{
+var ParameterRoot parameter.ParameterRoot = parameter.ParameterRoot{
+	Children: parameter.ParameterMap{
 		"lod": parameter.NewFloat64Parameter(2.0),
 		"antialias": parameter.NewGroupParameter(
 			"antialias",
@@ -67,8 +66,8 @@ var ParameterRoot parameter.Parameter = parameter.NewGroupParameter(
 			parameter.ParameterArray{},
 		),
 	},
-	[]string{"root"},
-)
+	Order: []string{"lod", "antialias", "curves"},
+}
 
 type Roto struct{}
 
