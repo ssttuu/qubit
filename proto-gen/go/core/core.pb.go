@@ -66,9 +66,7 @@ func (m *ComputationStatus) GetId() string  { return (*computations.ComputationS
 func (m *ComputationStatus) GetComputationId() string {
 	return (*computations.ComputationStatus)(m).GetComputationId()
 }
-func (m *ComputationStatus) GetStatus() string {
-	return (*computations.ComputationStatus)(m).GetStatus()
-}
+func (m *ComputationStatus) GetStatus() int32 { return (*computations.ComputationStatus)(m).GetStatus() }
 func (m *ComputationStatus) GetCreatedAt() int64 {
 	return (*computations.ComputationStatus)(m).GetCreatedAt()
 }

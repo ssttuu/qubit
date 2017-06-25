@@ -145,7 +145,7 @@ func Update(updateConfig *UpdateConfig) error {
 	}
 	err = func() error {
 		err = pgutils.SelectByID(&pgutils.SelectConfig{
-			ForClause: "UPDATE",
+			ForClause: "FOR UPDATE",
 			Id:        updateConfig.Id,
 			Out:       updateConfig.OldObject,
 			Table:     updateConfig.Table,

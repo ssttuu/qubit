@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	PubSubTopicID = "computations"
-	TableName     = "computations"
+	TableName = "computations"
 )
 
 type Computation struct {

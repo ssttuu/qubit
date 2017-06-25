@@ -2,7 +2,6 @@ package computations
 
 import (
 	"log"
-	"time"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/golang/protobuf/proto"
@@ -35,7 +34,7 @@ func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, pubSubClient *pu
 func (s *Server) CreateComputation(ctx context.Context, in *computations_pb.CreateComputationRequest) (*computations_pb.ComputationStatus, error) {
 	newComp := computation.NewFromProto(in.Computation)
 	// TODO: Validation
-	topic, err := s.PubSubClient.CreateTopic(ctx, computation.PubSubTopicID)
+	topic, err := s.PubSubClient.CreateTopic(ctx, computation_status.PubSubTopicID)
 	if err != nil {
 		// 409 ALREADY_EXISTS is an inevitable and harmless error
 		// https://cloud.google.com/pubsub/docs/reference/error-codes
@@ -49,10 +48,7 @@ func (s *Server) CreateComputation(ctx context.Context, in *computations_pb.Crea
 		log.Println(err)
 		return nil, status.Errorf(codes.Internal, "Internal error")
 	}
-	newCompStatus := computation_status.ComputationStatus{
-		Status:    computation_status.ComputationStatusCreated,
-		CreatedAt: time.Now(),
-	}
+	var newCompStatus computation_status.ComputationStatus
 	// If anon func returns an error, rollback the transaction
 	err = func() error {
 		err = apiutils.Create(&apiutils.CreateConfig{
@@ -63,7 +59,7 @@ func (s *Server) CreateComputation(ctx context.Context, in *computations_pb.Crea
 		if err != nil {
 			return err
 		}
-		newCompStatus.ComputationId = newComp.Id
+		newCompStatus = computation_status.New(newComp.Id, computation_status.ComputationStatusCreated)
 		err = apiutils.Create(&apiutils.CreateConfig{
 			Tx:     tx,
 			Object: &newCompStatus,
@@ -109,7 +105,7 @@ func (s *Server) GetComputationStatus(ctx context.Context, in *computations_pb.G
 		Limit:       1,
 		Out:         &compStatuses,
 		Table:       computation_status.TableName,
-		WhereClause: "computation_id=$1",
+		WhereClause: "WHERE computation_id=$1",
 	})
 	if err != nil {
 		log.Println(err)

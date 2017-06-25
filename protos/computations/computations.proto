@@ -20,7 +20,7 @@ message ComputationStatus {
     string id = 1;
     string computation_id = 2;
     // TODO: Enum type?
-    string status = 3;
+    int32 status = 3;
     int64 created_at = 4;
 }
 
