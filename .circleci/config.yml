@@ -128,12 +128,8 @@ jobs:
                 name: Authenticate GCloud
                 command: scripts/auth-gcloud.sh
             - run:
-                name: Cluster Credentials
-                command: |
-                    gcloud container clusters get-credentials dev-cluster --zone us-central1-a
-            - run:
-                name: Test Deploy
-                command: TEST=true ./deploy.sh
+                name: Deploy & Test Cluster
+                command: ./scripts/test-cluster.sh ${CIRCLE_BRANCH} ${CIRCLE_SHA1}
 
     deploy:
         docker:
@@ -151,12 +147,8 @@ jobs:
                 name: Authenticate GCloud
                 command: scripts/auth-gcloud.sh
             - run:
-                name: Cluster Credentials
-                command: |
-                    gcloud container clusters get-credentials dev-cluster --zone us-central1-a
-            - run:
-                name: Deploy Services
-                command: ./deploy.sh
+                name: Deploy
+                command: echo "Deploying"
 
 workflows:
     version: 2

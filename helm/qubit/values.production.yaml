@@ -1,0 +1,88 @@
+# Default values for qubit-helm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 1
+image:
+  repository: nginx
+  tag: stable
+  pullPolicy: IfNotPresent
+service:
+  name: nginx
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 80
+ingress:
+  enabled: false
+  # Used to create Ingress record (should used with service.type: ClusterIP).
+  hosts:
+    - chart-example.local
+  annotations:
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  tls:
+    # Secrets must be manually created in the namespace.
+    # - secretName: chart-example-tls
+    #   hosts:
+    #     - chart-example.local
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# My Configuration
+
+GoogleProjectId: qubit-161916
+Githash:
+DatastoreDataset: qubit
+
+
+ApiWeb:
+    ApiName: api.endpoints.qubit-161916.cloud.goog
+    ApiId:
+    AppName: api-web
+    ImageName: us.gcr.io/qubit-161916/api-web
+    StorageBucket: qubit-dev-161916
+    InternalPort: 9000
+    ExternalHttpPort: 9005
+    ExternalHttp2Port: 9010
+    Replicas: 1
+    MaxSurge: 2
+    NodeSelector: default-pool
+
+ComputeWeb:
+    ApiName: compute.endpoints.qubit-161916.cloud.goog
+    ApiId:
+    AppName: compute-web
+    ImageName: us.gcr.io/qubit-161916/compute-web
+    StorageBucket: qubit-dev-161916
+    InternalPort: 9000
+    ExternalHttpPort: 9005
+    ExternalHttp2Port: 9010
+    Replicas: 1
+    MaxSurge: 2
+    NodeSelector: default-pool
+
+ComputeCoordinator:
+    ApiName:
+    ApiId:
+    AppName: compute-coordinator
+    ImageName: us.gcr.io/qubit-161916/compute-coordinator
+    StorageBucket: qubit-dev-161916
+    InternalPort:
+    ExternalHttpPort:
+    ExternalHttp2Port:
+    Replicas: 1
+    MaxSurge: 2
+    NodeSelector: default-pool
+
+# Sub-Charts
+cassandra:
+    selector:
+        nodeSelector:
+            cloud.google.com/gke-nodepool: cassandra-pool
+
+cockroachdb:
+    Replicas: 1
