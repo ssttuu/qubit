@@ -4,15 +4,16 @@ set -euo pipefail
 
 function bootstrap() {
     set -euo pipefail
+
     app=${1}
 
     postgres_data_dir=/var/lib/postgresql/data
     postgres_host=postgres.${app}.qubit.site
     postgres_url=postgres://postgres@${postgres_host}:5432/postgres?sslmode=disable
 
-    docker volume rm qubit-${app}-postgres || :
-    docker volume create qubit-${app}-postgres
-    docker network create qubit-${app}-postgres-bootstrap 2>/dev/null || :
+    docker volume rm qubit-${app}-postgres >/dev/null || :
+    docker volume create qubit-${app}-postgres >/dev/null
+    docker network create qubit-${app}-postgres-bootstrap >/dev/null || :
     container=$(docker run -d \
         --volume qubit-${app}-postgres:${postgres_data_dir} \
         --network qubit-${app}-postgres-bootstrap \
@@ -52,7 +53,7 @@ function bootstrap() {
         /app/run migrate up
     '
 
-    echo "Running migrations"
+    echo "Running migrations for ${app}"
     docker run --rm \
         --volume ${PWD}/applications/${app}/tasks/migrate:/app \
         --network qubit-${app}-postgres-bootstrap \
@@ -60,9 +61,11 @@ function bootstrap() {
         golang:1.8 \
         /bin/bash -c "${commands}"
 
-    docker stop ${container} || :
-    docker rm ${container} || :
-    docker network rm qubit-${app}-postgres-bootstrap || :
+    echo "Migrations completed for ${app}"
+
+    docker stop ${container} >/dev/null || :
+    docker rm ${container} >/dev/null || :
+    docker network rm qubit-${app}-postgres-bootstrap >/dev/null || :
 }
 
 bootstrap api &

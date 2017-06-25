@@ -8,7 +8,8 @@ CREATE TABLE computations (
 CREATE TABLE computation_statuses (
     id BIGSERIAL PRIMARY KEY,
     computation_id BIGINT NOT NULL,
-    status VARCHAR(10) NOT NULL,
+    status SMALLINT NOT NULL,
     created_at TIMESTAMP NOT NULL,
-    FOREIGN KEY (computation_id) REFERENCES computations(id)
+    FOREIGN KEY (computation_id) REFERENCES computations(id),
+    INDEX (computation_id, created_at, status)
 );

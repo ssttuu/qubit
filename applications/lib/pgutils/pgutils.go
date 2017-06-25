@@ -31,17 +31,19 @@ type InsertConfig struct {
 
 // SelectConfig is a configuration for selecting rows
 type SelectConfig struct {
-	Args        []interface{}
-	Columns     []string
-	DB          *sqlx.DB
-	ForClause   string
-	Id          string
-	Limit       int
-	Offset      int
-	Out         interface{}
-	Table       string
-	Tx          *sqlx.Tx
-	WhereClause string
+	Args          []interface{}
+	Columns       []string
+	DB            *sqlx.DB
+	ForClause     string
+	Id            string
+	JoinClause    string
+	Limit         int
+	Offset        int
+	OrderByClause string
+	Out           interface{}
+	Table         string
+	Tx            *sqlx.Tx
+	WhereClause   string
 }
 
 // UpdateConfig is a configuration for updating rows
@@ -140,10 +142,6 @@ func InsertOne(insertConfig *InsertConfig) error {
 // Select selects records from a table
 func Select(selectConfig *SelectConfig) error {
 	columnString := getColumnString(selectConfig.Columns)
-	var whereClause string
-	if selectConfig.WhereClause != "" {
-		whereClause = fmt.Sprintf("WHERE %v", selectConfig.WhereClause)
-	}
 	var limitClause string
 	if selectConfig.Limit != 0 {
 		limitClause = fmt.Sprintf("LIMIT %v", selectConfig.Limit)
@@ -152,23 +150,23 @@ func Select(selectConfig *SelectConfig) error {
 	if selectConfig.Offset != 0 {
 		offsetClause = fmt.Sprintf("OFFSET %v", selectConfig.Offset)
 	}
-	var forClause string
-	if selectConfig.ForClause != "" {
-		forClause = fmt.Sprintf("FOR %v", selectConfig.ForClause)
-	}
 	query := fmt.Sprintf(
 		`SELECT %v
 		FROM %v
 		%v
 		%v
 		%v
+		%v
+		%v
 		%v`,
 		columnString,
 		selectConfig.Table,
-		whereClause,
+		selectConfig.JoinClause,
+		selectConfig.WhereClause,
+		selectConfig.OrderByClause,
 		limitClause,
 		offsetClause,
-		forClause,
+		selectConfig.ForClause,
 	)
 	var err error
 	if selectConfig.Tx == nil {
@@ -189,11 +187,7 @@ func SelectByID(selectConfig *SelectConfig) error {
 	if err != nil {
 		return errors.Wrapf(err, "Could not convert %v to integer", selectConfig.Id)
 	}
-	forClause := ""
-	if selectConfig.ForClause != "" {
-		forClause = fmt.Sprintf("FOR %v", selectConfig.ForClause)
-	}
-	query := fmt.Sprintf("SELECT %v FROM %v WHERE id=$1 %v", columnString, selectConfig.Table, forClause)
+	query := fmt.Sprintf("SELECT %v FROM %v WHERE id=$1 %v", columnString, selectConfig.Table, selectConfig.ForClause)
 	if selectConfig.Tx == nil {
 		err = selectConfig.DB.Get(selectConfig.Out, query, objId)
 	} else {
