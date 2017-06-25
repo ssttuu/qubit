@@ -54,5 +54,3 @@ RUN npm install -g grpc-tools
 
 RUN mkdir /workspace
 WORKDIR /workspace
-
-ENTRYPOINT []

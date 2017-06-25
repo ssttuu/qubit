@@ -76,8 +76,8 @@ for f in $(find protos -type f -name "*.proto"); do
 done
 
 if [ "${DOCKER}" = "true" ]; then
-    docker run --rm -v ${PWD}:/workspace us.gcr.io/qubit-161916/protoman /bin/bash -c "${protoc_command}"
-    docker run --rm -v ${PWD}:/workspace us.gcr.io/qubit-161916/protoman /bin/bash -c "chmod 777 -R proto-gen && chmod 777 -R tests/integration/protos"
+    docker run --rm -v ${PWD}:/workspace stuschwartz/protoman /bin/bash -c "${protoc_command}"
+    docker run --rm -v ${PWD}:/workspace stuschwartz/protoman /bin/bash -c "chmod 777 -R proto-gen && chmod 777 -R tests/integration/protos"
 else
     ${protoc_command}
     chmod 777 -R proto-gen && chmod 777 -R tests/integration/protos
