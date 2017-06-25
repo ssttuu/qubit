@@ -108,6 +108,3 @@ up: build
 .PHONY: test
 test:
 	./run-tests.integration.sh
-
-migrate-cockroachdb:
-	migrate -database
