@@ -53,6 +53,38 @@ services:
           - web.compute.qubit.site
     depends_on:
       - compute-postgres
+  compute-coordinator:
+    image: us.gcr.io/qubit-161916/compute-coordinator
+    build: ./applications/compute/services/coordinator
+    environment:
+      - APP_ENV=development
+      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
+      - GOOGLE_PROJECT_ID=qubit-161916
+      - PORT=9000
+      - POSTGRES_URL=postgres://postgres@postgres.compute.qubit.site:5432/postgres?sslmode=disable
+      - STORAGE_BUCKET=qubit-dev-161916
+    volumes:
+      - ./credentials:/opt/etc/credentials
+    networks:
+      - default
+    depends_on:
+      - compute-postgres
+      - compute-processor
+  compute-processor:
+    image: us.gcr.io/qubit-161916/compute-processor
+    build: ./applications/compute/services/processor
+    environment:
+      - APP_ENV=development
+      - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
+      - GOOGLE_PROJECT_ID=qubit-161916
+      - PORT=9000
+      - STORAGE_BUCKET=qubit-dev-161916
+    volumes:
+      - ./credentials:/opt/etc/credentials
+    networks:
+      default:
+        aliases:
+          - processor.compute.qubit.site
   compute-postgres:
     image: postgres:9.6
     volumes:

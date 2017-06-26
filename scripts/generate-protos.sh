@@ -42,6 +42,7 @@ for f in $(find protos -type f -name "*.proto"); do
             organizations/organizations.proto=github.com/stupschwartz/qubit/proto-gen/go/organizations
             parameters/parameters.proto=github.com/stupschwartz/qubit/proto-gen/go/parameters
             projects/projects.proto=github.com/stupschwartz/qubit/proto-gen/go/projects
+            renders/renders.proto=github.com/stupschwartz/qubit/proto-gen/go/renders
             scenes/scenes.proto=github.com/stupschwartz/qubit/proto-gen/go/scenes
         )
         module_string=

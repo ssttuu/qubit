@@ -40,7 +40,7 @@ DatastoreDataset: qubit
 
 
 ApiWeb:
-    ApiName: api.endpoints.qubit-161916.cloud.goog
+    ApiName: api-web.endpoints.qubit-161916.cloud.goog
     ApiId:
     AppName: api-web
     ImageName: us.gcr.io/qubit-161916/api-web
@@ -53,7 +53,7 @@ ApiWeb:
     NodeSelector: default-pool
 
 ComputeWeb:
-    ApiName: compute.endpoints.qubit-161916.cloud.goog
+    ApiName: compute-web.endpoints.qubit-161916.cloud.goog
     ApiId:
     AppName: compute-web
     ImageName: us.gcr.io/qubit-161916/compute-web
@@ -74,6 +74,19 @@ ComputeCoordinator:
     InternalPort:
     ExternalHttpPort:
     ExternalHttp2Port:
+    Replicas: 1
+    MaxSurge: 2
+    NodeSelector: default-pool
+
+ComputeProcessor:
+    ApiName: compute-processor.endpoints.qubit-161916.cloud.goog
+    ApiId:
+    AppName: compute-coordinator
+    ImageName: us.gcr.io/qubit-161916/compute-processor
+    StorageBucket: qubit-dev-161916
+    InternalPort: 9000
+    ExternalHttpPort: 9005
+    ExternalHttp2Port: 9010
     Replicas: 1
     MaxSurge: 2
     NodeSelector: default-pool

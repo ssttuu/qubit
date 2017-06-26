@@ -8,4 +8,5 @@ import public "projects/projects.proto";
 import public "operators/operators.proto";
 import public "parameters/parameters.proto";
 import public "organizations/organizations.proto";
+import public "renders/renders.proto";
 import public "scenes/scenes.proto";

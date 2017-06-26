@@ -15,5 +15,6 @@ var projects_projects_pb = require('../projects/projects_pb.js');
 var operators_operators_pb = require('../operators/operators_pb.js');
 var parameters_parameters_pb = require('../parameters/parameters_pb.js');
 var organizations_organizations_pb = require('../organizations/organizations_pb.js');
+var renders_renders_pb = require('../renders/renders_pb.js');
 var scenes_scenes_pb = require('../scenes/scenes_pb.js');
 goog.object.extend(exports, proto.web);
