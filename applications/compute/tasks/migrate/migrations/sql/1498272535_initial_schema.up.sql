@@ -10,6 +10,6 @@ CREATE TABLE computation_statuses (
     computation_id BIGINT NOT NULL,
     status SMALLINT NOT NULL,
     created_at TIMESTAMP NOT NULL,
-    FOREIGN KEY (computation_id) REFERENCES computations(id),
-    INDEX (computation_id, created_at, status)
+    FOREIGN KEY (computation_id) REFERENCES computations(id)
 );
+CREATE INDEX computation_statuses_indices ON computation_statuses USING btree (computation_id, created_at, status);
