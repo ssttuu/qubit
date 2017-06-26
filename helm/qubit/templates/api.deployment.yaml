@@ -56,9 +56,9 @@ spec:
             value: "{{ .Values.Api.StorageBucket }}"
           - name: PORT
             value: "{{ .Values.Api.InternalPort }}"
-          - name: API_SERVICE_ADDRESS
+          - name: API_WEB_SERVICE_ADDRESS
             value: "{{ .Values.Api.AppName }}:{{ .Values.Api.ExternalHttp2Port }}"
-          - name: COMPUTE_SERVICE_ADDRESS
+          - name: COMPUTE_WEB_SERVICE_ADDRESS
             value: "{{ .Values.Compute.AppName }}:{{ .Values.Compute.ExternalHttp2Port }}"
         volumeMounts:
           - name: google-credentials

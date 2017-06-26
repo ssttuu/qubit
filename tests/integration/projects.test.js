@@ -6,7 +6,7 @@ const organizations_grpc_pb = require('./protos/organizations/organizations_grpc
 const projects_pb = require('./protos/projects/projects_pb');
 const projects_grpc_pb = require('./protos/projects/projects_grpc_pb');
 
-const SERVER = process.env.API_SERVICE_ADDRESS;
+const SERVER = process.env.API_WEB_SERVICE_ADDRESS;
 
 describe('Projects', () => {
     let ORGANIZATIONS_CLIENT = null;

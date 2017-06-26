@@ -6,7 +6,7 @@ services:
   test:
     build: ./tests/integration
     environment:
-      - API_SERVICE_ADDRESS=web.api.qubit.site:9000
+      - API_WEB_SERVICE_ADDRESS=web.api.qubit.site:9000
       - GOOGLE_PROJECT_ID=qubit-161916
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
     working_dir: /workspace/tests/integration
