@@ -170,9 +170,9 @@ func Select(selectConfig *SelectConfig) error {
 	)
 	var err error
 	if selectConfig.Tx == nil {
-		err = selectConfig.DB.Select(selectConfig.Out, query, selectConfig.Args)
+		err = selectConfig.DB.Select(selectConfig.Out, query, selectConfig.Args...)
 	} else {
-		err = selectConfig.Tx.Select(selectConfig.Out, query, selectConfig.Args)
+		err = selectConfig.Tx.Select(selectConfig.Out, query, selectConfig.Args...)
 	}
 	if err != nil {
 		return errors.Wrapf(err, "Could not select from table %v", selectConfig.Table)

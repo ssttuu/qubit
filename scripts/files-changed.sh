@@ -6,7 +6,7 @@ prefix=${2:-}
 found=0
 
 for f in $(git diff --name-only origin/master ${branch}); do
-    if [[ ${f} == ${prefix}* ]]; then
+    if [[ "$(expr substr ${f} 1 ${#prefix})" = "${prefix}" ]]; then
         found=$((${found}+1))
     fi
 done

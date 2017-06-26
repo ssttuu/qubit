@@ -1,6 +1,6 @@
 version: 2
 jobs:
-    build_base:
+    build_builder:
         docker:
             - image: stuschwartz/docker-git:latest
         working_directory: /workspace
@@ -16,6 +16,24 @@ jobs:
                         docker build -t ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1} -t ${DOCKER_USER}/qubit-builder:latest ./builder/
                         docker push ${DOCKER_USER}/qubit-builder:${CIRCLE_SHA1}
                         docker push ${DOCKER_USER}/qubit-builder:latest
+                    fi
+
+    build_protoman:
+        docker:
+            - image: stuschwartz/docker-git:latest
+        working_directory: /workspace
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run:
+                name: Pull - Build - Push
+                command: |
+                    docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
+                    if [ "$(ash scripts/files-changed.sh ${CIRCLE_BRANCH} protoman)" != "0" ]; then
+                        docker pull ${DOCKER_USER}/protoman || echo "Getting protoman"
+                        docker build -t ${DOCKER_USER}/protoman:${CIRCLE_SHA1} -t ${DOCKER_USER}/protoman:latest ./protoman/
+                        docker push ${DOCKER_USER}/protoman:${CIRCLE_SHA1}
+                        docker push ${DOCKER_USER}/protoman:latest
                     fi
 
     build_api:
@@ -112,6 +130,17 @@ jobs:
             - checkout
             - setup_remote_docker
 
+    test_integration_compose:
+        docker:
+            - image: stuschwartz/qubit-builder:latest
+        working_directory: /workspace
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run:
+                name: Run Tests
+                command: make test
+
     deploy_test:
         docker:
             - image: stuschwartz/qubit-builder:latest
@@ -162,25 +191,32 @@ workflows:
     version: 2
     build_test_deploy:
         jobs:
-            - build_base
+            - build_builder
+            - build_protoman
             - build_api:
                 requires:
-                    - build_base
+                    - build_builder
             - build_compute:
                 requires:
-                    - build_base
+                    - build_builder
             - test_api:
                 requires:
                     - build_api
             - test_compute:
                 requires:
                     - build_compute
+            - test_integration_compose:
+                requires:
+                    - build_protoman
+                    - test_api
+                    - test_compute
             - deploy_test:
                 requires:
                     - test_api
                     - test_compute
             - deploy:
                 requires:
+                    - test_integration_compose
                     - deploy_test
                 filters:
                     branches:

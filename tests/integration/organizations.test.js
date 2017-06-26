@@ -1,7 +1,7 @@
 const grpc = require('grpc');
 
 const helpers = require('./lib/helpers');
-const organizations_pb = require('../../proto-gen/organizations/organizations_pb');
+const organizations_pb = require('./protos/organizations/organizations_pb');
 const organizations_grpc_pb = require('./protos/organizations/organizations_grpc_pb');
 
 const SERVER = process.env.API_SERVICE_ADDRESS;

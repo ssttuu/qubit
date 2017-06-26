@@ -85,9 +85,13 @@ bootstrap-postgres: build-api
 # Generate proto code
 #####################
 
+google-protos:
+	docker run --rm -v ${PWD}:/workspace --entrypoint bash stuschwartz/protoman -c 'protoc -I/protobuf -I/googleapis -I/googleapis/google/api/ --js_out=import_style=commonjs,binary:./proto-gen/js/ /googleapis/google/api/*.proto && chmod 777 -R ./proto-gen/js/'
+	docker run --rm -v ${PWD}:/workspace --entrypoint bash stuschwartz/protoman -c 'protoc -I/protobuf -I/googleapis -I/googleapis/google/api/ --js_out=import_style=commonjs,binary:./tests/integration/protos/ /googleapis/google/api/*.proto && chmod 777 -R ./tests/integration/protos/'
+
 .PHONY: protoman
 protoman:
-	docker build -t us.gcr.io/qubit-161916/protoman ./protoman
+	docker build -t stuschwartz/protoman ./protoman
 
 all-protos: $(PROTO_FILES)
 	rm -rf proto-gen || :
