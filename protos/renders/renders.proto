@@ -16,5 +16,5 @@ message RenderRequest {
 }
 
 message RenderResponse {
-    bytes data = 1;
+    string resource_id = 1;
 }

@@ -40,10 +40,10 @@ func (m *RenderRequest) GetTime() int32         { return (*renders.RenderRequest
 // RenderResponse from public import renders/renders.proto
 type RenderResponse renders.RenderResponse
 
-func (m *RenderResponse) Reset()          { (*renders.RenderResponse)(m).Reset() }
-func (m *RenderResponse) String() string  { return (*renders.RenderResponse)(m).String() }
-func (*RenderResponse) ProtoMessage()     {}
-func (m *RenderResponse) GetData() []byte { return (*renders.RenderResponse)(m).GetData() }
+func (m *RenderResponse) Reset()                { (*renders.RenderResponse)(m).Reset() }
+func (m *RenderResponse) String() string        { return (*renders.RenderResponse)(m).String() }
+func (*RenderResponse) ProtoMessage()           {}
+func (m *RenderResponse) GetResourceId() string { return (*renders.RenderResponse)(m).GetResourceId() }
 
 func init() { proto.RegisterFile("compute-processor/compute-processor.proto", fileDescriptor0) }
 
