@@ -306,7 +306,7 @@ proto.renders.RenderResponse.prototype.toObject = function(opt_includeInstance) 
  */
 proto.renders.RenderResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    data: msg.getData_asB64()
+    resourceId: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -344,8 +344,8 @@ proto.renders.RenderResponse.deserializeBinaryFromReader = function(msg, reader)
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {!Uint8Array} */ (reader.readBytes());
-      msg.setData(value);
+      var value = /** @type {string} */ (reader.readString());
+      msg.setResourceId(value);
       break;
     default:
       reader.skipField();
@@ -385,9 +385,9 @@ proto.renders.RenderResponse.prototype.serializeBinary = function() {
  */
 proto.renders.RenderResponse.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getData_asU8();
+  f = this.getResourceId();
   if (f.length > 0) {
-    writer.writeBytes(
+    writer.writeString(
       1,
       f
     );
@@ -396,40 +396,16 @@ proto.renders.RenderResponse.prototype.serializeBinaryToWriter = function (write
 
 
 /**
- * optional bytes data = 1;
- * @return {!(string|Uint8Array)}
- */
-proto.renders.RenderResponse.prototype.getData = function() {
-  return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
-};
-
-
-/**
- * optional bytes data = 1;
- * This is a type-conversion wrapper around `getData()`
+ * optional string resource_id = 1;
  * @return {string}
  */
-proto.renders.RenderResponse.prototype.getData_asB64 = function() {
-  return /** @type {string} */ (jspb.Message.bytesAsB64(
-      this.getData()));
+proto.renders.RenderResponse.prototype.getResourceId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/**
- * optional bytes data = 1;
- * Note that Uint8Array is not supported on all browsers.
- * @see http://caniuse.com/Uint8Array
- * This is a type-conversion wrapper around `getData()`
- * @return {!Uint8Array}
- */
-proto.renders.RenderResponse.prototype.getData_asU8 = function() {
-  return /** @type {!Uint8Array} */ (jspb.Message.bytesAsU8(
-      this.getData()));
-};
-
-
-/** @param {!(string|Uint8Array)} value */
-proto.renders.RenderResponse.prototype.setData = function(value) {
+/** @param {string} value */
+proto.renders.RenderResponse.prototype.setResourceId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 

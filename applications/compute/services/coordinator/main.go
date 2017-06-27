@@ -174,7 +174,7 @@ func (c *Coordinator) subscriptionHandler(ctx context.Context, msg *pubsub.Messa
 	log.Println("Acknowledging message:", msg)
 	msg.Ack()
 	log.Println("Processing computation:", msgCompStatus.ComputationId)
-	// TODO: Render request
+	// TODO: How to get operator & parameter IDs? Are they in the status or the computation?
 	pbRenderRequest := renders_pb.RenderRequest{
 		OperatorId:  "",
 		ParameterId: "",
@@ -200,19 +200,32 @@ func (c *Coordinator) subscriptionHandler(ctx context.Context, msg *pubsub.Messa
 		msg.Nack()
 		return
 	}
-	// TODO: Update computation with resource_id in this transaction
-	completedCompStatus := computation_status.New(
-		msgCompStatus.ComputationId,
-		computation_status.ComputationStatusCompleted,
-	)
-	err = apiutils.Create(&apiutils.CreateConfig{
-		Object: &completedCompStatus,
-		Table:  computation_status.TableName,
-		Tx:     tx,
-	})
+	err = func() error {
+		err := pgutils.UpdateByID(&pgutils.UpdateConfig{
+			Id:    msgCompStatus.ComputationId,
+			Table: computation.TableName,
+			Tx:    tx,
+			Updates: map[string]interface{}{
+				"resource_id": pbRenderResponse.ResourceId,
+			},
+		})
+		if err != nil {
+			return err
+		}
+		completedCompStatus := computation_status.New(
+			msgCompStatus.ComputationId,
+			computation_status.ComputationStatusCompleted,
+		)
+		return apiutils.Create(&apiutils.CreateConfig{
+			Object: &completedCompStatus,
+			Table:  computation_status.TableName,
+			Tx:     tx,
+		})
+	}()
 	if err != nil {
 		log.Println(err)
 		msg.Nack()
+		tx.Rollback()
 		return
 	}
 	err = tx.Commit()
