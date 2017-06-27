@@ -8,7 +8,7 @@ const projects_grpc_pb = require('./protos/projects/projects_grpc_pb');
 const scenes_pb = require('./protos/scenes/scenes_pb');
 const scenes_grpc_pb = require('./protos/scenes/scenes_grpc_pb');
 
-const SERVER = process.env.API_SERVICE_ADDRESS;
+const SERVER = process.env.API_WEB_SERVICE_ADDRESS;
 
 describe('Scenes', () => {
     let ORGANIZATIONS_CLIENT = null;

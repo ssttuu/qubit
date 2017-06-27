@@ -3,6 +3,7 @@
 'use strict';
 var grpc = require('grpc');
 var renders_renders_pb = require('../renders/renders_pb.js');
+var geometry_geometry_pb = require('../geometry/geometry_pb.js');
 
 function serialize_renders_RenderRequest(arg) {
   if (!(arg instanceof renders_renders_pb.RenderRequest)) {

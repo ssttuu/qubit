@@ -1,7 +1,8 @@
-
 syntax = "proto3";
 
 package renders;
+
+import "geometry/geometry.proto";
 
 service Renders {
     rpc DoRender (RenderRequest) returns (RenderResponse) {}
@@ -9,7 +10,9 @@ service Renders {
 
 message RenderRequest {
     string operator_id = 1;
-    // TODO: time, boundingbox, etc. ?
+    string parameter_id = 2;
+    int32 time = 3;
+    geometry.BoundingBox2D bounding_box = 4;
 }
 
 message RenderResponse {

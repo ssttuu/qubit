@@ -13,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 
 	"github.com/stupschwartz/qubit/applications/lib/apiutils"
@@ -20,6 +21,8 @@ import (
 	"github.com/stupschwartz/qubit/core/computation"
 	"github.com/stupschwartz/qubit/core/computation_status"
 	computations_pb "github.com/stupschwartz/qubit/proto-gen/go/computations"
+	geometry_pb "github.com/stupschwartz/qubit/proto-gen/go/geometry"
+	renders_pb "github.com/stupschwartz/qubit/proto-gen/go/renders"
 )
 
 const pubSubCoordinatorSubscriptionID = "coordinator"
@@ -32,6 +35,7 @@ var messageAckInterval = 60 * time.Second
 
 type Coordinator struct {
 	PostgresClient *sqlx.DB
+	RendersClient  renders_pb.RendersClient
 }
 
 func validateLastComputationStatus(tx *sqlx.Tx, computationId string, lastComputationStatusId string) error {
@@ -163,14 +167,60 @@ func (c *Coordinator) subscriptionHandler(ctx context.Context, msg *pubsub.Messa
 		msg.Nack()
 		return
 	}
-	log.Println("Processing computation:", msgCompStatus.ComputationId)
-	///////////////////////
-	// TODO: Business logic
-	///////////////////////
+	defer func() {
+		log.Println("Stopping heartbeat for computation:", msgCompStatus.ComputationId)
+		heartbeatTicker.Stop()
+	}()
 	log.Println("Acknowledging message:", msg)
 	msg.Ack()
-	log.Println("Stopping heartbeat for computation:", msgCompStatus.ComputationId)
-	heartbeatTicker.Stop()
+	log.Println("Processing computation:", msgCompStatus.ComputationId)
+	// TODO: Render request
+	pbRenderRequest := renders_pb.RenderRequest{
+		OperatorId:  "",
+		ParameterId: "",
+		Time:        0,
+		BoundingBox: &geometry_pb.BoundingBox2D{
+			StartX: 0,
+			StartY: 0,
+			EndX:   0,
+			EndY:   0,
+		},
+	}
+	log.Println("Sending render request:", pbRenderRequest)
+	pbRenderResponse, err := c.RendersClient.DoRender(ctx, &pbRenderRequest)
+	if err != nil {
+		log.Println(err)
+		msg.Nack()
+		return
+	}
+	log.Println("Sending render response:", pbRenderResponse)
+	tx, err = c.PostgresClient.Beginx()
+	if err != nil {
+		log.Println(err)
+		msg.Nack()
+		return
+	}
+	// TODO: Update computation with resource_id in this transaction
+	completedCompStatus := computation_status.New(
+		msgCompStatus.ComputationId,
+		computation_status.ComputationStatusCompleted,
+	)
+	err = apiutils.Create(&apiutils.CreateConfig{
+		Object: &completedCompStatus,
+		Table:  computation_status.TableName,
+		Tx:     tx,
+	})
+	if err != nil {
+		log.Println(err)
+		msg.Nack()
+		return
+	}
+	err = tx.Commit()
+	if err != nil {
+		log.Println(err)
+		msg.Nack()
+		return
+	}
 }
 
 func main() {
@@ -190,6 +240,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	computeProcessorAddress := os.Getenv("COMPUTE_PROCESSOR_SERVICE_ADDRESS")
+	if computeProcessorAddress == "" {
+		log.Fatal(`You need to set the environment variable "COMPUTE_PROCESSOR_SERVICE_ADDRESS"`)
+	}
+	computeProcConn, err := grpc.Dial(computeProcessorAddress, grpc.WithInsecure())
+	for err != nil {
+		log.Printf("Could not connect to Compute Processor Service: %v\n", err)
+		time.Sleep(100 * time.Millisecond)
+		computeProcConn, err = grpc.Dial(computeProcessorAddress, grpc.WithInsecure())
+	}
+	defer computeProcConn.Close()
 	ctx := context.Background()
 	serviceCredentials := option.WithServiceAccountFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
 	pubSubClient, err := pubsub.NewClient(ctx, projID, serviceCredentials)
@@ -217,7 +278,8 @@ func main() {
 			log.Fatal(errors.Wrapf(err, "Failed to get-or-create subscription %v", pubSubCoordinatorSubscriptionID))
 		}
 	}
-	coordinator := Coordinator{PostgresClient: postgresClient}
+	rendersClient := renders_pb.NewRendersClient(computeProcConn)
+	coordinator := Coordinator{PostgresClient: postgresClient, RendersClient: rendersClient}
 	err = subscription.Receive(ctx, coordinator.subscriptionHandler)
 	if err != nil {
 		log.Fatal(err)

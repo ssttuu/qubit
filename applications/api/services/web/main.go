@@ -38,9 +38,9 @@ func main() {
 		time.Sleep(100 * time.Millisecond)
 		storageClient, err = storage.NewClient(ctx, serviceCredentials)
 	}
-	apiAddress := os.Getenv("API_SERVICE_ADDRESS")
+	apiAddress := os.Getenv("API_WEB_SERVICE_ADDRESS")
 	if apiAddress == "" {
-		log.Fatal(`You need to set the environment variable "API_SERVICE_ADDRESS"`)
+		log.Fatal(`You need to set the environment variable "API_WEB_SERVICE_ADDRESS"`)
 	}
 	conn, err := grpc.Dial(apiAddress, grpc.WithInsecure())
 	for err != nil {
@@ -49,9 +49,9 @@ func main() {
 		conn, err = grpc.Dial(apiAddress, grpc.WithInsecure())
 	}
 	defer conn.Close()
-	computeAddress := os.Getenv("COMPUTE_SERVICE_ADDRESS")
+	computeAddress := os.Getenv("COMPUTE_WEB_SERVICE_ADDRESS")
 	if computeAddress == "" {
-		log.Fatal(`You need to set the environment variable "COMPUTE_SERVICE_ADDRESS"`)
+		log.Fatal(`You need to set the environment variable "COMPUTE_WEB_SERVICE_ADDRESS"`)
 	}
 	computeConn, err := grpc.Dial(computeAddress, grpc.WithInsecure())
 	for err != nil {

@@ -9,9 +9,9 @@ services:
     image: us.gcr.io/qubit-161916/api-web
     build: ./applications/api/services/web
     environment:
-      - API_SERVICE_ADDRESS=web.api.qubit.site:9000
+      - API_WEB_SERVICE_ADDRESS=web.api.qubit.site:9000
       - APP_ENV=development
-      - COMPUTE_SERVICE_ADDRESS=web.compute.qubit.site:9000
+      - COMPUTE_WEB_SERVICE_ADDRESS=web.compute.qubit.site:9000
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
       - GOOGLE_PROJECT_ID=qubit-161916
       - PORT=9000
@@ -57,7 +57,9 @@ services:
     image: us.gcr.io/qubit-161916/compute-coordinator
     build: ./applications/compute/services/coordinator
     environment:
+      - API_WEB_SERVICE_ADDRESS=web.api.qubit.site:9000
       - APP_ENV=development
+      - COMPUTE_PROCESSOR_SERVICE_ADDRESS=processor.compute.qubit.site:9000
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
       - GOOGLE_PROJECT_ID=qubit-161916
       - PORT=9000
@@ -75,6 +77,7 @@ services:
     build: ./applications/compute/services/processor
     environment:
       - APP_ENV=development
+      - COMPUTE_PROCESSOR_SERVICE_ADDRESS=processor.compute.qubit.site:9000
       - GOOGLE_APPLICATION_CREDENTIALS=/opt/etc/credentials/service-account-key-file.json
       - GOOGLE_PROJECT_ID=qubit-161916
       - PORT=9000

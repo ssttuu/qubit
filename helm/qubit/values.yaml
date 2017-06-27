@@ -81,7 +81,7 @@ ComputeCoordinator:
 ComputeProcessor:
     ApiName: compute-processor.endpoints.qubit-161916.cloud.goog
     ApiId:
-    AppName: compute-coordinator
+    AppName: compute-processor
     ImageName: us.gcr.io/qubit-161916/compute-processor
     StorageBucket: qubit-dev-161916
     InternalPort: 9000
@@ -90,12 +90,3 @@ ComputeProcessor:
     Replicas: 1
     MaxSurge: 2
     NodeSelector: default-pool
-
-# Sub-Charts
-cassandra:
-    selector:
-        nodeSelector:
-            cloud.google.com/gke-nodepool: cassandra-pool
-
-cockroachdb:
-    Replicas: 1
