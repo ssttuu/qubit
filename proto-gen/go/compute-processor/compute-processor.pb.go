@@ -33,9 +33,8 @@ type RenderRequest renders.RenderRequest
 func (m *RenderRequest) Reset()                 { (*renders.RenderRequest)(m).Reset() }
 func (m *RenderRequest) String() string         { return (*renders.RenderRequest)(m).String() }
 func (*RenderRequest) ProtoMessage()            {}
-func (m *RenderRequest) GetOperatorId() string  { return (*renders.RenderRequest)(m).GetOperatorId() }
-func (m *RenderRequest) GetParameterId() string { return (*renders.RenderRequest)(m).GetParameterId() }
-func (m *RenderRequest) GetTime() int32         { return (*renders.RenderRequest)(m).GetTime() }
+func (m *RenderRequest) GetOperatorKey() string { return (*renders.RenderRequest)(m).GetOperatorKey() }
+func (m *RenderRequest) GetTime() float32       { return (*renders.RenderRequest)(m).GetTime() }
 
 // RenderResponse from public import renders/renders.proto
 type RenderResponse renders.RenderResponse

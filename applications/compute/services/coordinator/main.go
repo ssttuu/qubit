@@ -21,17 +21,19 @@ import (
 	"github.com/stupschwartz/qubit/core/computation"
 	"github.com/stupschwartz/qubit/core/computation_status"
 	computations_pb "github.com/stupschwartz/qubit/proto-gen/go/computations"
-	geometry_pb "github.com/stupschwartz/qubit/proto-gen/go/geometry"
 	renders_pb "github.com/stupschwartz/qubit/proto-gen/go/renders"
 )
 
 const pubSubCoordinatorSubscriptionID = "coordinator"
 
-var heartbeatInterval = 10 * time.Second
+// Hearbeat interval determines theoretical minimum
+// TTL of a heartbeat message, which determines how
+// quickly we can detect a dropped computation
+var heartbeatInterval = 5 * time.Second
 
-// TODO: What's a reasonable ack deadline? Probably the amount of time in which
-// TODO: any calculation would finish, because we ack after it completes.
-var messageAckInterval = 60 * time.Second
+// Ack deadline should be as long as we ever expect it to
+// take from message receipt to beginning of processing
+var messageAckInterval = 5 * time.Second
 
 type Coordinator struct {
 	PostgresClient *sqlx.DB
@@ -174,30 +176,35 @@ func (c *Coordinator) subscriptionHandler(ctx context.Context, msg *pubsub.Messa
 	log.Println("Acknowledging message:", msg)
 	msg.Ack()
 	log.Println("Processing computation:", msgCompStatus.ComputationId)
-	// TODO: How to get operator & parameter IDs? Are they in the status or the computation?
+	var comp computation.Computation
+	err = pgutils.SelectByID(&pgutils.SelectConfig{
+		// Not locking because other mechanisms are ensuring that only one
+		// process is working on this computation at a time
+		DB:    c.PostgresClient,
+		Id:    msgCompStatus.ComputationId,
+		Out:   &comp,
+		Table: computation.TableName,
+	})
+	if err != nil {
+		// TODO: Just die and let something else resume?
+		log.Println(err)
+		return
+	}
 	pbRenderRequest := renders_pb.RenderRequest{
-		OperatorId:  "",
-		ParameterId: "",
-		Time:        0,
-		BoundingBox: &geometry_pb.BoundingBox2D{
-			StartX: 0,
-			StartY: 0,
-			EndX:   0,
-			EndY:   0,
-		},
+		OperatorKey: comp.OperatorKey,
+		Time:        comp.Time,
+		BoundingBox: comp.BoundingBox2D.ToProto(),
 	}
 	log.Println("Sending render request:", pbRenderRequest)
 	pbRenderResponse, err := c.RendersClient.DoRender(ctx, &pbRenderRequest)
 	if err != nil {
 		log.Println(err)
-		msg.Nack()
 		return
 	}
 	log.Println("Sending render response:", pbRenderResponse)
 	tx, err = c.PostgresClient.Beginx()
 	if err != nil {
 		log.Println(err)
-		msg.Nack()
 		return
 	}
 	err = func() error {
@@ -224,14 +231,12 @@ func (c *Coordinator) subscriptionHandler(ctx context.Context, msg *pubsub.Messa
 	}()
 	if err != nil {
 		log.Println(err)
-		msg.Nack()
 		tx.Rollback()
 		return
 	}
 	err = tx.Commit()
 	if err != nil {
 		log.Println(err)
-		msg.Nack()
 		return
 	}
 }

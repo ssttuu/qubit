@@ -19,3 +19,12 @@ func NewBoundingBoxFromProto(pb_bbox *pb.BoundingBox2D) *BoundingBox2D {
 		EndY:   pb_bbox.EndY,
 	}
 }
+
+func (b *BoundingBox2D) ToProto() *pb.BoundingBox2D {
+	return &pb.BoundingBox2D{
+		StartX: b.StartX,
+		StartY: b.StartY,
+		EndX:   b.EndX,
+		EndY:   b.EndY,
+	}
+}
