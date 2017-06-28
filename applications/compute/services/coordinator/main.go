@@ -193,15 +193,15 @@ func (c *Coordinator) subscriptionHandler(ctx context.Context, msg *pubsub.Messa
 	pbRenderRequest := renders_pb.RenderRequest{
 		OperatorKey: comp.OperatorKey,
 		Time:        comp.Time,
-		BoundingBox: comp.BoundingBox2D.ToProto(),
+		BoundingBox: comp.BoundingBox.ToProto(),
 	}
-	log.Println("Sending render request:", pbRenderRequest)
+	log.Println("Render request:", pbRenderRequest)
 	pbRenderResponse, err := c.RendersClient.DoRender(ctx, &pbRenderRequest)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	log.Println("Sending render response:", pbRenderResponse)
+	log.Println("Render response:", pbRenderResponse)
 	tx, err = c.PostgresClient.Beginx()
 	if err != nil {
 		log.Println(err)

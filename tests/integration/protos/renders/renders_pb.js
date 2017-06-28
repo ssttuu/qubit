@@ -102,7 +102,7 @@ proto.renders.RenderRequest.deserializeBinaryFromReader = function(msg, reader) 
       msg.setOperatorKey(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readFloat());
+      var value = /** @type {number} */ (reader.readDouble());
       msg.setTime(value);
       break;
     case 3:
@@ -157,7 +157,7 @@ proto.renders.RenderRequest.prototype.serializeBinaryToWriter = function (writer
   }
   f = this.getTime();
   if (f !== 0.0) {
-    writer.writeFloat(
+    writer.writeDouble(
       2,
       f
     );
@@ -189,7 +189,7 @@ proto.renders.RenderRequest.prototype.setOperatorKey = function(value) {
 
 
 /**
- * optional float time = 2;
+ * optional double time = 2;
  * @return {number}
  */
 proto.renders.RenderRequest.prototype.getTime = function() {

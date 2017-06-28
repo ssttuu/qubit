@@ -63,7 +63,7 @@ proto.computations.Computation.toObject = function(includeInstance, msg) {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     operatorKey: jspb.Message.getFieldWithDefault(msg, 2, ""),
     time: +jspb.Message.getFieldWithDefault(msg, 3, 0.0),
-    boundingBox2d: (f = msg.getBoundingBox2d()) && geometry_geometry_pb.BoundingBox2D.toObject(includeInstance, f),
+    boundingBox: (f = msg.getBoundingBox()) && geometry_geometry_pb.BoundingBox2D.toObject(includeInstance, f),
     resourceId: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
@@ -110,13 +110,13 @@ proto.computations.Computation.deserializeBinaryFromReader = function(msg, reade
       msg.setOperatorKey(value);
       break;
     case 3:
-      var value = /** @type {number} */ (reader.readFloat());
+      var value = /** @type {number} */ (reader.readDouble());
       msg.setTime(value);
       break;
     case 4:
       var value = new geometry_geometry_pb.BoundingBox2D;
       reader.readMessage(value,geometry_geometry_pb.BoundingBox2D.deserializeBinaryFromReader);
-      msg.setBoundingBox2d(value);
+      msg.setBoundingBox(value);
       break;
     case 5:
       var value = /** @type {string} */ (reader.readString());
@@ -176,12 +176,12 @@ proto.computations.Computation.prototype.serializeBinaryToWriter = function (wri
   }
   f = this.getTime();
   if (f !== 0.0) {
-    writer.writeFloat(
+    writer.writeDouble(
       3,
       f
     );
   }
-  f = this.getBoundingBox2d();
+  f = this.getBoundingBox();
   if (f != null) {
     writer.writeMessage(
       4,
@@ -230,7 +230,7 @@ proto.computations.Computation.prototype.setOperatorKey = function(value) {
 
 
 /**
- * optional float time = 3;
+ * optional double time = 3;
  * @return {number}
  */
 proto.computations.Computation.prototype.getTime = function() {
@@ -245,23 +245,23 @@ proto.computations.Computation.prototype.setTime = function(value) {
 
 
 /**
- * optional geometry.BoundingBox2D bounding_box2d = 4;
+ * optional geometry.BoundingBox2D bounding_box = 4;
  * @return {?proto.geometry.BoundingBox2D}
  */
-proto.computations.Computation.prototype.getBoundingBox2d = function() {
+proto.computations.Computation.prototype.getBoundingBox = function() {
   return /** @type{?proto.geometry.BoundingBox2D} */ (
     jspb.Message.getWrapperField(this, geometry_geometry_pb.BoundingBox2D, 4));
 };
 
 
 /** @param {?proto.geometry.BoundingBox2D|undefined} value */
-proto.computations.Computation.prototype.setBoundingBox2d = function(value) {
+proto.computations.Computation.prototype.setBoundingBox = function(value) {
   jspb.Message.setWrapperField(this, 4, value);
 };
 
 
-proto.computations.Computation.prototype.clearBoundingBox2d = function() {
-  this.setBoundingBox2d(undefined);
+proto.computations.Computation.prototype.clearBoundingBox = function() {
+  this.setBoundingBox(undefined);
 };
 
 
@@ -269,7 +269,7 @@ proto.computations.Computation.prototype.clearBoundingBox2d = function() {
  * Returns whether this field is set.
  * @return {!boolean}
  */
-proto.computations.Computation.prototype.hasBoundingBox2d = function() {
+proto.computations.Computation.prototype.hasBoundingBox = function() {
   return jspb.Message.getField(this, 4) != null;
 };
 

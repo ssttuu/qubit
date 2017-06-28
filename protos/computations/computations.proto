@@ -12,8 +12,8 @@ service Computations {
 message Computation {
     string id = 1;
     string operator_key = 2;
-    float time = 3;
-    geometry.BoundingBox2D bounding_box2d = 4;
+    double time = 3;
+    geometry.BoundingBox2D bounding_box = 4;
     string resource_id = 5; // Location in GCS
 }
 

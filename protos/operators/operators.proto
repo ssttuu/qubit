@@ -42,6 +42,9 @@ service Operators {
             body: ""
         };
     }
+    // Compute Processor uses this RPC to render
+    // No HTTP on purpose
+    rpc GetRenderParameters (RenderParameterRequest) returns (RenderParameter) {}
 }
 
 message Operator {
@@ -83,13 +86,23 @@ message DeleteOperatorRequest {
 
 message RenderOperatorRequest {
     string id = 1;
-
-    // TODO: use double?
-    int32 frame = 2;
+    double time = 2;
     geometry.BoundingBox2D bounding_box = 3;
 }
 
 message RenderOperatorResponse {
     string result_url = 1;
     string result_type = 2;
+}
+
+message RenderParameterRequest {
+    string operator_key = 1;
+    double time = 2;
+}
+
+message RenderParameter {
+    string type = 1;
+    // JSON field that varies by parameter type
+    bytes configuration = 2;
+    repeated RenderParameter inputs = 3;
 }

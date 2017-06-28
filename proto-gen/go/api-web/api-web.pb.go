@@ -470,8 +470,8 @@ func (m *RenderOperatorRequest) Reset()         { (*operators.RenderOperatorRequ
 func (m *RenderOperatorRequest) String() string { return (*operators.RenderOperatorRequest)(m).String() }
 func (*RenderOperatorRequest) ProtoMessage()    {}
 func (m *RenderOperatorRequest) GetId() string  { return (*operators.RenderOperatorRequest)(m).GetId() }
-func (m *RenderOperatorRequest) GetFrame() int32 {
-	return (*operators.RenderOperatorRequest)(m).GetFrame()
+func (m *RenderOperatorRequest) GetTime() float64 {
+	return (*operators.RenderOperatorRequest)(m).GetTime()
 }
 
 // RenderOperatorResponse from public import operators/operators.proto
@@ -487,6 +487,43 @@ func (m *RenderOperatorResponse) GetResultUrl() string {
 }
 func (m *RenderOperatorResponse) GetResultType() string {
 	return (*operators.RenderOperatorResponse)(m).GetResultType()
+}
+
+// RenderParameterRequest from public import operators/operators.proto
+type RenderParameterRequest operators.RenderParameterRequest
+
+func (m *RenderParameterRequest) Reset() { (*operators.RenderParameterRequest)(m).Reset() }
+func (m *RenderParameterRequest) String() string {
+	return (*operators.RenderParameterRequest)(m).String()
+}
+func (*RenderParameterRequest) ProtoMessage() {}
+func (m *RenderParameterRequest) GetOperatorKey() string {
+	return (*operators.RenderParameterRequest)(m).GetOperatorKey()
+}
+func (m *RenderParameterRequest) GetTime() float64 {
+	return (*operators.RenderParameterRequest)(m).GetTime()
+}
+
+// RenderParameter from public import operators/operators.proto
+type RenderParameter operators.RenderParameter
+
+func (m *RenderParameter) Reset()          { (*operators.RenderParameter)(m).Reset() }
+func (m *RenderParameter) String() string  { return (*operators.RenderParameter)(m).String() }
+func (*RenderParameter) ProtoMessage()     {}
+func (m *RenderParameter) GetType() string { return (*operators.RenderParameter)(m).GetType() }
+func (m *RenderParameter) GetConfiguration() []byte {
+	return (*operators.RenderParameter)(m).GetConfiguration()
+}
+func (m *RenderParameter) GetInputs() []*RenderParameter {
+	o := (*operators.RenderParameter)(m).GetInputs()
+	if o == nil {
+		return nil
+	}
+	s := make([]*RenderParameter, len(o))
+	for i, x := range o {
+		s[i] = (*RenderParameter)(x)
+	}
+	return s
 }
 
 // ParameterRoot from public import parameters/parameters.proto
@@ -658,7 +695,7 @@ func (m *RenderRequest) Reset()                 { (*renders.RenderRequest)(m).Re
 func (m *RenderRequest) String() string         { return (*renders.RenderRequest)(m).String() }
 func (*RenderRequest) ProtoMessage()            {}
 func (m *RenderRequest) GetOperatorKey() string { return (*renders.RenderRequest)(m).GetOperatorKey() }
-func (m *RenderRequest) GetTime() float32       { return (*renders.RenderRequest)(m).GetTime() }
+func (m *RenderRequest) GetTime() float64       { return (*renders.RenderRequest)(m).GetTime() }
 
 // RenderResponse from public import renders/renders.proto
 type RenderResponse renders.RenderResponse

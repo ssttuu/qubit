@@ -83,70 +83,12 @@ func (s *Server) List(ctx context.Context, in *operators_pb.ListOperatorsRequest
 }
 
 func (s *Server) Render(ctx context.Context, in *operators_pb.RenderOperatorRequest) (*operators_pb.RenderOperatorResponse, error) {
-	//	orgKey := datastore.NameKey(organization.Kind, in.OrganizationId, nil)
-	//	sceneKey := datastore.NameKey(scene.Kind, in.SceneId, orgKey)
-	//	operatorKey := datastore.NameKey(operator.Kind, in.Id, sceneKey)
-	//
-	//	// TODO: make gRPC request for the operator?
-	//	var theOperator operator.Operator
-	//	if err := s.DatastoreClient.Get(ctx, operatorKey, &theOperator); err != nil {
-	//		return nil, errors.Wrapf(err, "Failed to get operator to be rendered, %v", operatorKey)
-	//	}
-	//
-	//	listParamsRequest := &parameters_pb.ListParametersRequest{
-	//		OrganizationId: in.OrganizationId,
-	//		SceneId:        in.SceneId,
-	//		OperatorId:     in.Id,
-	//	}
-	//
-	//	params_pb, err := s.ParametersClient.List(ctx, listParamsRequest)
-	//	if err != nil {
-	//		return nil, errors.Wrapf(err, "Failed to list parameters, %v", listParamsRequest)
-	//	}
-	//
-	//	renderImageRequest := &compute_pb.RenderImageRequest{
-	//		Operator:   theOperator.ToProto(),
-	//		Parameters: params_pb.Parameters,
-	//	}
-	//	renderImageResponse, err := s.ComputeClient.RenderImage(ctx, renderImageRequest)
-	//	if err != nil {
-	//		return nil, errors.Wrapf(err, "Failed to render operator, %v", theOperator)
-	//	}
-	//
-	//	imagePlane := image.NewPlaneFromProto(renderImageResponse.ImagePlane)
-	//
-	//	//
-	//	//// TODO: create bucket per Organization
-	//	//// TODO: hash OrgId, SceneId, and OperatorId to get bucket path
-	//	imageProtoObjectPath := fmt.Sprintf("organizations/%d/scenes/%d/operators/%d/images/%d/image.bytes", in.OrganizationId, in.SceneId, in.Id, in.Frame)
-	//	imagePngObjectPath := fmt.Sprintf("organizations/%d/scenes/%d/operators/%d/images/%d/image.png", in.OrganizationId, in.SceneId, in.Id, in.Frame)
-	//
-	//	bucket := s.StorageClient.Bucket("qubit-dev-161916")
-	//	imageProtoObject := bucket.Object(imageProtoObjectPath)
-	//
-	//	// PROTO
-	//	protoWriter := imageProtoObject.NewWriter(ctx)
-	//	protoWriter.ContentType = "application/octet-stream"
-	//
-	//	image_bytes, err := proto.Marshal(imagePlane.ToProto())
-	//	if err != nil {
-	//		return nil, errors.Wrapf(err, "Failed to marshal imagePlane proto, %v", imagePlane)
-	//	}
-	//
-	//	protoWriter.Write(image_bytes)
-	//	protoWriter.Close()
-	//
-	//	// PNG
-	//	pngWriter := imageProtoObject.NewWriter(ctx)
-	//	pngWriter.ContentType = "image/png"
-	//
-	//	if err := png.Encode(pngWriter, imagePlane.ToNRGBA()); err != nil {
-	//		return nil, errors.Wrap(err, "Failed to encode png")
-	//	}
-	//
-	//	pngWriter.Close()
-	//
-	//	return &operators_pb.RenderOperatorResponse{ResultUrl: imagePngObjectPath, ResultType: operator.IMAGE}, nil
+	// TODO: Forward request to compute-web
+	return nil, nil
+}
+
+func (s *Server) GetRenderParameters(ctx context.Context, in *operators_pb.RenderParameterRequest) (*operators_pb.RenderParameter, error) {
+	// TODO: Use operator key to get parameter inputs and configuration
 	return nil, nil
 }
 
