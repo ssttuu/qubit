@@ -3,7 +3,7 @@
 'use strict';
 var grpc = require('grpc');
 var computations_computations_pb = require('../computations/computations_pb.js');
-var operators_operators_pb = require('../operators/operators_pb.js');
+var geometry_geometry_pb = require('../geometry/geometry_pb.js');
 
 function serialize_computations_ComputationStatus(arg) {
   if (!(arg instanceof computations_computations_pb.ComputationStatus)) {

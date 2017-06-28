@@ -58,9 +58,8 @@ proto.renders.RenderRequest.prototype.toObject = function(opt_includeInstance) {
  */
 proto.renders.RenderRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    operatorId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    parameterId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    time: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    operatorKey: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    time: +jspb.Message.getFieldWithDefault(msg, 2, 0.0),
     boundingBox: (f = msg.getBoundingBox()) && geometry_geometry_pb.BoundingBox2D.toObject(includeInstance, f)
   };
 
@@ -100,17 +99,13 @@ proto.renders.RenderRequest.deserializeBinaryFromReader = function(msg, reader) 
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorId(value);
+      msg.setOperatorKey(value);
       break;
     case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setParameterId(value);
-      break;
-    case 3:
-      var value = /** @type {number} */ (reader.readInt32());
+      var value = /** @type {number} */ (reader.readFloat());
       msg.setTime(value);
       break;
-    case 4:
+    case 3:
       var value = new geometry_geometry_pb.BoundingBox2D;
       reader.readMessage(value,geometry_geometry_pb.BoundingBox2D.deserializeBinaryFromReader);
       msg.setBoundingBox(value);
@@ -153,31 +148,24 @@ proto.renders.RenderRequest.prototype.serializeBinary = function() {
  */
 proto.renders.RenderRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOperatorId();
+  f = this.getOperatorKey();
   if (f.length > 0) {
     writer.writeString(
       1,
       f
     );
   }
-  f = this.getParameterId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
   f = this.getTime();
-  if (f !== 0) {
-    writer.writeInt32(
-      3,
+  if (f !== 0.0) {
+    writer.writeFloat(
+      2,
       f
     );
   }
   f = this.getBoundingBox();
   if (f != null) {
     writer.writeMessage(
-      4,
+      3,
       f,
       geometry_geometry_pb.BoundingBox2D.serializeBinaryToWriter
     );
@@ -186,63 +174,48 @@ proto.renders.RenderRequest.prototype.serializeBinaryToWriter = function (writer
 
 
 /**
- * optional string operator_id = 1;
+ * optional string operator_key = 1;
  * @return {string}
  */
-proto.renders.RenderRequest.prototype.getOperatorId = function() {
+proto.renders.RenderRequest.prototype.getOperatorKey = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.renders.RenderRequest.prototype.setOperatorId = function(value) {
+proto.renders.RenderRequest.prototype.setOperatorKey = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional string parameter_id = 2;
- * @return {string}
- */
-proto.renders.RenderRequest.prototype.getParameterId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.renders.RenderRequest.prototype.setParameterId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional int32 time = 3;
+ * optional float time = 2;
  * @return {number}
  */
 proto.renders.RenderRequest.prototype.getTime = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 2, 0.0));
 };
 
 
 /** @param {number} value */
 proto.renders.RenderRequest.prototype.setTime = function(value) {
-  jspb.Message.setField(this, 3, value);
+  jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * optional geometry.BoundingBox2D bounding_box = 4;
+ * optional geometry.BoundingBox2D bounding_box = 3;
  * @return {?proto.geometry.BoundingBox2D}
  */
 proto.renders.RenderRequest.prototype.getBoundingBox = function() {
   return /** @type{?proto.geometry.BoundingBox2D} */ (
-    jspb.Message.getWrapperField(this, geometry_geometry_pb.BoundingBox2D, 4));
+    jspb.Message.getWrapperField(this, geometry_geometry_pb.BoundingBox2D, 3));
 };
 
 
 /** @param {?proto.geometry.BoundingBox2D|undefined} value */
 proto.renders.RenderRequest.prototype.setBoundingBox = function(value) {
-  jspb.Message.setWrapperField(this, 4, value);
+  jspb.Message.setWrapperField(this, 3, value);
 };
 
 
@@ -256,7 +229,7 @@ proto.renders.RenderRequest.prototype.clearBoundingBox = function() {
  * @return {!boolean}
  */
 proto.renders.RenderRequest.prototype.hasBoundingBox = function() {
-  return jspb.Message.getField(this, 4) != null;
+  return jspb.Message.getField(this, 3) != null;
 };
 
 

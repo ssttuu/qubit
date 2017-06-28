@@ -30,25 +30,13 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // Computation from public import computations/computations.proto
 type Computation computations.Computation
 
-func (m *Computation) Reset()         { (*computations.Computation)(m).Reset() }
-func (m *Computation) String() string { return (*computations.Computation)(m).String() }
-func (*Computation) ProtoMessage()    {}
-func (m *Computation) GetId() string  { return (*computations.Computation)(m).GetId() }
-func (m *Computation) GetRootOperatorId() string {
-	return (*computations.Computation)(m).GetRootOperatorId()
-}
-func (m *Computation) GetOperatorMap() map[string]*Operator {
-	o := (*computations.Computation)(m).GetOperatorMap()
-	if o == nil {
-		return nil
-	}
-	s := make(map[string]*Operator, len(o))
-	for k, v := range o {
-		s[k] = (*Operator)(v)
-	}
-	return s
-}
-func (m *Computation) GetResourceId() string { return (*computations.Computation)(m).GetResourceId() }
+func (m *Computation) Reset()                 { (*computations.Computation)(m).Reset() }
+func (m *Computation) String() string         { return (*computations.Computation)(m).String() }
+func (*Computation) ProtoMessage()            {}
+func (m *Computation) GetId() string          { return (*computations.Computation)(m).GetId() }
+func (m *Computation) GetOperatorKey() string { return (*computations.Computation)(m).GetOperatorKey() }
+func (m *Computation) GetTime() float32       { return (*computations.Computation)(m).GetTime() }
+func (m *Computation) GetResourceId() string  { return (*computations.Computation)(m).GetResourceId() }
 
 // ComputationStatus from public import computations/computations.proto
 type ComputationStatus computations.ComputationStatus

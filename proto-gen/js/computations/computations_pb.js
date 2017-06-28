@@ -9,7 +9,7 @@ var jspb = require('google-protobuf');
 var goog = jspb;
 var global = Function('return this')();
 
-var operators_operators_pb = require('../operators/operators_pb.js');
+var geometry_geometry_pb = require('../geometry/geometry_pb.js');
 goog.exportSymbol('proto.computations.Computation', null, global);
 goog.exportSymbol('proto.computations.ComputationStatus', null, global);
 goog.exportSymbol('proto.computations.CreateComputationRequest', null, global);
@@ -61,9 +61,10 @@ proto.computations.Computation.prototype.toObject = function(opt_includeInstance
 proto.computations.Computation.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    rootOperatorId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    operatorMapMap: (f = msg.getOperatorMapMap()) ? f.toArray() : [],
-    resourceId: jspb.Message.getFieldWithDefault(msg, 4, "")
+    operatorKey: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    time: +jspb.Message.getFieldWithDefault(msg, 3, 0.0),
+    boundingBox2d: (f = msg.getBoundingBox2d()) && geometry_geometry_pb.BoundingBox2D.toObject(includeInstance, f),
+    resourceId: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
   if (includeInstance) {
@@ -106,15 +107,18 @@ proto.computations.Computation.deserializeBinaryFromReader = function(msg, reade
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setRootOperatorId(value);
+      msg.setOperatorKey(value);
       break;
     case 3:
-      var value = msg.getOperatorMapMap();
-      reader.readMessage(value, function(message, reader) {
-        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.operators.Operator.deserializeBinaryFromReader);
-         });
+      var value = /** @type {number} */ (reader.readFloat());
+      msg.setTime(value);
       break;
     case 4:
+      var value = new geometry_geometry_pb.BoundingBox2D;
+      reader.readMessage(value,geometry_geometry_pb.BoundingBox2D.deserializeBinaryFromReader);
+      msg.setBoundingBox2d(value);
+      break;
+    case 5:
       var value = /** @type {string} */ (reader.readString());
       msg.setResourceId(value);
       break;
@@ -163,21 +167,32 @@ proto.computations.Computation.prototype.serializeBinaryToWriter = function (wri
       f
     );
   }
-  f = this.getRootOperatorId();
+  f = this.getOperatorKey();
   if (f.length > 0) {
     writer.writeString(
       2,
       f
     );
   }
-  f = this.getOperatorMapMap(true);
-  if (f && f.getLength() > 0) {
-    f.serializeBinary(3, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.operators.Operator.serializeBinaryToWriter);
+  f = this.getTime();
+  if (f !== 0.0) {
+    writer.writeFloat(
+      3,
+      f
+    );
+  }
+  f = this.getBoundingBox2d();
+  if (f != null) {
+    writer.writeMessage(
+      4,
+      f,
+      geometry_geometry_pb.BoundingBox2D.serializeBinaryToWriter
+    );
   }
   f = this.getResourceId();
   if (f.length > 0) {
     writer.writeString(
-      4,
+      5,
       f
     );
   }
@@ -200,50 +215,77 @@ proto.computations.Computation.prototype.setId = function(value) {
 
 
 /**
- * optional string root_operator_id = 2;
+ * optional string operator_key = 2;
  * @return {string}
  */
-proto.computations.Computation.prototype.getRootOperatorId = function() {
+proto.computations.Computation.prototype.getOperatorKey = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.computations.Computation.prototype.setRootOperatorId = function(value) {
+proto.computations.Computation.prototype.setOperatorKey = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * map<string, operators.Operator> operator_map = 3;
- * @param {boolean=} opt_noLazyCreate Do not create the map if
- * empty, instead returning `undefined`
- * @return {!jspb.Map<string,!proto.operators.Operator>}
+ * optional float time = 3;
+ * @return {number}
  */
-proto.computations.Computation.prototype.getOperatorMapMap = function(opt_noLazyCreate) {
-  return /** @type {!jspb.Map<string,!proto.operators.Operator>} */ (
-      jspb.Message.getMapField(this, 3, opt_noLazyCreate,
-      proto.operators.Operator));
+proto.computations.Computation.prototype.getTime = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 3, 0.0));
 };
 
 
-proto.computations.Computation.prototype.clearOperatorMapMap = function() {
-  this.getOperatorMapMap().clear();
+/** @param {number} value */
+proto.computations.Computation.prototype.setTime = function(value) {
+  jspb.Message.setField(this, 3, value);
 };
 
 
 /**
- * optional string resource_id = 4;
+ * optional geometry.BoundingBox2D bounding_box2d = 4;
+ * @return {?proto.geometry.BoundingBox2D}
+ */
+proto.computations.Computation.prototype.getBoundingBox2d = function() {
+  return /** @type{?proto.geometry.BoundingBox2D} */ (
+    jspb.Message.getWrapperField(this, geometry_geometry_pb.BoundingBox2D, 4));
+};
+
+
+/** @param {?proto.geometry.BoundingBox2D|undefined} value */
+proto.computations.Computation.prototype.setBoundingBox2d = function(value) {
+  jspb.Message.setWrapperField(this, 4, value);
+};
+
+
+proto.computations.Computation.prototype.clearBoundingBox2d = function() {
+  this.setBoundingBox2d(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.computations.Computation.prototype.hasBoundingBox2d = function() {
+  return jspb.Message.getField(this, 4) != null;
+};
+
+
+/**
+ * optional string resource_id = 5;
  * @return {string}
  */
 proto.computations.Computation.prototype.getResourceId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
 
 /** @param {string} value */
 proto.computations.Computation.prototype.setResourceId = function(value) {
-  jspb.Message.setField(this, 4, value);
+  jspb.Message.setField(this, 5, value);
 };
 
 
