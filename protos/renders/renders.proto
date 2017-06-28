@@ -10,7 +10,7 @@ service Renders {
 
 message RenderRequest {
     string operator_key = 1;
-    float time = 2;
+    double time = 2;
     geometry.BoundingBox2D bounding_box = 3;
 }
 

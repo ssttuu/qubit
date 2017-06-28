@@ -34,7 +34,7 @@ func (m *RenderRequest) Reset()                 { (*renders.RenderRequest)(m).Re
 func (m *RenderRequest) String() string         { return (*renders.RenderRequest)(m).String() }
 func (*RenderRequest) ProtoMessage()            {}
 func (m *RenderRequest) GetOperatorKey() string { return (*renders.RenderRequest)(m).GetOperatorKey() }
-func (m *RenderRequest) GetTime() float32       { return (*renders.RenderRequest)(m).GetTime() }
+func (m *RenderRequest) GetTime() float64       { return (*renders.RenderRequest)(m).GetTime() }
 
 // RenderResponse from public import renders/renders.proto
 type RenderResponse renders.RenderResponse

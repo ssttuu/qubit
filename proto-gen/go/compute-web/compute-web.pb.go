@@ -35,7 +35,7 @@ func (m *Computation) String() string         { return (*computations.Computatio
 func (*Computation) ProtoMessage()            {}
 func (m *Computation) GetId() string          { return (*computations.Computation)(m).GetId() }
 func (m *Computation) GetOperatorKey() string { return (*computations.Computation)(m).GetOperatorKey() }
-func (m *Computation) GetTime() float32       { return (*computations.Computation)(m).GetTime() }
+func (m *Computation) GetTime() float64       { return (*computations.Computation)(m).GetTime() }
 func (m *Computation) GetResourceId() string  { return (*computations.Computation)(m).GetResourceId() }
 
 // ComputationStatus from public import computations/computations.proto

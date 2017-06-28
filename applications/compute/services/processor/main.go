@@ -11,7 +11,6 @@ import (
 
 	"github.com/stupschwartz/qubit/applications/compute/services/processor/renders"
 	operators_pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
-	parameters_pb "github.com/stupschwartz/qubit/proto-gen/go/parameters"
 )
 
 func serve(server *grpc.Server, listener net.Listener, done chan bool) {
@@ -54,7 +53,6 @@ func main() {
 	servingDone := make(chan bool)
 	go serve(grpcServer, lis, servingDone)
 	operatorsClient := operators_pb.NewOperatorsClient(apiWebConn)
-	parametersCilent := parameters_pb.NewParametersClient(apiWebConn)
-	renders.Register(grpcServer, operatorsClient, parametersCilent)
+	renders.Register(grpcServer, operatorsClient)
 	<-servingDone
 }

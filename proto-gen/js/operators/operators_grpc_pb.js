@@ -106,6 +106,28 @@ function deserialize_operators_RenderOperatorResponse(buffer_arg) {
   return operators_operators_pb.RenderOperatorResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_operators_RenderParameter(arg) {
+  if (!(arg instanceof operators_operators_pb.RenderParameter)) {
+    throw new Error('Expected argument of type operators.RenderParameter');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_operators_RenderParameter(buffer_arg) {
+  return operators_operators_pb.RenderParameter.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_operators_RenderParameterRequest(arg) {
+  if (!(arg instanceof operators_operators_pb.RenderParameterRequest)) {
+    throw new Error('Expected argument of type operators.RenderParameterRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_operators_RenderParameterRequest(buffer_arg) {
+  return operators_operators_pb.RenderParameterRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_operators_UpdateOperatorRequest(arg) {
   if (!(arg instanceof operators_operators_pb.UpdateOperatorRequest)) {
     throw new Error('Expected argument of type operators.UpdateOperatorRequest');
@@ -184,6 +206,19 @@ var OperatorsService = exports.OperatorsService = {
     requestDeserialize: deserialize_operators_RenderOperatorRequest,
     responseSerialize: serialize_operators_RenderOperatorResponse,
     responseDeserialize: deserialize_operators_RenderOperatorResponse,
+  },
+  // Compute Processor uses this RPC to render
+  // No HTTP on purpose
+  getRenderParameters: {
+    path: '/operators.Operators/GetRenderParameters',
+    requestStream: false,
+    responseStream: false,
+    requestType: operators_operators_pb.RenderParameterRequest,
+    responseType: operators_operators_pb.RenderParameter,
+    requestSerialize: serialize_operators_RenderParameterRequest,
+    requestDeserialize: deserialize_operators_RenderParameterRequest,
+    responseSerialize: serialize_operators_RenderParameter,
+    responseDeserialize: deserialize_operators_RenderParameter,
   },
 };
 
