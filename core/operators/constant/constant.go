@@ -8,17 +8,14 @@ import (
 
 const Name string = "Constant"
 
-var ParameterRoot parameter.ParameterRoot = parameter.ParameterRoot{
-	Children: parameter.ParameterMap{
-		"color": parameter.NewRGBParameter(),
-	},
-	Order: []string{"color"},
+var ConstantParameters parameter.ParameterSpecs = parameter.ParameterSpecs{
+	{Name: "color", Parameter: parameter.NewRGBParameter()},
 }
 
 type Constant struct{}
 
 func (c *Constant) Process(imageContext *operator.RenderImageContext) (*image.Plane, error) {
-	colorRoot := imageContext.ParameterRoot.GetGroup()
+	colorRoot := imageContext.Parameters.GetGroup()
 	colorGroup := colorRoot.GetGroup("color")
 	redParam := colorGroup.GetFloat64("red")
 	greenParam := colorGroup.GetFloat64("green")
@@ -45,5 +42,5 @@ func (c *Constant) Process(imageContext *operator.RenderImageContext) (*image.Pl
 }
 
 func init() {
-	operator.RegisterOperation(Name, &Constant{}, ParameterRoot)
+	operator.RegisterOperation(Name, &Constant{}, ConstantParameters)
 }

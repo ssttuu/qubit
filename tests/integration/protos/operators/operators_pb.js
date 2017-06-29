@@ -20,8 +20,6 @@ goog.exportSymbol('proto.operators.ListOperatorsResponse', null, global);
 goog.exportSymbol('proto.operators.Operator', null, global);
 goog.exportSymbol('proto.operators.RenderOperatorRequest', null, global);
 goog.exportSymbol('proto.operators.RenderOperatorResponse', null, global);
-goog.exportSymbol('proto.operators.RenderParameter', null, global);
-goog.exportSymbol('proto.operators.RenderParameterRequest', null, global);
 goog.exportSymbol('proto.operators.UpdateOperatorRequest', null, global);
 
 /**
@@ -78,11 +76,11 @@ proto.operators.Operator.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     sceneId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    type: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    name: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    context: jspb.Message.getFieldWithDefault(msg, 5, ""),
-    inputsList: jspb.Message.getField(msg, 6),
-    parameterRoot: msg.getParameterRoot_asB64()
+    context: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    type: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    name: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    inputIdsList: jspb.Message.getField(msg, 6),
+    configuration: msg.getConfiguration_asB64()
   };
 
   if (includeInstance) {
@@ -129,23 +127,23 @@ proto.operators.Operator.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
-      msg.setType(value);
+      msg.setContext(value);
       break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
-      msg.setName(value);
+      msg.setType(value);
       break;
     case 5:
       var value = /** @type {string} */ (reader.readString());
-      msg.setContext(value);
+      msg.setName(value);
       break;
     case 6:
       var value = /** @type {string} */ (reader.readString());
-      msg.addInputs(value);
+      msg.addInputIds(value);
       break;
     case 7:
       var value = /** @type {!Uint8Array} */ (reader.readBytes());
-      msg.setParameterRoot(value);
+      msg.setConfiguration(value);
       break;
     default:
       reader.skipField();
@@ -199,35 +197,35 @@ proto.operators.Operator.prototype.serializeBinaryToWriter = function (writer) {
       f
     );
   }
-  f = this.getType();
+  f = this.getContext();
   if (f.length > 0) {
     writer.writeString(
       3,
       f
     );
   }
-  f = this.getName();
+  f = this.getType();
   if (f.length > 0) {
     writer.writeString(
       4,
       f
     );
   }
-  f = this.getContext();
+  f = this.getName();
   if (f.length > 0) {
     writer.writeString(
       5,
       f
     );
   }
-  f = this.getInputsList();
+  f = this.getInputIdsList();
   if (f.length > 0) {
     writer.writeRepeatedString(
       6,
       f
     );
   }
-  f = this.getParameterRoot_asU8();
+  f = this.getConfiguration_asU8();
   if (f.length > 0) {
     writer.writeBytes(
       7,
@@ -268,63 +266,63 @@ proto.operators.Operator.prototype.setSceneId = function(value) {
 
 
 /**
- * optional string type = 3;
+ * optional string context = 3;
  * @return {string}
  */
-proto.operators.Operator.prototype.getType = function() {
+proto.operators.Operator.prototype.getContext = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
-proto.operators.Operator.prototype.setType = function(value) {
+proto.operators.Operator.prototype.setContext = function(value) {
   jspb.Message.setField(this, 3, value);
 };
 
 
 /**
- * optional string name = 4;
+ * optional string type = 4;
  * @return {string}
  */
-proto.operators.Operator.prototype.getName = function() {
+proto.operators.Operator.prototype.getType = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.operators.Operator.prototype.setName = function(value) {
+proto.operators.Operator.prototype.setType = function(value) {
   jspb.Message.setField(this, 4, value);
 };
 
 
 /**
- * optional string context = 5;
+ * optional string name = 5;
  * @return {string}
  */
-proto.operators.Operator.prototype.getContext = function() {
+proto.operators.Operator.prototype.getName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
 
 /** @param {string} value */
-proto.operators.Operator.prototype.setContext = function(value) {
+proto.operators.Operator.prototype.setName = function(value) {
   jspb.Message.setField(this, 5, value);
 };
 
 
 /**
- * repeated string inputs = 6;
+ * repeated string input_ids = 6;
  * If you change this array by adding, removing or replacing elements, or if you
  * replace the array itself, then you must call the setter to update it.
  * @return {!Array.<string>}
  */
-proto.operators.Operator.prototype.getInputsList = function() {
+proto.operators.Operator.prototype.getInputIdsList = function() {
   return /** @type {!Array.<string>} */ (jspb.Message.getField(this, 6));
 };
 
 
 /** @param {!Array.<string>} value */
-proto.operators.Operator.prototype.setInputsList = function(value) {
+proto.operators.Operator.prototype.setInputIdsList = function(value) {
   jspb.Message.setField(this, 6, value || []);
 };
 
@@ -333,51 +331,51 @@ proto.operators.Operator.prototype.setInputsList = function(value) {
  * @param {!string} value
  * @param {number=} opt_index
  */
-proto.operators.Operator.prototype.addInputs = function(value, opt_index) {
+proto.operators.Operator.prototype.addInputIds = function(value, opt_index) {
   jspb.Message.addToRepeatedField(this, 6, value, opt_index);
 };
 
 
-proto.operators.Operator.prototype.clearInputsList = function() {
-  this.setInputsList([]);
+proto.operators.Operator.prototype.clearInputIdsList = function() {
+  this.setInputIdsList([]);
 };
 
 
 /**
- * optional bytes parameter_root = 7;
+ * optional bytes configuration = 7;
  * @return {!(string|Uint8Array)}
  */
-proto.operators.Operator.prototype.getParameterRoot = function() {
+proto.operators.Operator.prototype.getConfiguration = function() {
   return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
 };
 
 
 /**
- * optional bytes parameter_root = 7;
- * This is a type-conversion wrapper around `getParameterRoot()`
+ * optional bytes configuration = 7;
+ * This is a type-conversion wrapper around `getConfiguration()`
  * @return {string}
  */
-proto.operators.Operator.prototype.getParameterRoot_asB64 = function() {
+proto.operators.Operator.prototype.getConfiguration_asB64 = function() {
   return /** @type {string} */ (jspb.Message.bytesAsB64(
-      this.getParameterRoot()));
+      this.getConfiguration()));
 };
 
 
 /**
- * optional bytes parameter_root = 7;
+ * optional bytes configuration = 7;
  * Note that Uint8Array is not supported on all browsers.
  * @see http://caniuse.com/Uint8Array
- * This is a type-conversion wrapper around `getParameterRoot()`
+ * This is a type-conversion wrapper around `getConfiguration()`
  * @return {!Uint8Array}
  */
-proto.operators.Operator.prototype.getParameterRoot_asU8 = function() {
+proto.operators.Operator.prototype.getConfiguration_asU8 = function() {
   return /** @type {!Uint8Array} */ (jspb.Message.bytesAsU8(
-      this.getParameterRoot()));
+      this.getConfiguration()));
 };
 
 
 /** @param {!(string|Uint8Array)} value */
-proto.operators.Operator.prototype.setParameterRoot = function(value) {
+proto.operators.Operator.prototype.setConfiguration = function(value) {
   jspb.Message.setField(this, 7, value);
 };
 
@@ -1820,439 +1818,6 @@ proto.operators.RenderOperatorResponse.prototype.getResultType = function() {
 /** @param {string} value */
 proto.operators.RenderOperatorResponse.prototype.setResultType = function(value) {
   jspb.Message.setField(this, 2, value);
-};
-
-
-
-/**
- * Generated by JsPbCodeGenerator.
- * @param {Array=} opt_data Optional initial data array, typically from a
- * server response, or constructed directly in Javascript. The array is used
- * in place and becomes part of the constructed object. It is not cloned.
- * If no data is provided, the constructed object will be empty, but still
- * valid.
- * @extends {jspb.Message}
- * @constructor
- */
-proto.operators.RenderParameterRequest = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
-};
-goog.inherits(proto.operators.RenderParameterRequest, jspb.Message);
-if (goog.DEBUG && !COMPILED) {
-  proto.operators.RenderParameterRequest.displayName = 'proto.operators.RenderParameterRequest';
-}
-
-
-if (jspb.Message.GENERATE_TO_OBJECT) {
-/**
- * Creates an object representation of this proto suitable for use in Soy templates.
- * Field names that are reserved in JavaScript and will be renamed to pb_name.
- * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
- * For the list of reserved names please see:
- *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
- * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
- *     for transitional soy proto support: http://goto/soy-param-migration
- * @return {!Object}
- */
-proto.operators.RenderParameterRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.operators.RenderParameterRequest.toObject(opt_includeInstance, this);
-};
-
-
-/**
- * Static version of the {@see toObject} method.
- * @param {boolean|undefined} includeInstance Whether to include the JSPB
- *     instance for transitional soy proto support:
- *     http://goto/soy-param-migration
- * @param {!proto.operators.RenderParameterRequest} msg The msg instance to transform.
- * @return {!Object}
- */
-proto.operators.RenderParameterRequest.toObject = function(includeInstance, msg) {
-  var f, obj = {
-    operatorKey: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    time: +jspb.Message.getFieldWithDefault(msg, 2, 0.0)
-  };
-
-  if (includeInstance) {
-    obj.$jspbMessageInstance = msg;
-  }
-  return obj;
-};
-}
-
-
-/**
- * Deserializes binary data (in protobuf wire format).
- * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.operators.RenderParameterRequest}
- */
-proto.operators.RenderParameterRequest.deserializeBinary = function(bytes) {
-  var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.operators.RenderParameterRequest;
-  return proto.operators.RenderParameterRequest.deserializeBinaryFromReader(msg, reader);
-};
-
-
-/**
- * Deserializes binary data (in protobuf wire format) from the
- * given reader into the given message object.
- * @param {!proto.operators.RenderParameterRequest} msg The message object to deserialize into.
- * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.operators.RenderParameterRequest}
- */
-proto.operators.RenderParameterRequest.deserializeBinaryFromReader = function(msg, reader) {
-  while (reader.nextField()) {
-    if (reader.isEndGroup()) {
-      break;
-    }
-    var field = reader.getFieldNumber();
-    switch (field) {
-    case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorKey(value);
-      break;
-    case 2:
-      var value = /** @type {number} */ (reader.readDouble());
-      msg.setTime(value);
-      break;
-    default:
-      reader.skipField();
-      break;
-    }
-  }
-  return msg;
-};
-
-
-/**
- * Class method variant: serializes the given message to binary data
- * (in protobuf wire format), writing to the given BinaryWriter.
- * @param {!proto.operators.RenderParameterRequest} message
- * @param {!jspb.BinaryWriter} writer
- */
-proto.operators.RenderParameterRequest.serializeBinaryToWriter = function(message, writer) {
-  message.serializeBinaryToWriter(writer);
-};
-
-
-/**
- * Serializes the message to binary data (in protobuf wire format).
- * @return {!Uint8Array}
- */
-proto.operators.RenderParameterRequest.prototype.serializeBinary = function() {
-  var writer = new jspb.BinaryWriter();
-  this.serializeBinaryToWriter(writer);
-  return writer.getResultBuffer();
-};
-
-
-/**
- * Serializes the message to binary data (in protobuf wire format),
- * writing to the given BinaryWriter.
- * @param {!jspb.BinaryWriter} writer
- */
-proto.operators.RenderParameterRequest.prototype.serializeBinaryToWriter = function (writer) {
-  var f = undefined;
-  f = this.getOperatorKey();
-  if (f.length > 0) {
-    writer.writeString(
-      1,
-      f
-    );
-  }
-  f = this.getTime();
-  if (f !== 0.0) {
-    writer.writeDouble(
-      2,
-      f
-    );
-  }
-};
-
-
-/**
- * optional string operator_key = 1;
- * @return {string}
- */
-proto.operators.RenderParameterRequest.prototype.getOperatorKey = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.RenderParameterRequest.prototype.setOperatorKey = function(value) {
-  jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional double time = 2;
- * @return {number}
- */
-proto.operators.RenderParameterRequest.prototype.getTime = function() {
-  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 2, 0.0));
-};
-
-
-/** @param {number} value */
-proto.operators.RenderParameterRequest.prototype.setTime = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-
-/**
- * Generated by JsPbCodeGenerator.
- * @param {Array=} opt_data Optional initial data array, typically from a
- * server response, or constructed directly in Javascript. The array is used
- * in place and becomes part of the constructed object. It is not cloned.
- * If no data is provided, the constructed object will be empty, but still
- * valid.
- * @extends {jspb.Message}
- * @constructor
- */
-proto.operators.RenderParameter = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.operators.RenderParameter.repeatedFields_, null);
-};
-goog.inherits(proto.operators.RenderParameter, jspb.Message);
-if (goog.DEBUG && !COMPILED) {
-  proto.operators.RenderParameter.displayName = 'proto.operators.RenderParameter';
-}
-/**
- * List of repeated fields within this message type.
- * @private {!Array<number>}
- * @const
- */
-proto.operators.RenderParameter.repeatedFields_ = [3];
-
-
-
-if (jspb.Message.GENERATE_TO_OBJECT) {
-/**
- * Creates an object representation of this proto suitable for use in Soy templates.
- * Field names that are reserved in JavaScript and will be renamed to pb_name.
- * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
- * For the list of reserved names please see:
- *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
- * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
- *     for transitional soy proto support: http://goto/soy-param-migration
- * @return {!Object}
- */
-proto.operators.RenderParameter.prototype.toObject = function(opt_includeInstance) {
-  return proto.operators.RenderParameter.toObject(opt_includeInstance, this);
-};
-
-
-/**
- * Static version of the {@see toObject} method.
- * @param {boolean|undefined} includeInstance Whether to include the JSPB
- *     instance for transitional soy proto support:
- *     http://goto/soy-param-migration
- * @param {!proto.operators.RenderParameter} msg The msg instance to transform.
- * @return {!Object}
- */
-proto.operators.RenderParameter.toObject = function(includeInstance, msg) {
-  var f, obj = {
-    type: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    configuration: msg.getConfiguration_asB64(),
-    inputsList: jspb.Message.toObjectList(msg.getInputsList(),
-    proto.operators.RenderParameter.toObject, includeInstance)
-  };
-
-  if (includeInstance) {
-    obj.$jspbMessageInstance = msg;
-  }
-  return obj;
-};
-}
-
-
-/**
- * Deserializes binary data (in protobuf wire format).
- * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.operators.RenderParameter}
- */
-proto.operators.RenderParameter.deserializeBinary = function(bytes) {
-  var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.operators.RenderParameter;
-  return proto.operators.RenderParameter.deserializeBinaryFromReader(msg, reader);
-};
-
-
-/**
- * Deserializes binary data (in protobuf wire format) from the
- * given reader into the given message object.
- * @param {!proto.operators.RenderParameter} msg The message object to deserialize into.
- * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.operators.RenderParameter}
- */
-proto.operators.RenderParameter.deserializeBinaryFromReader = function(msg, reader) {
-  while (reader.nextField()) {
-    if (reader.isEndGroup()) {
-      break;
-    }
-    var field = reader.getFieldNumber();
-    switch (field) {
-    case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setType(value);
-      break;
-    case 2:
-      var value = /** @type {!Uint8Array} */ (reader.readBytes());
-      msg.setConfiguration(value);
-      break;
-    case 3:
-      var value = new proto.operators.RenderParameter;
-      reader.readMessage(value,proto.operators.RenderParameter.deserializeBinaryFromReader);
-      msg.addInputs(value);
-      break;
-    default:
-      reader.skipField();
-      break;
-    }
-  }
-  return msg;
-};
-
-
-/**
- * Class method variant: serializes the given message to binary data
- * (in protobuf wire format), writing to the given BinaryWriter.
- * @param {!proto.operators.RenderParameter} message
- * @param {!jspb.BinaryWriter} writer
- */
-proto.operators.RenderParameter.serializeBinaryToWriter = function(message, writer) {
-  message.serializeBinaryToWriter(writer);
-};
-
-
-/**
- * Serializes the message to binary data (in protobuf wire format).
- * @return {!Uint8Array}
- */
-proto.operators.RenderParameter.prototype.serializeBinary = function() {
-  var writer = new jspb.BinaryWriter();
-  this.serializeBinaryToWriter(writer);
-  return writer.getResultBuffer();
-};
-
-
-/**
- * Serializes the message to binary data (in protobuf wire format),
- * writing to the given BinaryWriter.
- * @param {!jspb.BinaryWriter} writer
- */
-proto.operators.RenderParameter.prototype.serializeBinaryToWriter = function (writer) {
-  var f = undefined;
-  f = this.getType();
-  if (f.length > 0) {
-    writer.writeString(
-      1,
-      f
-    );
-  }
-  f = this.getConfiguration_asU8();
-  if (f.length > 0) {
-    writer.writeBytes(
-      2,
-      f
-    );
-  }
-  f = this.getInputsList();
-  if (f.length > 0) {
-    writer.writeRepeatedMessage(
-      3,
-      f,
-      proto.operators.RenderParameter.serializeBinaryToWriter
-    );
-  }
-};
-
-
-/**
- * optional string type = 1;
- * @return {string}
- */
-proto.operators.RenderParameter.prototype.getType = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
-};
-
-
-/** @param {string} value */
-proto.operators.RenderParameter.prototype.setType = function(value) {
-  jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional bytes configuration = 2;
- * @return {!(string|Uint8Array)}
- */
-proto.operators.RenderParameter.prototype.getConfiguration = function() {
-  return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/**
- * optional bytes configuration = 2;
- * This is a type-conversion wrapper around `getConfiguration()`
- * @return {string}
- */
-proto.operators.RenderParameter.prototype.getConfiguration_asB64 = function() {
-  return /** @type {string} */ (jspb.Message.bytesAsB64(
-      this.getConfiguration()));
-};
-
-
-/**
- * optional bytes configuration = 2;
- * Note that Uint8Array is not supported on all browsers.
- * @see http://caniuse.com/Uint8Array
- * This is a type-conversion wrapper around `getConfiguration()`
- * @return {!Uint8Array}
- */
-proto.operators.RenderParameter.prototype.getConfiguration_asU8 = function() {
-  return /** @type {!Uint8Array} */ (jspb.Message.bytesAsU8(
-      this.getConfiguration()));
-};
-
-
-/** @param {!(string|Uint8Array)} value */
-proto.operators.RenderParameter.prototype.setConfiguration = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * repeated RenderParameter inputs = 3;
- * If you change this array by adding, removing or replacing elements, or if you
- * replace the array itself, then you must call the setter to update it.
- * @return {!Array.<!proto.operators.RenderParameter>}
- */
-proto.operators.RenderParameter.prototype.getInputsList = function() {
-  return /** @type{!Array.<!proto.operators.RenderParameter>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.operators.RenderParameter, 3));
-};
-
-
-/** @param {!Array.<!proto.operators.RenderParameter>} value */
-proto.operators.RenderParameter.prototype.setInputsList = function(value) {
-  jspb.Message.setRepeatedWrapperField(this, 3, value);
-};
-
-
-/**
- * @param {!proto.operators.RenderParameter=} opt_value
- * @param {number=} opt_index
- * @return {!proto.operators.RenderParameter}
- */
-proto.operators.RenderParameter.prototype.addInputs = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 3, opt_value, proto.operators.RenderParameter, opt_index);
-};
-
-
-proto.operators.RenderParameter.prototype.clearInputsList = function() {
-  this.setInputsList([]);
 };
 
 

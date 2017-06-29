@@ -17,9 +17,8 @@ import math "math"
 import image_sequences "github.com/stupschwartz/qubit/proto-gen/go/image_sequences"
 import images "github.com/stupschwartz/qubit/proto-gen/go/images"
 import projects "github.com/stupschwartz/qubit/proto-gen/go/projects"
-import operators "github.com/stupschwartz/qubit/proto-gen/go/operators"
-import parameters "github.com/stupschwartz/qubit/proto-gen/go/parameters"
 import organizations "github.com/stupschwartz/qubit/proto-gen/go/organizations"
+import render_parameters "github.com/stupschwartz/qubit/proto-gen/go/render_parameters"
 import renders "github.com/stupschwartz/qubit/proto-gen/go/renders"
 import scenes "github.com/stupschwartz/qubit/proto-gen/go/scenes"
 
@@ -378,218 +377,6 @@ func (m *DeleteProjectRequest) String() string { return (*projects.DeleteProject
 func (*DeleteProjectRequest) ProtoMessage()    {}
 func (m *DeleteProjectRequest) GetId() string  { return (*projects.DeleteProjectRequest)(m).GetId() }
 
-// Operator from public import operators/operators.proto
-type Operator operators.Operator
-
-func (m *Operator) Reset()                   { (*operators.Operator)(m).Reset() }
-func (m *Operator) String() string           { return (*operators.Operator)(m).String() }
-func (*Operator) ProtoMessage()              {}
-func (m *Operator) GetId() string            { return (*operators.Operator)(m).GetId() }
-func (m *Operator) GetSceneId() string       { return (*operators.Operator)(m).GetSceneId() }
-func (m *Operator) GetType() string          { return (*operators.Operator)(m).GetType() }
-func (m *Operator) GetName() string          { return (*operators.Operator)(m).GetName() }
-func (m *Operator) GetContext() string       { return (*operators.Operator)(m).GetContext() }
-func (m *Operator) GetInputs() []string      { return (*operators.Operator)(m).GetInputs() }
-func (m *Operator) GetParameterRoot() []byte { return (*operators.Operator)(m).GetParameterRoot() }
-
-// ListOperatorsRequest from public import operators/operators.proto
-type ListOperatorsRequest operators.ListOperatorsRequest
-
-func (m *ListOperatorsRequest) Reset()         { (*operators.ListOperatorsRequest)(m).Reset() }
-func (m *ListOperatorsRequest) String() string { return (*operators.ListOperatorsRequest)(m).String() }
-func (*ListOperatorsRequest) ProtoMessage()    {}
-func (m *ListOperatorsRequest) GetPageSize() int32 {
-	return (*operators.ListOperatorsRequest)(m).GetPageSize()
-}
-func (m *ListOperatorsRequest) GetPageToken() string {
-	return (*operators.ListOperatorsRequest)(m).GetPageToken()
-}
-
-// ListOperatorsResponse from public import operators/operators.proto
-type ListOperatorsResponse operators.ListOperatorsResponse
-
-func (m *ListOperatorsResponse) Reset()         { (*operators.ListOperatorsResponse)(m).Reset() }
-func (m *ListOperatorsResponse) String() string { return (*operators.ListOperatorsResponse)(m).String() }
-func (*ListOperatorsResponse) ProtoMessage()    {}
-func (m *ListOperatorsResponse) GetOperators() []*Operator {
-	o := (*operators.ListOperatorsResponse)(m).GetOperators()
-	if o == nil {
-		return nil
-	}
-	s := make([]*Operator, len(o))
-	for i, x := range o {
-		s[i] = (*Operator)(x)
-	}
-	return s
-}
-func (m *ListOperatorsResponse) GetNextPageToken() string {
-	return (*operators.ListOperatorsResponse)(m).GetNextPageToken()
-}
-
-// GetOperatorRequest from public import operators/operators.proto
-type GetOperatorRequest operators.GetOperatorRequest
-
-func (m *GetOperatorRequest) Reset()         { (*operators.GetOperatorRequest)(m).Reset() }
-func (m *GetOperatorRequest) String() string { return (*operators.GetOperatorRequest)(m).String() }
-func (*GetOperatorRequest) ProtoMessage()    {}
-func (m *GetOperatorRequest) GetId() string  { return (*operators.GetOperatorRequest)(m).GetId() }
-
-// CreateOperatorRequest from public import operators/operators.proto
-type CreateOperatorRequest operators.CreateOperatorRequest
-
-func (m *CreateOperatorRequest) Reset()         { (*operators.CreateOperatorRequest)(m).Reset() }
-func (m *CreateOperatorRequest) String() string { return (*operators.CreateOperatorRequest)(m).String() }
-func (*CreateOperatorRequest) ProtoMessage()    {}
-func (m *CreateOperatorRequest) GetOperator() *Operator {
-	return (*Operator)((*operators.CreateOperatorRequest)(m).GetOperator())
-}
-
-// UpdateOperatorRequest from public import operators/operators.proto
-type UpdateOperatorRequest operators.UpdateOperatorRequest
-
-func (m *UpdateOperatorRequest) Reset()         { (*operators.UpdateOperatorRequest)(m).Reset() }
-func (m *UpdateOperatorRequest) String() string { return (*operators.UpdateOperatorRequest)(m).String() }
-func (*UpdateOperatorRequest) ProtoMessage()    {}
-func (m *UpdateOperatorRequest) GetId() string  { return (*operators.UpdateOperatorRequest)(m).GetId() }
-func (m *UpdateOperatorRequest) GetOperator() *Operator {
-	return (*Operator)((*operators.UpdateOperatorRequest)(m).GetOperator())
-}
-
-// DeleteOperatorRequest from public import operators/operators.proto
-type DeleteOperatorRequest operators.DeleteOperatorRequest
-
-func (m *DeleteOperatorRequest) Reset()         { (*operators.DeleteOperatorRequest)(m).Reset() }
-func (m *DeleteOperatorRequest) String() string { return (*operators.DeleteOperatorRequest)(m).String() }
-func (*DeleteOperatorRequest) ProtoMessage()    {}
-func (m *DeleteOperatorRequest) GetId() string  { return (*operators.DeleteOperatorRequest)(m).GetId() }
-
-// RenderOperatorRequest from public import operators/operators.proto
-type RenderOperatorRequest operators.RenderOperatorRequest
-
-func (m *RenderOperatorRequest) Reset()         { (*operators.RenderOperatorRequest)(m).Reset() }
-func (m *RenderOperatorRequest) String() string { return (*operators.RenderOperatorRequest)(m).String() }
-func (*RenderOperatorRequest) ProtoMessage()    {}
-func (m *RenderOperatorRequest) GetId() string  { return (*operators.RenderOperatorRequest)(m).GetId() }
-func (m *RenderOperatorRequest) GetTime() float64 {
-	return (*operators.RenderOperatorRequest)(m).GetTime()
-}
-
-// RenderOperatorResponse from public import operators/operators.proto
-type RenderOperatorResponse operators.RenderOperatorResponse
-
-func (m *RenderOperatorResponse) Reset() { (*operators.RenderOperatorResponse)(m).Reset() }
-func (m *RenderOperatorResponse) String() string {
-	return (*operators.RenderOperatorResponse)(m).String()
-}
-func (*RenderOperatorResponse) ProtoMessage() {}
-func (m *RenderOperatorResponse) GetResultUrl() string {
-	return (*operators.RenderOperatorResponse)(m).GetResultUrl()
-}
-func (m *RenderOperatorResponse) GetResultType() string {
-	return (*operators.RenderOperatorResponse)(m).GetResultType()
-}
-
-// RenderParameterRequest from public import operators/operators.proto
-type RenderParameterRequest operators.RenderParameterRequest
-
-func (m *RenderParameterRequest) Reset() { (*operators.RenderParameterRequest)(m).Reset() }
-func (m *RenderParameterRequest) String() string {
-	return (*operators.RenderParameterRequest)(m).String()
-}
-func (*RenderParameterRequest) ProtoMessage() {}
-func (m *RenderParameterRequest) GetOperatorKey() string {
-	return (*operators.RenderParameterRequest)(m).GetOperatorKey()
-}
-func (m *RenderParameterRequest) GetTime() float64 {
-	return (*operators.RenderParameterRequest)(m).GetTime()
-}
-
-// RenderParameter from public import operators/operators.proto
-type RenderParameter operators.RenderParameter
-
-func (m *RenderParameter) Reset()          { (*operators.RenderParameter)(m).Reset() }
-func (m *RenderParameter) String() string  { return (*operators.RenderParameter)(m).String() }
-func (*RenderParameter) ProtoMessage()     {}
-func (m *RenderParameter) GetType() string { return (*operators.RenderParameter)(m).GetType() }
-func (m *RenderParameter) GetConfiguration() []byte {
-	return (*operators.RenderParameter)(m).GetConfiguration()
-}
-func (m *RenderParameter) GetInputs() []*RenderParameter {
-	o := (*operators.RenderParameter)(m).GetInputs()
-	if o == nil {
-		return nil
-	}
-	s := make([]*RenderParameter, len(o))
-	for i, x := range o {
-		s[i] = (*RenderParameter)(x)
-	}
-	return s
-}
-
-// ParameterRoot from public import parameters/parameters.proto
-type ParameterRoot parameters.ParameterRoot
-
-func (m *ParameterRoot) Reset()                { (*parameters.ParameterRoot)(m).Reset() }
-func (m *ParameterRoot) String() string        { return (*parameters.ParameterRoot)(m).String() }
-func (*ParameterRoot) ProtoMessage()           {}
-func (m *ParameterRoot) GetOperatorId() string { return (*parameters.ParameterRoot)(m).GetOperatorId() }
-func (m *ParameterRoot) GetChildren() []byte   { return (*parameters.ParameterRoot)(m).GetChildren() }
-func (m *ParameterRoot) GetOrder() []string    { return (*parameters.ParameterRoot)(m).GetOrder() }
-
-// GetParameterRootRequest from public import parameters/parameters.proto
-type GetParameterRootRequest parameters.GetParameterRootRequest
-
-func (m *GetParameterRootRequest) Reset() { (*parameters.GetParameterRootRequest)(m).Reset() }
-func (m *GetParameterRootRequest) String() string {
-	return (*parameters.GetParameterRootRequest)(m).String()
-}
-func (*GetParameterRootRequest) ProtoMessage() {}
-func (m *GetParameterRootRequest) GetOperatorId() string {
-	return (*parameters.GetParameterRootRequest)(m).GetOperatorId()
-}
-
-// CreateParameterRootRequest from public import parameters/parameters.proto
-type CreateParameterRootRequest parameters.CreateParameterRootRequest
-
-func (m *CreateParameterRootRequest) Reset() { (*parameters.CreateParameterRootRequest)(m).Reset() }
-func (m *CreateParameterRootRequest) String() string {
-	return (*parameters.CreateParameterRootRequest)(m).String()
-}
-func (*CreateParameterRootRequest) ProtoMessage() {}
-func (m *CreateParameterRootRequest) GetOperatorId() string {
-	return (*parameters.CreateParameterRootRequest)(m).GetOperatorId()
-}
-func (m *CreateParameterRootRequest) GetParameterRoot() *ParameterRoot {
-	return (*ParameterRoot)((*parameters.CreateParameterRootRequest)(m).GetParameterRoot())
-}
-
-// UpdateParameterRootRequest from public import parameters/parameters.proto
-type UpdateParameterRootRequest parameters.UpdateParameterRootRequest
-
-func (m *UpdateParameterRootRequest) Reset() { (*parameters.UpdateParameterRootRequest)(m).Reset() }
-func (m *UpdateParameterRootRequest) String() string {
-	return (*parameters.UpdateParameterRootRequest)(m).String()
-}
-func (*UpdateParameterRootRequest) ProtoMessage() {}
-func (m *UpdateParameterRootRequest) GetOperatorId() string {
-	return (*parameters.UpdateParameterRootRequest)(m).GetOperatorId()
-}
-func (m *UpdateParameterRootRequest) GetParameterRoot() *ParameterRoot {
-	return (*ParameterRoot)((*parameters.UpdateParameterRootRequest)(m).GetParameterRoot())
-}
-
-// DeleteParameterRootRequest from public import parameters/parameters.proto
-type DeleteParameterRootRequest parameters.DeleteParameterRootRequest
-
-func (m *DeleteParameterRootRequest) Reset() { (*parameters.DeleteParameterRootRequest)(m).Reset() }
-func (m *DeleteParameterRootRequest) String() string {
-	return (*parameters.DeleteParameterRootRequest)(m).String()
-}
-func (*DeleteParameterRootRequest) ProtoMessage() {}
-func (m *DeleteParameterRootRequest) GetOperatorId() string {
-	return (*parameters.DeleteParameterRootRequest)(m).GetOperatorId()
-}
-
 // Organization from public import organizations/organizations.proto
 type Organization organizations.Organization
 
@@ -688,6 +475,43 @@ func (m *DeleteOrganizationRequest) GetId() string {
 	return (*organizations.DeleteOrganizationRequest)(m).GetId()
 }
 
+// RenderParameterRequest from public import render_parameters/render_parameters.proto
+type RenderParameterRequest render_parameters.RenderParameterRequest
+
+func (m *RenderParameterRequest) Reset() { (*render_parameters.RenderParameterRequest)(m).Reset() }
+func (m *RenderParameterRequest) String() string {
+	return (*render_parameters.RenderParameterRequest)(m).String()
+}
+func (*RenderParameterRequest) ProtoMessage() {}
+func (m *RenderParameterRequest) GetOperatorKey() string {
+	return (*render_parameters.RenderParameterRequest)(m).GetOperatorKey()
+}
+func (m *RenderParameterRequest) GetTime() float64 {
+	return (*render_parameters.RenderParameterRequest)(m).GetTime()
+}
+
+// RenderParameter from public import render_parameters/render_parameters.proto
+type RenderParameter render_parameters.RenderParameter
+
+func (m *RenderParameter) Reset()          { (*render_parameters.RenderParameter)(m).Reset() }
+func (m *RenderParameter) String() string  { return (*render_parameters.RenderParameter)(m).String() }
+func (*RenderParameter) ProtoMessage()     {}
+func (m *RenderParameter) GetType() string { return (*render_parameters.RenderParameter)(m).GetType() }
+func (m *RenderParameter) GetConfiguration() []byte {
+	return (*render_parameters.RenderParameter)(m).GetConfiguration()
+}
+func (m *RenderParameter) GetInputs() []*RenderParameter {
+	o := (*render_parameters.RenderParameter)(m).GetInputs()
+	if o == nil {
+		return nil
+	}
+	s := make([]*RenderParameter, len(o))
+	for i, x := range o {
+		s[i] = (*RenderParameter)(x)
+	}
+	return s
+}
+
 // RenderRequest from public import renders/renders.proto
 type RenderRequest renders.RenderRequest
 
@@ -713,7 +537,9 @@ func (m *Scene) String() string       { return (*scenes.Scene)(m).String() }
 func (*Scene) ProtoMessage()          {}
 func (m *Scene) GetId() string        { return (*scenes.Scene)(m).GetId() }
 func (m *Scene) GetProjectId() string { return (*scenes.Scene)(m).GetProjectId() }
+func (m *Scene) GetVersion() string   { return (*scenes.Scene)(m).GetVersion() }
 func (m *Scene) GetName() string      { return (*scenes.Scene)(m).GetName() }
+func (m *Scene) GetOperators() []byte { return (*scenes.Scene)(m).GetOperators() }
 
 // ListScenesRequest from public import scenes/scenes.proto
 type ListScenesRequest scenes.ListScenesRequest
@@ -787,16 +613,16 @@ func (m *DeleteSceneRequest) GetId() string  { return (*scenes.DeleteSceneReques
 func init() { proto.RegisterFile("api-web/api-web.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 172 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x5c, 0x8e, 0xc1, 0x0a, 0xc2, 0x30,
-	0x0c, 0x86, 0xd5, 0xe9, 0x04, 0x8f, 0xca, 0x10, 0xe7, 0xc9, 0x83, 0x47, 0xed, 0xc1, 0x17, 0xc9,
-	0x1b, 0x48, 0x36, 0xc3, 0xa8, 0xb0, 0xa6, 0xa6, 0x15, 0xc1, 0xa7, 0xb7, 0x6e, 0x99, 0x8a, 0xa7,
-	0xff, 0xcf, 0xf7, 0x25, 0x90, 0x45, 0x81, 0xde, 0x1e, 0x1e, 0x54, 0x19, 0xcd, 0xa3, 0x17, 0x8e,
-	0xbc, 0xcc, 0x52, 0x2d, 0xf7, 0xb6, 0xc5, 0x86, 0xce, 0x81, 0x6e, 0x77, 0x72, 0x35, 0x05, 0xf3,
-	0x37, 0xf7, 0xbb, 0xe5, 0xaa, 0xc3, 0x6a, 0x07, 0xb8, 0x4e, 0x71, 0xa5, 0x3a, 0x06, 0x33, 0x14,
-	0x15, 0x1b, 0xf6, 0x24, 0x18, 0x59, 0x82, 0xf9, 0x34, 0x55, 0x5b, 0x8f, 0x82, 0x2d, 0x45, 0x4a,
-	0xee, 0x5b, 0x55, 0xee, 0x58, 0x1a, 0x74, 0xf6, 0x89, 0xd1, 0xb2, 0x4b, 0xb7, 0xbf, 0x93, 0xae,
-	0x14, 0x42, 0xee, 0xf2, 0x3e, 0xd6, 0x1c, 0xfe, 0x0b, 0x35, 0xb9, 0xf4, 0x5f, 0x1f, 0x3d, 0x84,
-	0x11, 0x8c, 0x61, 0x02, 0x19, 0x4c, 0x61, 0x06, 0x39, 0xcc, 0xab, 0xbc, 0xc3, 0xa7, 0x57, 0x00,
-	0x00, 0x00, 0xff, 0xff, 0x40, 0xb4, 0x85, 0x89, 0x10, 0x01, 0x00, 0x00,
+	// 164 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x64, 0x8e, 0xb1, 0x0a, 0xc2, 0x30,
+	0x10, 0x86, 0xd5, 0x6a, 0x07, 0x47, 0xa5, 0x08, 0xdd, 0x1c, 0x1c, 0x1c, 0x34, 0x83, 0x2f, 0x72,
+	0x6f, 0x50, 0xae, 0xf1, 0x28, 0x11, 0x9a, 0xc4, 0xbb, 0x88, 0xe0, 0xd3, 0x1b, 0x9a, 0x44, 0x50,
+	0xa7, 0xff, 0xee, 0xfb, 0xbf, 0xe1, 0x5f, 0x37, 0xe8, 0xcd, 0xe9, 0x49, 0xbd, 0xca, 0x79, 0xf6,
+	0xec, 0x82, 0xdb, 0x54, 0xf1, 0x6c, 0x0f, 0x66, 0xc4, 0x81, 0x3a, 0xa1, 0xfb, 0x83, 0xac, 0x26,
+	0x51, 0x3f, 0x7f, 0x72, 0xdb, 0xed, 0x84, 0x73, 0x5b, 0xe0, 0x2e, 0xc6, 0x8d, 0x74, 0x10, 0x55,
+	0x8e, 0x5c, 0xec, 0x1d, 0x0f, 0x68, 0xcd, 0x0b, 0x83, 0x71, 0x56, 0xd4, 0xd7, 0x97, 0x95, 0x23,
+	0x93, 0xbd, 0x12, 0x77, 0x1e, 0x19, 0x47, 0x0a, 0xc4, 0xa2, 0xfe, 0x48, 0x56, 0x9b, 0x54, 0x14,
+	0xe1, 0x33, 0x49, 0x34, 0xd9, 0x38, 0x29, 0x45, 0x82, 0x30, 0x83, 0x39, 0x2c, 0xa0, 0x82, 0x25,
+	0xac, 0xa0, 0xee, 0xeb, 0x09, 0x5e, 0xde, 0x01, 0x00, 0x00, 0xff, 0xff, 0x95, 0x48, 0x93, 0x0e,
+	0x01, 0x01, 0x00, 0x00,
 }

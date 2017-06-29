@@ -66,7 +66,9 @@ proto.scenes.Scene.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     projectId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    name: jspb.Message.getFieldWithDefault(msg, 3, "")
+    version: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    name: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    operators: msg.getOperators_asB64()
   };
 
   if (includeInstance) {
@@ -113,7 +115,15 @@ proto.scenes.Scene.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
+      msg.setVersion(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
       msg.setName(value);
+      break;
+    case 5:
+      var value = /** @type {!Uint8Array} */ (reader.readBytes());
+      msg.setOperators(value);
       break;
     default:
       reader.skipField();
@@ -167,10 +177,24 @@ proto.scenes.Scene.prototype.serializeBinaryToWriter = function (writer) {
       f
     );
   }
-  f = this.getName();
+  f = this.getVersion();
   if (f.length > 0) {
     writer.writeString(
       3,
+      f
+    );
+  }
+  f = this.getName();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
+  f = this.getOperators_asU8();
+  if (f.length > 0) {
+    writer.writeBytes(
+      5,
       f
     );
   }
@@ -208,17 +232,71 @@ proto.scenes.Scene.prototype.setProjectId = function(value) {
 
 
 /**
- * optional string name = 3;
+ * optional string version = 3;
  * @return {string}
  */
-proto.scenes.Scene.prototype.getName = function() {
+proto.scenes.Scene.prototype.getVersion = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
-proto.scenes.Scene.prototype.setName = function(value) {
+proto.scenes.Scene.prototype.setVersion = function(value) {
   jspb.Message.setField(this, 3, value);
+};
+
+
+/**
+ * optional string name = 4;
+ * @return {string}
+ */
+proto.scenes.Scene.prototype.getName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.scenes.Scene.prototype.setName = function(value) {
+  jspb.Message.setField(this, 4, value);
+};
+
+
+/**
+ * optional bytes operators = 5;
+ * @return {!(string|Uint8Array)}
+ */
+proto.scenes.Scene.prototype.getOperators = function() {
+  return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/**
+ * optional bytes operators = 5;
+ * This is a type-conversion wrapper around `getOperators()`
+ * @return {string}
+ */
+proto.scenes.Scene.prototype.getOperators_asB64 = function() {
+  return /** @type {string} */ (jspb.Message.bytesAsB64(
+      this.getOperators()));
+};
+
+
+/**
+ * optional bytes operators = 5;
+ * Note that Uint8Array is not supported on all browsers.
+ * @see http://caniuse.com/Uint8Array
+ * This is a type-conversion wrapper around `getOperators()`
+ * @return {!Uint8Array}
+ */
+proto.scenes.Scene.prototype.getOperators_asU8 = function() {
+  return /** @type {!Uint8Array} */ (jspb.Message.bytesAsU8(
+      this.getOperators()));
+};
+
+
+/** @param {!(string|Uint8Array)} value */
+proto.scenes.Scene.prototype.setOperators = function(value) {
+  jspb.Message.setField(this, 5, value);
 };
 
 

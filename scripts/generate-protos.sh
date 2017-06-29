@@ -38,10 +38,9 @@ for f in $(find protos -type f -name "*.proto"); do
             google/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations
             images/images.proto=github.com/stupschwartz/qubit/proto-gen/go/images
             image_sequences/image_sequences.proto=github.com/stupschwartz/qubit/proto-gen/go/image_sequences
-            operators/operators.proto=github.com/stupschwartz/qubit/proto-gen/go/operators
             organizations/organizations.proto=github.com/stupschwartz/qubit/proto-gen/go/organizations
-            parameters/parameters.proto=github.com/stupschwartz/qubit/proto-gen/go/parameters
             projects/projects.proto=github.com/stupschwartz/qubit/proto-gen/go/projects
+            render_parameters/render_parameters.proto=github.com/stupschwartz/qubit/proto-gen/go/render_parameters
             renders/renders.proto=github.com/stupschwartz/qubit/proto-gen/go/renders
             scenes/scenes.proto=github.com/stupschwartz/qubit/proto-gen/go/scenes
         )
