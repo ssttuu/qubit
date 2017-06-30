@@ -8,17 +8,14 @@ import (
 
 const Name string = "CheckerBoard"
 
-var ParameterRoot parameter.ParameterRoot = parameter.ParameterRoot{
-	Children: parameter.ParameterMap{
-		"size": parameter.NewFloat64Parameter(256.0),
-	},
-	Order: []string{"size"},
+var CheckerBoardParameters parameter.ParameterSpecs = parameter.ParameterSpecs{
+	{Name: "size", Parameter: parameter.NewFloat64Parameter(256.0)},
 }
 
 type CheckerBoard struct{}
 
 func (c *CheckerBoard) Process(imageContext *operator.RenderImageContext) (*image.Plane, error) {
-	rootGroup := imageContext.ParameterRoot.GetGroup()
+	rootGroup := imageContext.Parameters.GetGroup()
 	sizeFl64 := rootGroup.GetFloat64("size")
 	sizeValue := int32(sizeFl64.GetValue(0.0))
 	width := imageContext.BoundingBox.EndX - imageContext.BoundingBox.StartX
@@ -47,5 +44,5 @@ func (c *CheckerBoard) Process(imageContext *operator.RenderImageContext) (*imag
 }
 
 func init() {
-	operator.RegisterOperation(Name, &CheckerBoard{}, ParameterRoot)
+	operator.RegisterOperation(Name, &CheckerBoard{}, CheckerBoardParameters)
 }

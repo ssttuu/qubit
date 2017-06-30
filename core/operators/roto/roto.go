@@ -9,70 +9,62 @@ import (
 
 const Name string = "Roto"
 
-var ParameterRoot parameter.ParameterRoot = parameter.ParameterRoot{
-	Children: parameter.ParameterMap{
-		"lod": parameter.NewFloat64Parameter(2.0),
-		"antialias": parameter.NewGroupParameter(
-			"antialias",
-			parameter.ParameterMap{
-				"x": parameter.NewFloat64Parameter(0.0),
-				"y": parameter.NewFloat64Parameter(0.0),
-			},
-			[]string{"x", "y"},
-		),
-		"curves": parameter.NewMultiParameter(
-			parameter.NewGroupParameter(
-				"curve",
-				parameter.ParameterMap{
-					"curve": parameter.NewGroupParameter(
-						"spline",
-						parameter.ParameterMap{
-							"splineType":     parameter.NewEnumParameter([]string{"polygon", "bezier"}, "bezier"),
-							"shapeComposite": parameter.NewEnumParameter([]string{"over", "under", "atop", "etc"}, "over"),
-							"fill":           parameter.NewEnumParameter([]string{"closed", "open"}, "closed"),
-							"thickness":      parameter.NewFloat64Parameter(0.02),
-							"feather":        parameter.NewBoolParameter(false),
-							"featherDropoff": parameter.NewEnumParameter([]string{"linear", "gaussian"}, "gaussian"),
-							//"featherRamp": parameter.Ramp{},
+var RotoParameters parameter.ParameterSpecs = parameter.ParameterSpecs{
+	{Name: "lod", Parameter: parameter.NewFloat64Parameter(2.0)},
+	{Name: "antialias", Parameter: parameter.NewGroupParameter(
+		"antialias",
+		parameter.ParameterSpecs{
+			{Name: "x", Parameter: parameter.NewFloat64Parameter(0.0)},
+			{Name: "y", Parameter: parameter.NewFloat64Parameter(0.0)},
+		},
+	)},
+	{Name: "curves", Parameter: parameter.NewMultiParameter(
+		parameter.NewGroupParameter(
+			"curve",
+			parameter.ParameterSpecs{
+				{Name: "curve", Parameter: parameter.NewGroupParameter(
+					"spline",
+					parameter.ParameterSpecs{
+						{Name: "splineType", Parameter: parameter.NewEnumParameter([]string{"polygon", "bezier"}, "bezier")},
+						{Name: "shapeComposite", Parameter: parameter.NewEnumParameter([]string{"over", "under", "atop", "etc"}, "over")},
+						{Name: "fill", Parameter: parameter.NewEnumParameter([]string{"closed", "open"}, "closed")},
+						{Name: "thickness", Parameter: parameter.NewFloat64Parameter(0.02)},
+						{Name: "feather", Parameter: parameter.NewBoolParameter(false)},
+						{Name: "featherDropoff", Parameter: parameter.NewEnumParameter([]string{"linear", "gaussian"}, "gaussian")},
+						//{Name: "featherRamp", Parameter: parameter.Ramp{}},
+					},
+				)},
+				{Name: "points", Parameter: parameter.NewMultiParameter(
+					parameter.NewGroupParameter(
+						"point",
+						parameter.ParameterSpecs{
+							{Name: "position", Parameter: parameter.NewPosition2DParameter()},
+							{Name: "tieSlopes", Parameter: parameter.NewGroupParameter(
+								"tieSlopes",
+								parameter.ParameterSpecs{
+									{Name: "x", Parameter: parameter.NewFloat64Parameter(0.0)},
+									{Name: "y", Parameter: parameter.NewFloat64Parameter(0.0)},
+									{Name: "z", Parameter: parameter.NewFloat64Parameter(0.0)},
+									{Name: "w", Parameter: parameter.NewFloat64Parameter(0.0)},
+								},
+							)},
+							{Name: "thickness", Parameter: parameter.NewFloat64Parameter(1.0)},
 						},
-						[]string{"splineType", "shapeComposite", "fill", "thickness", "feather", "featherDropoff"},
 					),
-					"points": parameter.NewMultiParameter(
-						parameter.NewGroupParameter(
-							"point",
-							parameter.ParameterMap{
-								"position": parameter.NewPosition2DParameter(),
-								"tieSlopes": parameter.NewGroupParameter(
-									"tieSlopes",
-									parameter.ParameterMap{
-										"x": parameter.NewFloat64Parameter(0.0),
-										"y": parameter.NewFloat64Parameter(0.0),
-										"z": parameter.NewFloat64Parameter(0.0),
-										"w": parameter.NewFloat64Parameter(0.0),
-									},
-									[]string{"x", "y", "z", "w"},
-								),
-								"thickness": parameter.NewFloat64Parameter(1.0),
-							},
-							[]string{"position", "tieSlopes", "thickness"},
-						),
-						0,
-						parameter.ParameterArray{},
-					),
-				},
-				[]string{"curve", "points"},
-			),
-			0,
-			parameter.ParameterArray{},
+					0,
+					parameter.Parameters{},
+				)},
+			},
 		),
-	},
-	Order: []string{"lod", "antialias", "curves"},
+		0,
+		parameter.Parameters{},
+	)},
 }
 
 type Roto struct{}
 
 func (c *Roto) Process(renderContext *operator.RenderImageContext) (*image.Plane, error) {
-	rotoRoot := renderContext.ParameterRoot.GetGroup()
+	rotoRoot := renderContext.Parameters.GetGroup()
 	curves := rotoRoot.GetMulti("curves")
 	for curve := range curves.Iterator() {
 		curveRoot := curve.GetGroup()
@@ -91,5 +83,5 @@ func (c *Roto) Process(renderContext *operator.RenderImageContext) (*image.Plane
 }
 
 func init() {
-	operator.RegisterOperation(Name, &Roto{}, ParameterRoot)
+	operator.RegisterOperation(Name, &Roto{}, RotoParameters)
 }

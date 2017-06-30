@@ -1,6 +1,7 @@
 package scenes
 
 import (
+	"cloud.google.com/go/storage"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/net/context"
@@ -8,15 +9,22 @@ import (
 
 	"github.com/stupschwartz/qubit/applications/lib/apiutils"
 	"github.com/stupschwartz/qubit/core/scene"
+	computations_pb "github.com/stupschwartz/qubit/proto-gen/go/computations"
 	scenes_pb "github.com/stupschwartz/qubit/proto-gen/go/scenes"
 )
 
 type Server struct {
-	PostgresClient *sqlx.DB
+	ComputationsClient computations_pb.ComputationsClient
+	PostgresClient     *sqlx.DB
+	StorageClient      *storage.Client
 }
 
-func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB) {
-	scenes_pb.RegisterScenesServer(grpcServer, &Server{PostgresClient: postgresClient})
+func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, storageClient *storage.Client, computationsClient computations_pb.ComputationsClient) {
+	scenes_pb.RegisterScenesServer(grpcServer, &Server{
+		ComputationsClient: computationsClient,
+		PostgresClient:     postgresClient,
+		StorageClient:      storageClient,
+	})
 }
 
 func (s *Server) Create(ctx context.Context, in *scenes_pb.CreateSceneRequest) (*scenes_pb.Scene, error) {

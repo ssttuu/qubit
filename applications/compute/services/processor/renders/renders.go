@@ -8,23 +8,23 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	operators_pb "github.com/stupschwartz/qubit/proto-gen/go/operators"
+	render_parameters_pb "github.com/stupschwartz/qubit/proto-gen/go/render_parameters"
 	renders_pb "github.com/stupschwartz/qubit/proto-gen/go/renders"
 )
 
 type Server struct {
-	OperatorsClient operators_pb.OperatorsClient
+	RenderParametersClient render_parameters_pb.RenderParametersClient
 }
 
-func Register(grpcServer *grpc.Server, operatorsClient operators_pb.OperatorsClient) {
+func Register(grpcServer *grpc.Server, renderParametersClient render_parameters_pb.RenderParametersClient) {
 	renders_pb.RegisterRendersServer(grpcServer, &Server{
-		OperatorsClient: operatorsClient,
+		RenderParametersClient: renderParametersClient,
 	})
 }
 
 func (s *Server) DoRender(ctx context.Context, in *renders_pb.RenderRequest) (*renders_pb.RenderResponse, error) {
-	pbRenderParameterRequest := operators_pb.RenderParameterRequest{}
-	pbRenderParameter, err := s.OperatorsClient.GetRenderParameters(ctx, &pbRenderParameterRequest)
+	pbRenderParameterRequest := render_parameters_pb.RenderParameterRequest{}
+	pbRenderParameter, err := s.RenderParametersClient.GetRenderParameters(ctx, &pbRenderParameterRequest)
 	if err != nil {
 		log.Println(err)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid argument")

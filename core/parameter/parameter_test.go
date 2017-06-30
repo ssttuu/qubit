@@ -6,7 +6,7 @@ import (
 )
 
 func TestConvertBoolToJson(t *testing.T) {
-	b := NewBool(true)
+	b := NewBoolParameter(true)
 
 	data, err := json.Marshal(b)
 	if err != nil {
@@ -26,7 +26,7 @@ func TestConvertBoolToJson(t *testing.T) {
 }
 
 func TestConvertInt64ToJson(t *testing.T) {
-	i64 := NewInt64(0)
+	i64 := NewInt64Parameter(0)
 
 	data, err := json.Marshal(i64)
 	if err != nil {
@@ -46,7 +46,7 @@ func TestConvertInt64ToJson(t *testing.T) {
 }
 
 func TestConvertEnumToJson(t *testing.T) {
-	enum := NewEnum([]string{"one", "two", "three"}, "one")
+	enum := NewEnumParameter([]string{"one", "two", "three"}, "one")
 
 	data, err := json.Marshal(enum)
 	if err != nil {
@@ -66,11 +66,10 @@ func TestConvertEnumToJson(t *testing.T) {
 
 func TestConvertPositionToJson(t *testing.T) {
 	grp := NewGroupParameter("position",
-		ParameterMap{
-			"x": NewFloat64(1.0),
-			"y": NewFloat64(1.0),
+		ParameterSpecs{
+			{Name: "x", Parameter: NewFloat64Parameter(1.0)},
+			{Name: "y", Parameter: NewFloat64Parameter(1.0)},
 		},
-		[]string{"x", "y"},
 	)
 
 	data, err := json.Marshal(grp)
@@ -91,12 +90,11 @@ func TestConvertPositionToJson(t *testing.T) {
 
 func TestConvertColorToJson(t *testing.T) {
 	pos := NewGroupParameter("color",
-		ParameterMap{
-			"r": NewFloat64(1.0),
-			"g": NewFloat64(1.0),
-			"b": NewFloat64(1.0),
+		ParameterSpecs{
+			{Name: "r", Parameter: NewFloat64Parameter(1.0)},
+			{Name: "g", Parameter: NewFloat64Parameter(1.0)},
+			{Name: "b", Parameter: NewFloat64Parameter(1.0)},
 		},
-		[]string{"r", "g", "b"},
 	)
 	data, err := json.Marshal(pos)
 	if err != nil {
@@ -116,13 +114,12 @@ func TestConvertColorToJson(t *testing.T) {
 
 func TestConvertColorAlphaToJson(t *testing.T) {
 	pos := NewGroupParameter("colorAlpha",
-		ParameterMap{
-			"r": NewFloat64(1.0),
-			"g": NewFloat64(1.0),
-			"b": NewFloat64(1.0),
-			"a": NewFloat64(1.0),
+		ParameterSpecs{
+			{Name: "r", Parameter: NewFloat64Parameter(1.0)},
+			{Name: "g", Parameter: NewFloat64Parameter(1.0)},
+			{Name: "b", Parameter: NewFloat64Parameter(1.0)},
+			{Name: "a", Parameter: NewFloat64Parameter(1.0)},
 		},
-		[]string{"r", "g", "b", "a"},
 	)
 
 	data, err := json.Marshal(pos)
@@ -142,16 +139,15 @@ func TestConvertColorAlphaToJson(t *testing.T) {
 }
 
 func TestConvertMultiPointToJson(t *testing.T) {
-	multi := NewMulti(
+	multi := NewMultiParameter(
 		NewGroupParameter("position",
-			ParameterMap{
-				"x": NewFloat64(1.0),
-				"y": NewFloat64(1.0),
+			ParameterSpecs{
+				{Name: "x", Parameter: NewFloat64Parameter(1.0)},
+				{Name: "y", Parameter: NewFloat64Parameter(1.0)},
 			},
-			[]string{"x", "y"},
 		),
 		0,
-		ParameterArray{},
+		Parameters{},
 	)
 
 	data, err := json.Marshal(multi)
@@ -171,22 +167,21 @@ func TestConvertMultiPointToJson(t *testing.T) {
 }
 
 func TestConvertComplexGroupToJson(t *testing.T) {
-	multi := NewGroupParameter("custom",
-		ParameterMap{
-			"name": NewString(""),
-			"points": NewMulti(
+	multi := NewGroupParameter(
+		"custom",
+		ParameterSpecs{
+			{Name: "name", Parameter: &String("")},
+			{Name: "points", Parameter: NewMultiParameter(
 				NewGroupParameter("position",
-					ParameterMap{
-						"x": NewFloat64(1.0),
-						"y": NewFloat64(1.0),
+					ParameterSpecs{
+						{Name: "x", Parameter: NewFloat64Parameter(1.0)},
+						{Name: "y", Parameter: NewFloat64Parameter(1.0)},
 					},
-					[]string{"x", "y"},
 				),
 				0,
-				ParameterArray{},
-			),
+				Parameters{},
+			)},
 		},
-		[]string{"name", "points"},
 	)
 
 	data, err := json.Marshal(multi)
