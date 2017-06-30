@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 
 	"github.com/stupschwartz/qubit/applications/compute/services/processor/renders"
-	render_parameters_pb "github.com/stupschwartz/qubit/proto-gen/go/render_parameters"
+	render_parameters_pb "github.com/stupschwartz/qubit/proto-gen/go/render_operators"
 )
 
 func serve(server *grpc.Server, listener net.Listener, done chan bool) {
@@ -52,7 +52,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	servingDone := make(chan bool)
 	go serve(grpcServer, lis, servingDone)
-	renderParametersClient := render_parameters_pb.NewRenderParametersClient(apiWebConn)
-	renders.Register(grpcServer, renderParametersClient)
+	renderOperatorsClient := render_parameters_pb.NewRenderOperatorsClient(apiWebConn)
+	renders.Register(grpcServer, renderOperatorsClient)
 	<-servingDone
 }

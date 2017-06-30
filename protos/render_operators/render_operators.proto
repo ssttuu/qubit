@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package render_operators;
+
+import "google/api/annotations.proto";
+import "geometry/geometry.proto";
+
+service RenderOperators {
+    rpc GetRenderOperators (RenderOperatorRequest) returns (RenderOperator) {}
+}
+
+message RenderOperatorRequest {
+    string render_key = 1;
+}
+
+message RenderOperator {
+    string id = 1;
+    string scene_id = 2;
+    int32 scene_version = 3;
+    string operator_id = 4;
+    string time = 5;
+    geometry.BoundingBox2D bounding_box = 6;
+    bytes input_ids = 7;
+    bytes parameters = 8;
+}

@@ -8,28 +8,28 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	render_parameters_pb "github.com/stupschwartz/qubit/proto-gen/go/render_parameters"
-	renders_pb "github.com/stupschwartz/qubit/proto-gen/go/renders"
+	renders_pb "github.com/stupschwartz/qubit/proto-gen/go/computation_renders"
+	render_operators_pb "github.com/stupschwartz/qubit/proto-gen/go/render_operators"
 )
 
 type Server struct {
-	RenderParametersClient render_parameters_pb.RenderParametersClient
+	RenderOperatorsClient render_operators_pb.RenderOperatorsClient
 }
 
-func Register(grpcServer *grpc.Server, renderParametersClient render_parameters_pb.RenderParametersClient) {
-	renders_pb.RegisterRendersServer(grpcServer, &Server{
-		RenderParametersClient: renderParametersClient,
+func Register(grpcServer *grpc.Server, renderOperatorsClient render_operators_pb.RenderOperatorsClient) {
+	renders_pb.RegisterComputationRendersServer(grpcServer, &Server{
+		RenderOperatorsClient: renderOperatorsClient,
 	})
 }
 
-func (s *Server) DoRender(ctx context.Context, in *renders_pb.RenderRequest) (*renders_pb.RenderResponse, error) {
-	pbRenderParameterRequest := render_parameters_pb.RenderParameterRequest{}
-	pbRenderParameter, err := s.RenderParametersClient.GetRenderParameters(ctx, &pbRenderParameterRequest)
+func (s *Server) Render(ctx context.Context, in *renders_pb.ComputationRenderRequest) (*renders_pb.ComputationRenderResponse, error) {
+	pbRenderOperatorRequest := render_operators_pb.RenderOperatorRequest{}
+	pbRenderOperator, err := s.RenderOperatorsClient.GetRenderOperators(ctx, &pbRenderOperatorRequest)
 	if err != nil {
 		log.Println(err)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid argument")
 	}
-	log.Println("Render Parameters:", pbRenderParameter)
+	log.Println("Render Operators:", pbRenderOperator)
 	// TODO: Use core/parameters to Unmarshal
 	// TODO: Do the rendering
 	return nil, nil

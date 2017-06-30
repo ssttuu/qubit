@@ -98,6 +98,8 @@ all-protos: $(PROTO_FILES)
 	mkdir -p proto-gen/services
 	mkdir -p proto-gen/go
 	mkdir -p proto-gen/js
+	rm -rf tests/integration/protos || :
+	mkdir -p tests/integration/protos
 	./scripts/generate-protos.sh
 
 proto-gen/services/%.pb: protos/%.proto

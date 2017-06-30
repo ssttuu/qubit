@@ -20,8 +20,8 @@ import (
 	"github.com/stupschwartz/qubit/applications/lib/pgutils"
 	"github.com/stupschwartz/qubit/core/computation"
 	"github.com/stupschwartz/qubit/core/computation_status"
+	renders_pb "github.com/stupschwartz/qubit/proto-gen/go/computation_renders"
 	computations_pb "github.com/stupschwartz/qubit/proto-gen/go/computations"
-	renders_pb "github.com/stupschwartz/qubit/proto-gen/go/renders"
 )
 
 const pubSubCoordinatorSubscriptionID = "coordinator"
@@ -37,7 +37,7 @@ var messageAckInterval = 5 * time.Second
 
 type Coordinator struct {
 	PostgresClient *sqlx.DB
-	RendersClient  renders_pb.RendersClient
+	RendersClient  renders_pb.ComputationRendersClient
 }
 
 func validateLastComputationStatus(tx *sqlx.Tx, computationId string, lastComputationStatusId string) error {
@@ -190,13 +190,13 @@ func (c *Coordinator) subscriptionHandler(ctx context.Context, msg *pubsub.Messa
 		log.Println(err)
 		return
 	}
-	pbRenderRequest := renders_pb.RenderRequest{
+	pbRenderRequest := renders_pb.ComputationRenderRequest{
 		OperatorKey: comp.OperatorKey,
 		Time:        comp.Time,
 		BoundingBox: comp.BoundingBox.ToProto(),
 	}
 	log.Println("Render request:", pbRenderRequest)
-	pbRenderResponse, err := c.RendersClient.DoRender(ctx, &pbRenderRequest)
+	pbRenderResponse, err := c.RendersClient.Render(ctx, &pbRenderRequest)
 	if err != nil {
 		log.Println(err)
 		return
@@ -296,7 +296,7 @@ func main() {
 			log.Fatal(errors.Wrapf(err, "Failed to get-or-create subscription %v", pubSubCoordinatorSubscriptionID))
 		}
 	}
-	rendersClient := renders_pb.NewRendersClient(computeProcConn)
+	rendersClient := renders_pb.NewComputationRendersClient(computeProcConn)
 	coordinator := Coordinator{PostgresClient: postgresClient, RendersClient: rendersClient}
 	err = subscription.Receive(ctx, coordinator.subscriptionHandler)
 	if err != nil {

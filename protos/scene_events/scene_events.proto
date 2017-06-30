@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package scene_events;
+
+import "google/api/annotations.proto";
+
+service SceneEvents {
+    rpc List (ListSceneEventsRequest) returns (ListSceneEventsResponse) {
+        option (google.api.http) = {
+            get: "/v1/scene_events"
+        };
+    }
+    rpc Get (GetSceneEventRequest) returns (SceneEvent) {
+        option (google.api.http) = {
+            get: "/v1/scene_events/{id}"
+        };
+    }
+    rpc Create (CreateSceneEventRequest) returns (SceneEvent) {
+        option (google.api.http) = {
+            post: "/v1/scene_events"
+            body: "scene_event"
+        };
+    }
+}
+
+message SceneEvent {
+    string id = 1;
+    string scene_id = 2;
+    int32 up_version = 3;
+    int32 down_version = 4;
+    bytes up_change_data = 5;
+    bytes down_change_data = 6;
+}
+
+message ListSceneEventsRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+}
+
+message ListSceneEventsResponse {
+    repeated SceneEvent scene_events = 1;
+    string next_page_token = 2;
+}
+
+message GetSceneEventRequest {
+    string id = 1;
+}
+
+message CreateSceneEventRequest {
+    SceneEvent scene_event = 1;
+}

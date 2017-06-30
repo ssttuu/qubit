@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package scene_renders;
+
+import "google/api/annotations.proto";
+import "geometry/geometry.proto";
+
+service SceneRenders {
+    rpc Create (SceneRenderRequest) returns (SceneRenderStatus) {
+        option (google.api.http) = {
+            post: "/v1/renders"
+            body: "render"
+        };
+    }
+    rpc Get (SceneRenderStatusRequest) returns (SceneRenderStatus) {
+        option (google.api.http) = {
+            get: "/v1/renders/{id}"
+        };
+    }
+}
+
+message SceneRender {
+    string scene_id = 1;
+    string operator_id = 2;
+    string time = 3;
+    geometry.BoundingBox2D bounding_box = 4;
+}
+
+message SceneRenderStatus {
+    string id = 1;
+    int32 status = 2;
+    int64 created_at = 3;
+    string resource_id = 4; // Location in GCS
+}
+
+message SceneRenderRequest {
+    SceneRender render = 1;
+}
+
+message SceneRenderStatusRequest {
+    SceneRenderStatus status = 1;
+}

@@ -39,9 +39,9 @@ service Scenes {
 message Scene {
     string id = 1;
     string project_id = 2;
-    string version = 3;
+    int32 version = 3;
     string name = 4;
-    bytes operators = 5;
+    bytes operator_data = 5;
 }
 
 message ListScenesRequest {

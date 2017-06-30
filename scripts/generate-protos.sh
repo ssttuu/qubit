@@ -33,15 +33,17 @@ for f in $(find protos -type f -name "*.proto"); do
     if [ -z "${proto_type}" ] || [ "${proto_type}" = "go" ]; then
         mkdir -p ./proto-gen/go
         modules=(
+            computation_renders/computation_renders.proto=github.com/stupschwartz/qubit/proto-gen/go/computation_renders
             computations/computations.proto=github.com/stupschwartz/qubit/proto-gen/go/computations
             geometry/geometry.proto=github.com/stupschwartz/qubit/proto-gen/go/geometry
             google/api/annotations.proto=google.golang.org/genproto/googleapis/api/annotations
-            images/images.proto=github.com/stupschwartz/qubit/proto-gen/go/images
             image_sequences/image_sequences.proto=github.com/stupschwartz/qubit/proto-gen/go/image_sequences
+            images/images.proto=github.com/stupschwartz/qubit/proto-gen/go/images
             organizations/organizations.proto=github.com/stupschwartz/qubit/proto-gen/go/organizations
             projects/projects.proto=github.com/stupschwartz/qubit/proto-gen/go/projects
-            render_parameters/render_parameters.proto=github.com/stupschwartz/qubit/proto-gen/go/render_parameters
-            renders/renders.proto=github.com/stupschwartz/qubit/proto-gen/go/renders
+            render_operators/render_operators.proto=github.com/stupschwartz/qubit/proto-gen/go/render_operators
+            scene_events/scene_events.proto=github.com/stupschwartz/qubit/proto-gen/go/scene_events
+            scene_renders/scene_renders.proto=github.com/stupschwartz/qubit/proto-gen/go/scene_renders
             scenes/scenes.proto=github.com/stupschwartz/qubit/proto-gen/go/scenes
         )
         module_string=

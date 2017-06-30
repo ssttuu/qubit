@@ -18,6 +18,8 @@ import (
 	"github.com/stupschwartz/qubit/applications/api/services/web/images"
 	"github.com/stupschwartz/qubit/applications/api/services/web/organizations"
 	"github.com/stupschwartz/qubit/applications/api/services/web/projects"
+	"github.com/stupschwartz/qubit/applications/api/services/web/scene_events"
+	"github.com/stupschwartz/qubit/applications/api/services/web/scene_renders"
 	"github.com/stupschwartz/qubit/applications/api/services/web/scenes"
 	"github.com/stupschwartz/qubit/proto-gen/go/computations"
 )
@@ -84,7 +86,9 @@ func main() {
 	}
 	organizations.Register(grpcServer, postgresClient)
 	projects.Register(grpcServer, postgresClient)
-	scenes.Register(grpcServer, postgresClient, storageClient, computationsClient)
+	scene_events.Register(grpcServer, postgresClient)
+	scene_renders.Register(grpcServer, postgresClient, computationsClient)
+	scenes.Register(grpcServer, postgresClient, storageClient)
 	images.Register(grpcServer, postgresClient)
 	image_sequences.Register(grpcServer, postgresClient)
 	<-servingDone
