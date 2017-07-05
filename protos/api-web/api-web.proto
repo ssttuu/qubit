@@ -2,10 +2,12 @@ syntax = "proto3";
 
 package web;
 
+import public "computation_renders/computation_renders.proto";
 import public "image_sequences/image_sequences.proto";
 import public "images/images.proto";
-import public "projects/projects.proto";
 import public "organizations/organizations.proto";
-import public "render_parameters/render_parameters.proto";
-import public "renders/renders.proto";
+import public "projects/projects.proto";
+import public "render_operators/render_operators.proto";
+import public "scene_events/scene_events.proto";
+import public "scene_renders/scene_renders.proto";
 import public "scenes/scenes.proto";

@@ -14,12 +14,14 @@ package web
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
+import computation_renders "github.com/stupschwartz/qubit/proto-gen/go/computation_renders"
 import image_sequences "github.com/stupschwartz/qubit/proto-gen/go/image_sequences"
 import images "github.com/stupschwartz/qubit/proto-gen/go/images"
-import projects "github.com/stupschwartz/qubit/proto-gen/go/projects"
 import organizations "github.com/stupschwartz/qubit/proto-gen/go/organizations"
-import render_parameters "github.com/stupschwartz/qubit/proto-gen/go/render_parameters"
-import renders "github.com/stupschwartz/qubit/proto-gen/go/renders"
+import projects "github.com/stupschwartz/qubit/proto-gen/go/projects"
+import render_operators "github.com/stupschwartz/qubit/proto-gen/go/render_operators"
+import scene_events "github.com/stupschwartz/qubit/proto-gen/go/scene_events"
+import scene_renders "github.com/stupschwartz/qubit/proto-gen/go/scene_renders"
 import scenes "github.com/stupschwartz/qubit/proto-gen/go/scenes"
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -32,6 +34,35 @@ var _ = math.Inf
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+
+// ComputationRenderRequest from public import computation_renders/computation_renders.proto
+type ComputationRenderRequest computation_renders.ComputationRenderRequest
+
+func (m *ComputationRenderRequest) Reset() { (*computation_renders.ComputationRenderRequest)(m).Reset() }
+func (m *ComputationRenderRequest) String() string {
+	return (*computation_renders.ComputationRenderRequest)(m).String()
+}
+func (*ComputationRenderRequest) ProtoMessage() {}
+func (m *ComputationRenderRequest) GetOperatorKey() string {
+	return (*computation_renders.ComputationRenderRequest)(m).GetOperatorKey()
+}
+func (m *ComputationRenderRequest) GetTime() float64 {
+	return (*computation_renders.ComputationRenderRequest)(m).GetTime()
+}
+
+// ComputationRenderResponse from public import computation_renders/computation_renders.proto
+type ComputationRenderResponse computation_renders.ComputationRenderResponse
+
+func (m *ComputationRenderResponse) Reset() {
+	(*computation_renders.ComputationRenderResponse)(m).Reset()
+}
+func (m *ComputationRenderResponse) String() string {
+	return (*computation_renders.ComputationRenderResponse)(m).String()
+}
+func (*ComputationRenderResponse) ProtoMessage() {}
+func (m *ComputationRenderResponse) GetResourceId() string {
+	return (*computation_renders.ComputationRenderResponse)(m).GetResourceId()
+}
 
 // ImageSequence from public import image_sequences/image_sequences.proto
 type ImageSequence image_sequences.ImageSequence
@@ -296,87 +327,6 @@ func (m *DeleteImageRequest) String() string { return (*images.DeleteImageReques
 func (*DeleteImageRequest) ProtoMessage()    {}
 func (m *DeleteImageRequest) GetId() string  { return (*images.DeleteImageRequest)(m).GetId() }
 
-// Project from public import projects/projects.proto
-type Project projects.Project
-
-func (m *Project) Reset()                    { (*projects.Project)(m).Reset() }
-func (m *Project) String() string            { return (*projects.Project)(m).String() }
-func (*Project) ProtoMessage()               {}
-func (m *Project) GetId() string             { return (*projects.Project)(m).GetId() }
-func (m *Project) GetOrganizationId() string { return (*projects.Project)(m).GetOrganizationId() }
-func (m *Project) GetName() string           { return (*projects.Project)(m).GetName() }
-
-// ListProjectsRequest from public import projects/projects.proto
-type ListProjectsRequest projects.ListProjectsRequest
-
-func (m *ListProjectsRequest) Reset()         { (*projects.ListProjectsRequest)(m).Reset() }
-func (m *ListProjectsRequest) String() string { return (*projects.ListProjectsRequest)(m).String() }
-func (*ListProjectsRequest) ProtoMessage()    {}
-func (m *ListProjectsRequest) GetPageSize() int32 {
-	return (*projects.ListProjectsRequest)(m).GetPageSize()
-}
-func (m *ListProjectsRequest) GetPageToken() string {
-	return (*projects.ListProjectsRequest)(m).GetPageToken()
-}
-
-// ListProjectsResponse from public import projects/projects.proto
-type ListProjectsResponse projects.ListProjectsResponse
-
-func (m *ListProjectsResponse) Reset()         { (*projects.ListProjectsResponse)(m).Reset() }
-func (m *ListProjectsResponse) String() string { return (*projects.ListProjectsResponse)(m).String() }
-func (*ListProjectsResponse) ProtoMessage()    {}
-func (m *ListProjectsResponse) GetProjects() []*Project {
-	o := (*projects.ListProjectsResponse)(m).GetProjects()
-	if o == nil {
-		return nil
-	}
-	s := make([]*Project, len(o))
-	for i, x := range o {
-		s[i] = (*Project)(x)
-	}
-	return s
-}
-func (m *ListProjectsResponse) GetNextPageToken() string {
-	return (*projects.ListProjectsResponse)(m).GetNextPageToken()
-}
-
-// GetProjectRequest from public import projects/projects.proto
-type GetProjectRequest projects.GetProjectRequest
-
-func (m *GetProjectRequest) Reset()         { (*projects.GetProjectRequest)(m).Reset() }
-func (m *GetProjectRequest) String() string { return (*projects.GetProjectRequest)(m).String() }
-func (*GetProjectRequest) ProtoMessage()    {}
-func (m *GetProjectRequest) GetId() string  { return (*projects.GetProjectRequest)(m).GetId() }
-
-// CreateProjectRequest from public import projects/projects.proto
-type CreateProjectRequest projects.CreateProjectRequest
-
-func (m *CreateProjectRequest) Reset()         { (*projects.CreateProjectRequest)(m).Reset() }
-func (m *CreateProjectRequest) String() string { return (*projects.CreateProjectRequest)(m).String() }
-func (*CreateProjectRequest) ProtoMessage()    {}
-func (m *CreateProjectRequest) GetProject() *Project {
-	return (*Project)((*projects.CreateProjectRequest)(m).GetProject())
-}
-
-// UpdateProjectRequest from public import projects/projects.proto
-type UpdateProjectRequest projects.UpdateProjectRequest
-
-func (m *UpdateProjectRequest) Reset()         { (*projects.UpdateProjectRequest)(m).Reset() }
-func (m *UpdateProjectRequest) String() string { return (*projects.UpdateProjectRequest)(m).String() }
-func (*UpdateProjectRequest) ProtoMessage()    {}
-func (m *UpdateProjectRequest) GetId() string  { return (*projects.UpdateProjectRequest)(m).GetId() }
-func (m *UpdateProjectRequest) GetProject() *Project {
-	return (*Project)((*projects.UpdateProjectRequest)(m).GetProject())
-}
-
-// DeleteProjectRequest from public import projects/projects.proto
-type DeleteProjectRequest projects.DeleteProjectRequest
-
-func (m *DeleteProjectRequest) Reset()         { (*projects.DeleteProjectRequest)(m).Reset() }
-func (m *DeleteProjectRequest) String() string { return (*projects.DeleteProjectRequest)(m).String() }
-func (*DeleteProjectRequest) ProtoMessage()    {}
-func (m *DeleteProjectRequest) GetId() string  { return (*projects.DeleteProjectRequest)(m).GetId() }
-
 // Organization from public import organizations/organizations.proto
 type Organization organizations.Organization
 
@@ -475,71 +425,258 @@ func (m *DeleteOrganizationRequest) GetId() string {
 	return (*organizations.DeleteOrganizationRequest)(m).GetId()
 }
 
-// RenderParameterRequest from public import render_parameters/render_parameters.proto
-type RenderParameterRequest render_parameters.RenderParameterRequest
+// Project from public import projects/projects.proto
+type Project projects.Project
 
-func (m *RenderParameterRequest) Reset() { (*render_parameters.RenderParameterRequest)(m).Reset() }
-func (m *RenderParameterRequest) String() string {
-	return (*render_parameters.RenderParameterRequest)(m).String()
+func (m *Project) Reset()                    { (*projects.Project)(m).Reset() }
+func (m *Project) String() string            { return (*projects.Project)(m).String() }
+func (*Project) ProtoMessage()               {}
+func (m *Project) GetId() string             { return (*projects.Project)(m).GetId() }
+func (m *Project) GetOrganizationId() string { return (*projects.Project)(m).GetOrganizationId() }
+func (m *Project) GetName() string           { return (*projects.Project)(m).GetName() }
+
+// ListProjectsRequest from public import projects/projects.proto
+type ListProjectsRequest projects.ListProjectsRequest
+
+func (m *ListProjectsRequest) Reset()         { (*projects.ListProjectsRequest)(m).Reset() }
+func (m *ListProjectsRequest) String() string { return (*projects.ListProjectsRequest)(m).String() }
+func (*ListProjectsRequest) ProtoMessage()    {}
+func (m *ListProjectsRequest) GetPageSize() int32 {
+	return (*projects.ListProjectsRequest)(m).GetPageSize()
 }
-func (*RenderParameterRequest) ProtoMessage() {}
-func (m *RenderParameterRequest) GetOperatorKey() string {
-	return (*render_parameters.RenderParameterRequest)(m).GetOperatorKey()
-}
-func (m *RenderParameterRequest) GetTime() float64 {
-	return (*render_parameters.RenderParameterRequest)(m).GetTime()
+func (m *ListProjectsRequest) GetPageToken() string {
+	return (*projects.ListProjectsRequest)(m).GetPageToken()
 }
 
-// RenderParameter from public import render_parameters/render_parameters.proto
-type RenderParameter render_parameters.RenderParameter
+// ListProjectsResponse from public import projects/projects.proto
+type ListProjectsResponse projects.ListProjectsResponse
 
-func (m *RenderParameter) Reset()          { (*render_parameters.RenderParameter)(m).Reset() }
-func (m *RenderParameter) String() string  { return (*render_parameters.RenderParameter)(m).String() }
-func (*RenderParameter) ProtoMessage()     {}
-func (m *RenderParameter) GetType() string { return (*render_parameters.RenderParameter)(m).GetType() }
-func (m *RenderParameter) GetConfiguration() []byte {
-	return (*render_parameters.RenderParameter)(m).GetConfiguration()
-}
-func (m *RenderParameter) GetInputs() []*RenderParameter {
-	o := (*render_parameters.RenderParameter)(m).GetInputs()
+func (m *ListProjectsResponse) Reset()         { (*projects.ListProjectsResponse)(m).Reset() }
+func (m *ListProjectsResponse) String() string { return (*projects.ListProjectsResponse)(m).String() }
+func (*ListProjectsResponse) ProtoMessage()    {}
+func (m *ListProjectsResponse) GetProjects() []*Project {
+	o := (*projects.ListProjectsResponse)(m).GetProjects()
 	if o == nil {
 		return nil
 	}
-	s := make([]*RenderParameter, len(o))
+	s := make([]*Project, len(o))
 	for i, x := range o {
-		s[i] = (*RenderParameter)(x)
+		s[i] = (*Project)(x)
 	}
 	return s
 }
+func (m *ListProjectsResponse) GetNextPageToken() string {
+	return (*projects.ListProjectsResponse)(m).GetNextPageToken()
+}
 
-// RenderRequest from public import renders/renders.proto
-type RenderRequest renders.RenderRequest
+// GetProjectRequest from public import projects/projects.proto
+type GetProjectRequest projects.GetProjectRequest
 
-func (m *RenderRequest) Reset()                 { (*renders.RenderRequest)(m).Reset() }
-func (m *RenderRequest) String() string         { return (*renders.RenderRequest)(m).String() }
-func (*RenderRequest) ProtoMessage()            {}
-func (m *RenderRequest) GetOperatorKey() string { return (*renders.RenderRequest)(m).GetOperatorKey() }
-func (m *RenderRequest) GetTime() float64       { return (*renders.RenderRequest)(m).GetTime() }
+func (m *GetProjectRequest) Reset()         { (*projects.GetProjectRequest)(m).Reset() }
+func (m *GetProjectRequest) String() string { return (*projects.GetProjectRequest)(m).String() }
+func (*GetProjectRequest) ProtoMessage()    {}
+func (m *GetProjectRequest) GetId() string  { return (*projects.GetProjectRequest)(m).GetId() }
 
-// RenderResponse from public import renders/renders.proto
-type RenderResponse renders.RenderResponse
+// CreateProjectRequest from public import projects/projects.proto
+type CreateProjectRequest projects.CreateProjectRequest
 
-func (m *RenderResponse) Reset()                { (*renders.RenderResponse)(m).Reset() }
-func (m *RenderResponse) String() string        { return (*renders.RenderResponse)(m).String() }
-func (*RenderResponse) ProtoMessage()           {}
-func (m *RenderResponse) GetResourceId() string { return (*renders.RenderResponse)(m).GetResourceId() }
+func (m *CreateProjectRequest) Reset()         { (*projects.CreateProjectRequest)(m).Reset() }
+func (m *CreateProjectRequest) String() string { return (*projects.CreateProjectRequest)(m).String() }
+func (*CreateProjectRequest) ProtoMessage()    {}
+func (m *CreateProjectRequest) GetProject() *Project {
+	return (*Project)((*projects.CreateProjectRequest)(m).GetProject())
+}
+
+// UpdateProjectRequest from public import projects/projects.proto
+type UpdateProjectRequest projects.UpdateProjectRequest
+
+func (m *UpdateProjectRequest) Reset()         { (*projects.UpdateProjectRequest)(m).Reset() }
+func (m *UpdateProjectRequest) String() string { return (*projects.UpdateProjectRequest)(m).String() }
+func (*UpdateProjectRequest) ProtoMessage()    {}
+func (m *UpdateProjectRequest) GetId() string  { return (*projects.UpdateProjectRequest)(m).GetId() }
+func (m *UpdateProjectRequest) GetProject() *Project {
+	return (*Project)((*projects.UpdateProjectRequest)(m).GetProject())
+}
+
+// DeleteProjectRequest from public import projects/projects.proto
+type DeleteProjectRequest projects.DeleteProjectRequest
+
+func (m *DeleteProjectRequest) Reset()         { (*projects.DeleteProjectRequest)(m).Reset() }
+func (m *DeleteProjectRequest) String() string { return (*projects.DeleteProjectRequest)(m).String() }
+func (*DeleteProjectRequest) ProtoMessage()    {}
+func (m *DeleteProjectRequest) GetId() string  { return (*projects.DeleteProjectRequest)(m).GetId() }
+
+// RenderOperatorRequest from public import render_operators/render_operators.proto
+type RenderOperatorRequest render_operators.RenderOperatorRequest
+
+func (m *RenderOperatorRequest) Reset() { (*render_operators.RenderOperatorRequest)(m).Reset() }
+func (m *RenderOperatorRequest) String() string {
+	return (*render_operators.RenderOperatorRequest)(m).String()
+}
+func (*RenderOperatorRequest) ProtoMessage() {}
+func (m *RenderOperatorRequest) GetRenderKey() string {
+	return (*render_operators.RenderOperatorRequest)(m).GetRenderKey()
+}
+
+// RenderOperator from public import render_operators/render_operators.proto
+type RenderOperator render_operators.RenderOperator
+
+func (m *RenderOperator) Reset()         { (*render_operators.RenderOperator)(m).Reset() }
+func (m *RenderOperator) String() string { return (*render_operators.RenderOperator)(m).String() }
+func (*RenderOperator) ProtoMessage()    {}
+func (m *RenderOperator) GetId() string  { return (*render_operators.RenderOperator)(m).GetId() }
+func (m *RenderOperator) GetSceneId() string {
+	return (*render_operators.RenderOperator)(m).GetSceneId()
+}
+func (m *RenderOperator) GetSceneVersion() int32 {
+	return (*render_operators.RenderOperator)(m).GetSceneVersion()
+}
+func (m *RenderOperator) GetOperatorId() string {
+	return (*render_operators.RenderOperator)(m).GetOperatorId()
+}
+func (m *RenderOperator) GetTime() string { return (*render_operators.RenderOperator)(m).GetTime() }
+func (m *RenderOperator) GetInputIds() []byte {
+	return (*render_operators.RenderOperator)(m).GetInputIds()
+}
+func (m *RenderOperator) GetParameters() []byte {
+	return (*render_operators.RenderOperator)(m).GetParameters()
+}
+
+// SceneEvent from public import scene_events/scene_events.proto
+type SceneEvent scene_events.SceneEvent
+
+func (m *SceneEvent) Reset()                  { (*scene_events.SceneEvent)(m).Reset() }
+func (m *SceneEvent) String() string          { return (*scene_events.SceneEvent)(m).String() }
+func (*SceneEvent) ProtoMessage()             {}
+func (m *SceneEvent) GetId() string           { return (*scene_events.SceneEvent)(m).GetId() }
+func (m *SceneEvent) GetSceneId() string      { return (*scene_events.SceneEvent)(m).GetSceneId() }
+func (m *SceneEvent) GetUpVersion() int32     { return (*scene_events.SceneEvent)(m).GetUpVersion() }
+func (m *SceneEvent) GetDownVersion() int32   { return (*scene_events.SceneEvent)(m).GetDownVersion() }
+func (m *SceneEvent) GetUpChangeData() []byte { return (*scene_events.SceneEvent)(m).GetUpChangeData() }
+func (m *SceneEvent) GetDownChangeData() []byte {
+	return (*scene_events.SceneEvent)(m).GetDownChangeData()
+}
+
+// ListSceneEventsRequest from public import scene_events/scene_events.proto
+type ListSceneEventsRequest scene_events.ListSceneEventsRequest
+
+func (m *ListSceneEventsRequest) Reset() { (*scene_events.ListSceneEventsRequest)(m).Reset() }
+func (m *ListSceneEventsRequest) String() string {
+	return (*scene_events.ListSceneEventsRequest)(m).String()
+}
+func (*ListSceneEventsRequest) ProtoMessage() {}
+func (m *ListSceneEventsRequest) GetPageSize() int32 {
+	return (*scene_events.ListSceneEventsRequest)(m).GetPageSize()
+}
+func (m *ListSceneEventsRequest) GetPageToken() string {
+	return (*scene_events.ListSceneEventsRequest)(m).GetPageToken()
+}
+
+// ListSceneEventsResponse from public import scene_events/scene_events.proto
+type ListSceneEventsResponse scene_events.ListSceneEventsResponse
+
+func (m *ListSceneEventsResponse) Reset() { (*scene_events.ListSceneEventsResponse)(m).Reset() }
+func (m *ListSceneEventsResponse) String() string {
+	return (*scene_events.ListSceneEventsResponse)(m).String()
+}
+func (*ListSceneEventsResponse) ProtoMessage() {}
+func (m *ListSceneEventsResponse) GetSceneEvents() []*SceneEvent {
+	o := (*scene_events.ListSceneEventsResponse)(m).GetSceneEvents()
+	if o == nil {
+		return nil
+	}
+	s := make([]*SceneEvent, len(o))
+	for i, x := range o {
+		s[i] = (*SceneEvent)(x)
+	}
+	return s
+}
+func (m *ListSceneEventsResponse) GetNextPageToken() string {
+	return (*scene_events.ListSceneEventsResponse)(m).GetNextPageToken()
+}
+
+// GetSceneEventRequest from public import scene_events/scene_events.proto
+type GetSceneEventRequest scene_events.GetSceneEventRequest
+
+func (m *GetSceneEventRequest) Reset() { (*scene_events.GetSceneEventRequest)(m).Reset() }
+func (m *GetSceneEventRequest) String() string {
+	return (*scene_events.GetSceneEventRequest)(m).String()
+}
+func (*GetSceneEventRequest) ProtoMessage()   {}
+func (m *GetSceneEventRequest) GetId() string { return (*scene_events.GetSceneEventRequest)(m).GetId() }
+
+// CreateSceneEventRequest from public import scene_events/scene_events.proto
+type CreateSceneEventRequest scene_events.CreateSceneEventRequest
+
+func (m *CreateSceneEventRequest) Reset() { (*scene_events.CreateSceneEventRequest)(m).Reset() }
+func (m *CreateSceneEventRequest) String() string {
+	return (*scene_events.CreateSceneEventRequest)(m).String()
+}
+func (*CreateSceneEventRequest) ProtoMessage() {}
+func (m *CreateSceneEventRequest) GetSceneEvent() *SceneEvent {
+	return (*SceneEvent)((*scene_events.CreateSceneEventRequest)(m).GetSceneEvent())
+}
+
+// SceneRender from public import scene_renders/scene_renders.proto
+type SceneRender scene_renders.SceneRender
+
+func (m *SceneRender) Reset()                { (*scene_renders.SceneRender)(m).Reset() }
+func (m *SceneRender) String() string        { return (*scene_renders.SceneRender)(m).String() }
+func (*SceneRender) ProtoMessage()           {}
+func (m *SceneRender) GetSceneId() string    { return (*scene_renders.SceneRender)(m).GetSceneId() }
+func (m *SceneRender) GetOperatorId() string { return (*scene_renders.SceneRender)(m).GetOperatorId() }
+func (m *SceneRender) GetTime() string       { return (*scene_renders.SceneRender)(m).GetTime() }
+
+// SceneRenderStatus from public import scene_renders/scene_renders.proto
+type SceneRenderStatus scene_renders.SceneRenderStatus
+
+func (m *SceneRenderStatus) Reset()         { (*scene_renders.SceneRenderStatus)(m).Reset() }
+func (m *SceneRenderStatus) String() string { return (*scene_renders.SceneRenderStatus)(m).String() }
+func (*SceneRenderStatus) ProtoMessage()    {}
+func (m *SceneRenderStatus) GetId() string  { return (*scene_renders.SceneRenderStatus)(m).GetId() }
+func (m *SceneRenderStatus) GetStatus() int32 {
+	return (*scene_renders.SceneRenderStatus)(m).GetStatus()
+}
+func (m *SceneRenderStatus) GetCreatedAt() int64 {
+	return (*scene_renders.SceneRenderStatus)(m).GetCreatedAt()
+}
+func (m *SceneRenderStatus) GetResourceId() string {
+	return (*scene_renders.SceneRenderStatus)(m).GetResourceId()
+}
+
+// SceneRenderRequest from public import scene_renders/scene_renders.proto
+type SceneRenderRequest scene_renders.SceneRenderRequest
+
+func (m *SceneRenderRequest) Reset()         { (*scene_renders.SceneRenderRequest)(m).Reset() }
+func (m *SceneRenderRequest) String() string { return (*scene_renders.SceneRenderRequest)(m).String() }
+func (*SceneRenderRequest) ProtoMessage()    {}
+func (m *SceneRenderRequest) GetRender() *SceneRender {
+	return (*SceneRender)((*scene_renders.SceneRenderRequest)(m).GetRender())
+}
+
+// SceneRenderStatusRequest from public import scene_renders/scene_renders.proto
+type SceneRenderStatusRequest scene_renders.SceneRenderStatusRequest
+
+func (m *SceneRenderStatusRequest) Reset() { (*scene_renders.SceneRenderStatusRequest)(m).Reset() }
+func (m *SceneRenderStatusRequest) String() string {
+	return (*scene_renders.SceneRenderStatusRequest)(m).String()
+}
+func (*SceneRenderStatusRequest) ProtoMessage() {}
+func (m *SceneRenderStatusRequest) GetStatus() *SceneRenderStatus {
+	return (*SceneRenderStatus)((*scene_renders.SceneRenderStatusRequest)(m).GetStatus())
+}
 
 // Scene from public import scenes/scenes.proto
 type Scene scenes.Scene
 
-func (m *Scene) Reset()               { (*scenes.Scene)(m).Reset() }
-func (m *Scene) String() string       { return (*scenes.Scene)(m).String() }
-func (*Scene) ProtoMessage()          {}
-func (m *Scene) GetId() string        { return (*scenes.Scene)(m).GetId() }
-func (m *Scene) GetProjectId() string { return (*scenes.Scene)(m).GetProjectId() }
-func (m *Scene) GetVersion() string   { return (*scenes.Scene)(m).GetVersion() }
-func (m *Scene) GetName() string      { return (*scenes.Scene)(m).GetName() }
-func (m *Scene) GetOperators() []byte { return (*scenes.Scene)(m).GetOperators() }
+func (m *Scene) Reset()                  { (*scenes.Scene)(m).Reset() }
+func (m *Scene) String() string          { return (*scenes.Scene)(m).String() }
+func (*Scene) ProtoMessage()             {}
+func (m *Scene) GetId() string           { return (*scenes.Scene)(m).GetId() }
+func (m *Scene) GetProjectId() string    { return (*scenes.Scene)(m).GetProjectId() }
+func (m *Scene) GetVersion() int32       { return (*scenes.Scene)(m).GetVersion() }
+func (m *Scene) GetName() string         { return (*scenes.Scene)(m).GetName() }
+func (m *Scene) GetOperatorData() []byte { return (*scenes.Scene)(m).GetOperatorData() }
 
 // ListScenesRequest from public import scenes/scenes.proto
 type ListScenesRequest scenes.ListScenesRequest
@@ -613,16 +750,18 @@ func (m *DeleteSceneRequest) GetId() string  { return (*scenes.DeleteSceneReques
 func init() { proto.RegisterFile("api-web/api-web.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 164 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x64, 0x8e, 0xb1, 0x0a, 0xc2, 0x30,
-	0x10, 0x86, 0xd5, 0x6a, 0x07, 0x47, 0xa5, 0x08, 0xdd, 0x1c, 0x1c, 0x1c, 0x34, 0x83, 0x2f, 0x72,
-	0x6f, 0x50, 0xae, 0xf1, 0x28, 0x11, 0x9a, 0xc4, 0xbb, 0x88, 0xe0, 0xd3, 0x1b, 0x9a, 0x44, 0x50,
-	0xa7, 0xff, 0xee, 0xfb, 0xbf, 0xe1, 0x5f, 0x37, 0xe8, 0xcd, 0xe9, 0x49, 0xbd, 0xca, 0x79, 0xf6,
-	0xec, 0x82, 0xdb, 0x54, 0xf1, 0x6c, 0x0f, 0x66, 0xc4, 0x81, 0x3a, 0xa1, 0xfb, 0x83, 0xac, 0x26,
-	0x51, 0x3f, 0x7f, 0x72, 0xdb, 0xed, 0x84, 0x73, 0x5b, 0xe0, 0x2e, 0xc6, 0x8d, 0x74, 0x10, 0x55,
-	0x8e, 0x5c, 0xec, 0x1d, 0x0f, 0x68, 0xcd, 0x0b, 0x83, 0x71, 0x56, 0xd4, 0xd7, 0x97, 0x95, 0x23,
-	0x93, 0xbd, 0x12, 0x77, 0x1e, 0x19, 0x47, 0x0a, 0xc4, 0xa2, 0xfe, 0x48, 0x56, 0x9b, 0x54, 0x14,
-	0xe1, 0x33, 0x49, 0x34, 0xd9, 0x38, 0x29, 0x45, 0x82, 0x30, 0x83, 0x39, 0x2c, 0xa0, 0x82, 0x25,
-	0xac, 0xa0, 0xee, 0xeb, 0x09, 0x5e, 0xde, 0x01, 0x00, 0x00, 0xff, 0xff, 0x95, 0x48, 0x93, 0x0e,
-	0x01, 0x01, 0x00, 0x00,
+	// 193 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x6c, 0x8f, 0xc1, 0xca, 0xc2, 0x30,
+	0x10, 0x84, 0xff, 0xdf, 0x6a, 0x15, 0x8f, 0x8a, 0x08, 0xbd, 0x88, 0x07, 0xf1, 0x54, 0x73, 0xf0,
+	0x45, 0xf6, 0x0d, 0x42, 0x1a, 0x97, 0x12, 0xa1, 0x49, 0x4c, 0x52, 0x05, 0x9f, 0xde, 0x90, 0x6e,
+	0xc0, 0x16, 0x4f, 0xbb, 0xf3, 0xcd, 0x64, 0x99, 0xac, 0x77, 0xc2, 0xaa, 0xfa, 0x85, 0x0d, 0xa3,
+	0x79, 0xb1, 0xce, 0x04, 0xb3, 0x29, 0xe2, 0x5a, 0xd5, 0xd2, 0x74, 0xb6, 0x0f, 0x22, 0x28, 0xa3,
+	0xb9, 0x43, 0x7d, 0x43, 0xe7, 0xd9, 0x0f, 0x36, 0xbc, 0xa9, 0x4e, 0xaa, 0x13, 0x2d, 0x72, 0x8f,
+	0x8f, 0x1e, 0xb5, 0x44, 0xcf, 0x26, 0x9a, 0x62, 0xdb, 0x84, 0xc9, 0xcd, 0xf0, 0x68, 0x5c, 0x2b,
+	0xb4, 0x7a, 0xa7, 0xbb, 0x9e, 0x8d, 0x14, 0x45, 0xf6, 0x71, 0xdc, 0x51, 0x06, 0xcf, 0xf2, 0x42,
+	0xc6, 0x79, 0xa8, 0xc1, 0x8d, 0x45, 0x27, 0x82, 0x89, 0x1d, 0xa7, 0x80, 0x82, 0x07, 0x2f, 0x51,
+	0x23, 0xc7, 0x27, 0xea, 0x78, 0xe5, 0x5b, 0xe4, 0x16, 0x03, 0xcb, 0x5f, 0x1d, 0xa9, 0xdc, 0x3e,
+	0x41, 0xf2, 0x08, 0xc2, 0x1f, 0xfc, 0xc3, 0x0c, 0x0a, 0x98, 0xc3, 0x02, 0x4a, 0x58, 0xc2, 0xaa,
+	0x29, 0x93, 0x71, 0xfd, 0x04, 0x00, 0x00, 0xff, 0xff, 0xbd, 0xf8, 0x1b, 0x65, 0x5f, 0x01, 0x00,
+	0x00,
 }

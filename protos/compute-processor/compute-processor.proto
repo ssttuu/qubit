@@ -2,4 +2,4 @@ syntax = "proto3";
 
 package processor;
 
-import public "renders/renders.proto";
+import public "computation_renders/computation_renders.proto";

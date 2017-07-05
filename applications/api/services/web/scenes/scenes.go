@@ -9,21 +9,18 @@ import (
 
 	"github.com/stupschwartz/qubit/applications/lib/apiutils"
 	"github.com/stupschwartz/qubit/core/scene"
-	computations_pb "github.com/stupschwartz/qubit/proto-gen/go/computations"
 	scenes_pb "github.com/stupschwartz/qubit/proto-gen/go/scenes"
 )
 
 type Server struct {
-	ComputationsClient computations_pb.ComputationsClient
-	PostgresClient     *sqlx.DB
-	StorageClient      *storage.Client
+	PostgresClient *sqlx.DB
+	StorageClient  *storage.Client
 }
 
-func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, storageClient *storage.Client, computationsClient computations_pb.ComputationsClient) {
+func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, storageClient *storage.Client) {
 	scenes_pb.RegisterScenesServer(grpcServer, &Server{
-		ComputationsClient: computationsClient,
-		PostgresClient:     postgresClient,
-		StorageClient:      storageClient,
+		PostgresClient: postgresClient,
+		StorageClient:  storageClient,
 	})
 }
 

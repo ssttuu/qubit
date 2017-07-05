@@ -8,15 +8,20 @@ import (
 	"github.com/stupschwartz/qubit/core/parameter"
 )
 
+// TODO: Move to scene package?
 type Operator struct {
-	Context    string // 2d, 3d, etc.
-	Inputs     Operators
-	Name       string
-	Parameters *parameter.Parameter
-	Type       string
+	Context    string               `json:"context"` // 2d, 3d, etc.
+	Id         string               `json:"id"`
+	InputIds   string               `json:"input_ids"`
+	Name       string               `json:"name"`
+	Parameters *parameter.Parameter `json:"parameters"`
+	Type       string               `json:"type"`
 }
 
-type Operators []Operator
+type OperatorData struct {
+	RootOperatorIds []string            `json:"root_operator_ids"`
+	OperatorMap     map[string]Operator `json:"operator_map"`
+}
 
 type RenderImageContext struct {
 	BoundingBox *geometry.BoundingBox2D
