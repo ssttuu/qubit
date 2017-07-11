@@ -2,6 +2,7 @@ package computation
 
 import (
 	"github.com/stupschwartz/qubit/core/geometry"
+	"github.com/stupschwartz/qubit/core/scene"
 	pb "github.com/stupschwartz/qubit/proto-gen/go/computations"
 )
 
@@ -10,11 +11,12 @@ const (
 )
 
 type Computation struct {
-	Id          string                  `db:"id"`
-	OperatorKey string                  `db:"operator_key"`
-	Time        float64                 `db:"time"`
-	BoundingBox *geometry.BoundingBox2D `db:"bounding_box"`
-	ResourceId  string                  `db:"resource_id"`
+	Id          string
+	Scene       scene.Scene
+	OperatorId  string
+	Time        float64
+	BoundingBox *geometry.BoundingBox2D
+	ResourceId  string
 }
 
 type Computations []Computation
@@ -22,7 +24,8 @@ type Computations []Computation
 func NewFromProto(pbComputation *pb.Computation) Computation {
 	return Computation{
 		Id:          pbComputation.GetId(),
-		OperatorKey: pbComputation.GetOperatorKey(),
+		Scene:       scene.NewFromProto(pbComputation.GetScene()),
+		OperatorId:  pbComputation.GetOperatorId(),
 		Time:        pbComputation.GetTime(),
 		BoundingBox: geometry.NewBoundingBoxFromProto(pbComputation.GetBoundingBox()),
 		ResourceId:  pbComputation.GetResourceId(),
@@ -32,7 +35,8 @@ func NewFromProto(pbComputation *pb.Computation) Computation {
 func (c *Computation) ToProto() *pb.Computation {
 	return &pb.Computation{
 		Id:          c.Id,
-		OperatorKey: c.OperatorKey,
+		Scene:       c.Scene.ToProto(),
+		OperatorId:  c.OperatorId,
 		Time:        c.Time,
 		BoundingBox: c.BoundingBox.ToProto(),
 		ResourceId:  c.ResourceId,
@@ -41,7 +45,7 @@ func (c *Computation) ToProto() *pb.Computation {
 
 func (c *Computation) GetCreateData() map[string]interface{} {
 	return map[string]interface{}{
-		"operator_key":   c.OperatorKey,
+		"operator_id":    c.OperatorId,
 		"time":           c.Time,
 		"bounding_box2d": c.BoundingBox,
 	}

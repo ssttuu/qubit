@@ -9,7 +9,7 @@ service ComputationRenders {
 }
 
 message ComputationRenderRequest {
-    string operator_key = 1;
+    string operator_id = 1;
     double time = 2;
     geometry.BoundingBox2D bounding_box = 3;
 }

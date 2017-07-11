@@ -5,6 +5,8 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"github.com/stupschwartz/qubit/applications/lib/apiutils"
+	"github.com/stupschwartz/qubit/core/scene"
 	computations_pb "github.com/stupschwartz/qubit/proto-gen/go/computations"
 	scene_renders_pb "github.com/stupschwartz/qubit/proto-gen/go/scene_renders"
 )
@@ -24,6 +26,26 @@ func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, computationsClie
 func (s *Server) Create(ctx context.Context, in *scene_renders_pb.SceneRenderRequest) (*scene_renders_pb.SceneRenderStatus, error) {
 	// TODO: Denormalize scene/operator data
 	// TODO: Pass through to computations
+
+	var obj scene.Scene
+	err := apiutils.Get(&apiutils.GetConfig{
+		DB:    s.PostgresClient,
+		Id:    in.Render.GetSceneId(),
+		Out:   &obj,
+		Table: scene.TableName,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	s.ComputationsClient.CreateComputation(ctx, &computations_pb.CreateComputationRequest{
+		&computations_pb.Computation{
+			Scene:       obj.ToProto(),
+			OperatorId:  in.Render.GetOperatorId(),
+			BoundingBox: in.Render.GetBoundingBox(),
+		},
+	})
+
 	return nil, nil
 }
 

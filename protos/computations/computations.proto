@@ -3,6 +3,7 @@ syntax = "proto3";
 package computations;
 
 import "geometry/geometry.proto";
+import "scenes/scenes.proto";
 
 service Computations {
     rpc CreateComputation (CreateComputationRequest) returns (ComputationStatus) {}
@@ -11,10 +12,11 @@ service Computations {
 
 message Computation {
     string id = 1;
-    string operator_key = 2;
-    double time = 3;
-    geometry.BoundingBox2D bounding_box = 4;
-    string resource_id = 5; // Location in GCS
+    scenes.Scene scene = 2;
+    string operator_id = 3;
+    double time = 4;
+    geometry.BoundingBox2D bounding_box = 5;
+    string resource_id = 6; // Location in GCS
 }
 
 message ComputationStatus {

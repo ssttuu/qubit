@@ -191,7 +191,7 @@ func (c *Coordinator) subscriptionHandler(ctx context.Context, msg *pubsub.Messa
 		return
 	}
 	pbRenderRequest := renders_pb.ComputationRenderRequest{
-		OperatorKey: comp.OperatorKey,
+		OperatorKey: comp.OperatorId,
 		Time:        comp.Time,
 		BoundingBox: comp.BoundingBox.ToProto(),
 	}
