@@ -58,7 +58,7 @@ proto.computation_renders.ComputationRenderRequest.prototype.toObject = function
  */
 proto.computation_renders.ComputationRenderRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    operatorKey: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    operatorId: jspb.Message.getFieldWithDefault(msg, 1, ""),
     time: +jspb.Message.getFieldWithDefault(msg, 2, 0.0),
     boundingBox: (f = msg.getBoundingBox()) && geometry_geometry_pb.BoundingBox2D.toObject(includeInstance, f)
   };
@@ -99,7 +99,7 @@ proto.computation_renders.ComputationRenderRequest.deserializeBinaryFromReader =
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorKey(value);
+      msg.setOperatorId(value);
       break;
     case 2:
       var value = /** @type {number} */ (reader.readDouble());
@@ -148,7 +148,7 @@ proto.computation_renders.ComputationRenderRequest.prototype.serializeBinary = f
  */
 proto.computation_renders.ComputationRenderRequest.prototype.serializeBinaryToWriter = function (writer) {
   var f = undefined;
-  f = this.getOperatorKey();
+  f = this.getOperatorId();
   if (f.length > 0) {
     writer.writeString(
       1,
@@ -174,16 +174,16 @@ proto.computation_renders.ComputationRenderRequest.prototype.serializeBinaryToWr
 
 
 /**
- * optional string operator_key = 1;
+ * optional string operator_id = 1;
  * @return {string}
  */
-proto.computation_renders.ComputationRenderRequest.prototype.getOperatorKey = function() {
+proto.computation_renders.ComputationRenderRequest.prototype.getOperatorId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.computation_renders.ComputationRenderRequest.prototype.setOperatorKey = function(value) {
+proto.computation_renders.ComputationRenderRequest.prototype.setOperatorId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 

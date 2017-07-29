@@ -1,0 +1,157 @@
+syntax = "proto3";
+
+package operators;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+
+service Operators {
+    rpc List (ListOperatorsRequest) returns (ListOperatorsResponse) {
+        option (google.api.http) = {
+            get: "/v1/scenes/{scene_id}/operators"
+        };
+    }
+    rpc Get (GetOperatorRequest) returns (Operator) {
+        option (google.api.http) = {
+            get: "/v1/scenes/{scene_id}/operators/{id}"
+        };
+    }
+    rpc Create (CreateOperatorRequest) returns (Operator) {
+        option (google.api.http) = {
+            post: "/v1/scenes/{scene_id}/operators"
+            body: "operator"
+        };
+    }
+    rpc Delete (DeleteOperatorRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/scenes/{scene_id}/operators/{id}"
+        };
+    }
+    rpc Rename (RenameOperatorRequest) returns (Operator) {
+        option (google.api.http) = {
+            post: "/v1/scenes/{scene_id}/operators/{id}/rename"
+            body: "operator"
+        };
+    }
+    // Connections API
+    rpc Connect (ConnectOperatorRequest) returns (Connection) {
+        option (google.api.http) = {
+            post: "/v1/scenes/{scene_id}/connections"
+            body: "connection"
+        };
+    }
+    rpc Disconnect (DisconnectOperatorRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/scenes/{scene_id}/connections/{connection_id}"
+        };
+    }
+    // Parameters API
+    // TODO: does anything need to be returned or are status codes sufficient?
+    // TODO: this will be a chatty API, ideally status codes are sufficient.
+    rpc SetValue (SetValueRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
+            body: "value"
+        };
+    }
+    rpc SetKeyFrame (SetKeyFrameRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
+            body: "keyframe"
+        };
+    }
+    rpc SetExpression (SetExpressionRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/scenes/{scene_id}/operators/{operator_id}/parameters/{parameter_id}"
+            body: "expression"
+        };
+    }
+}
+
+message Operator {
+    string scene_id = 1;
+    string id = 2;
+    int32 version = 3;
+    string name = 4;
+    bytes operator_data = 5;
+}
+
+message Connection {
+    string scene_id = 1;
+    string id = 2;
+    string input_id = 3;
+    int32 input_index = 4;
+    string output_id = 5;
+    int32 output_index = 6;
+}
+
+
+// Operator Requests
+message ListOperatorsRequest {
+    string scene_id = 1;
+    int32 page_size = 2;
+    string page_token = 3;
+}
+message ListOperatorsResponse {
+    repeated Operator operators = 1;
+    string next_page_token = 2;
+}
+message GetOperatorRequest {
+    string scene_id = 1;
+    string id = 2;
+}
+message CreateOperatorRequest {
+    string scene_id = 1;
+    Operator operator = 2;
+}
+message DeleteOperatorRequest {
+    string scene_id = 1;
+    string id = 2;
+}
+message RenameOperatorRequest {
+    string scene_id = 1;
+    string id = 2;
+    string name = 3;
+}
+
+// Connection Requests
+message ConnectOperatorRequest {
+    string scene_id = 1;
+    Connection connection = 2;
+}
+message DisconnectOperatorRequest {
+    string scene_id = 1;
+    string connection_id = 2;
+}
+
+// Parameters Requests
+message Value {
+
+}
+message KeyFrameValue {
+    double time = 1;
+    Value value = 2;
+}
+message ExpressionValue {
+    string expression = 1;
+}
+message SetValueRequest {
+    string scene_id = 1;
+    string operator_id = 2;
+    string parameter_id = 3;
+    Value value = 4;
+}
+message SetKeyFrameRequest {
+    string scene_id = 1;
+    string operator_id = 2;
+    string parameter_id = 3;
+    KeyFrameValue keyframe = 4;
+}
+message SetExpressionRequest {
+    string scene_id = 1;
+    string operator_id = 2;
+    string parameter_id = 3;
+    ExpressionValue expression = 4;
+}
+

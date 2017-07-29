@@ -40,7 +40,7 @@ type Coordinator struct {
 	RendersClient  renders_pb.ComputationRendersClient
 }
 
-func validateLastComputationStatus(tx *sqlx.Tx, computationId string, lastComputationStatusId string) error {
+func lockAndValidateComputationStatus(tx *sqlx.Tx, computationId string, lastComputationStatusId string) error {
 	var compStatuses []computation_status.ComputationStatus
 	err := pgutils.Select(&pgutils.SelectConfig{
 		Args: []interface{}{computationId},
@@ -81,7 +81,7 @@ func (c *Coordinator) heartbeat(tkr *time.Ticker, firstCompStatus *computation_s
 			log.Println(errors.Wrap(err, "Failed to begin transaction"))
 			continue
 		}
-		err = validateLastComputationStatus(
+		err = lockAndValidateComputationStatus(
 			tx,
 			lastCompStatus.ComputationId,
 			lastCompStatus.Id,
@@ -135,7 +135,7 @@ func (c *Coordinator) subscriptionHandler(ctx context.Context, msg *pubsub.Messa
 		msg.Nack()
 		return
 	}
-	err = validateLastComputationStatus(
+	err = lockAndValidateComputationStatus(
 		tx,
 		msgCompStatus.ComputationId,
 		msgCompStatus.Id,
@@ -191,7 +191,7 @@ func (c *Coordinator) subscriptionHandler(ctx context.Context, msg *pubsub.Messa
 		return
 	}
 	pbRenderRequest := renders_pb.ComputationRenderRequest{
-		OperatorKey: comp.OperatorKey,
+		OperatorKey: comp.OperatorId,
 		Time:        comp.Time,
 		BoundingBox: comp.BoundingBox.ToProto(),
 	}

@@ -2,26 +2,31 @@ package scene_event
 
 import (
 	"encoding/json"
-	"errors"
 
+	"github.com/pkg/errors"
 	pb "github.com/stupschwartz/qubit/proto-gen/go/scene_events"
 )
 
-const TableName = "scene_events"
-
 type SceneEventChange struct {
-	// TODO: Enum
-	Action     string                 `json:"action"` // create, update, delete
-	Changes    map[string]interface{} `json:"changes"`
-	OperatorId string                 `json:"operator_id"`
+	Action  string                 `json:"action"` // create, update, delete
+	Changes map[string]interface{} `json:"changes"`
+	//OperatorId string                 `json:"operator_id"`
+}
+
+func (s *SceneEventChange) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s)
+}
+
+func (s *SceneEventChange) UnmarshalJSON(b []byte) error {
+	return json.Unmarshal(b, s)
 }
 
 type SceneEvent struct {
-	DownChangeData []byte
+	DownChangeData *SceneEventChange
 	DownVersion    int32
 	Id             string
 	SceneId        string
-	UpChangeData   []byte
+	UpChangeData   *SceneEventChange
 	UpVersion      int32
 }
 
@@ -29,12 +34,20 @@ type SceneEvents []SceneEvent
 
 // TODO: Return a pointer
 func NewFromProto(pbSceneEvent *pb.SceneEvent) SceneEvent {
+	var upChangeData SceneEventChange
+	if err := json.Unmarshal(pbSceneEvent.GetUpChangeData(), &upChangeData); err != nil {
+
+	}
+	var downChangeData SceneEventChange
+	if err := json.Unmarshal(pbSceneEvent.GetDownChangeData(), &downChangeData); err != nil {
+
+	}
 	return SceneEvent{
-		DownChangeData: pbSceneEvent.GetDownChangeData(),
+		DownChangeData: &downChangeData,
 		DownVersion:    pbSceneEvent.GetDownVersion(),
 		Id:             pbSceneEvent.GetId(),
 		SceneId:        pbSceneEvent.GetSceneId(),
-		UpChangeData:   pbSceneEvent.GetUpChangeData(),
+		UpChangeData:   &upChangeData,
 		UpVersion:      pbSceneEvent.GetUpVersion(),
 	}
 }
@@ -49,29 +62,25 @@ func (s *SceneEvent) GetCreateData() map[string]interface{} {
 	}
 }
 
-func (s *SceneEvent) GetDownSceneEventChange() (*SceneEventChange, error) {
-	var sec SceneEventChange
-	err := json.Unmarshal(s.DownChangeData, &sec)
-	return &sec, err
-}
-
-func (s *SceneEvent) GetUpSceneEventChange() (*SceneEventChange, error) {
-	var sec SceneEventChange
-	err := json.Unmarshal(s.UpChangeData, &sec)
-	return &sec, err
-}
-
 func (s *SceneEvent) GetUpdateData() map[string]interface{} {
 	return map[string]interface{}{}
 }
 
 func (s *SceneEvent) ToProto() *pb.SceneEvent {
+	pbDownChangeData, err := json.Marshal(s.DownChangeData)
+	if err != nil {
+		// meh
+	}
+	pbUpChangeData, err := json.Marshal(s.UpChangeData)
+	if err != nil {
+		// meh
+	}
 	return &pb.SceneEvent{
-		DownChangeData: s.DownChangeData,
+		DownChangeData: pbDownChangeData,
 		DownVersion:    s.DownVersion,
 		Id:             s.Id,
 		SceneId:        s.SceneId,
-		UpChangeData:   s.UpChangeData,
+		UpChangeData:   pbUpChangeData,
 		UpVersion:      s.UpVersion,
 	}
 }

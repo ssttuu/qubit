@@ -4,6 +4,7 @@
 var grpc = require('grpc');
 var computations_computations_pb = require('../computations/computations_pb.js');
 var geometry_geometry_pb = require('../geometry/geometry_pb.js');
+var scenes_scenes_pb = require('../scenes/scenes_pb.js');
 
 function serialize_computations_ComputationStatus(arg) {
   if (!(arg instanceof computations_computations_pb.ComputationStatus)) {

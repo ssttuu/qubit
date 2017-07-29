@@ -10,6 +10,7 @@ var goog = jspb;
 var global = Function('return this')();
 
 var geometry_geometry_pb = require('../geometry/geometry_pb.js');
+var scenes_scenes_pb = require('../scenes/scenes_pb.js');
 goog.exportSymbol('proto.computations.Computation', null, global);
 goog.exportSymbol('proto.computations.ComputationStatus', null, global);
 goog.exportSymbol('proto.computations.CreateComputationRequest', null, global);
@@ -61,10 +62,11 @@ proto.computations.Computation.prototype.toObject = function(opt_includeInstance
 proto.computations.Computation.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    operatorKey: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    time: +jspb.Message.getFieldWithDefault(msg, 3, 0.0),
+    scene: (f = msg.getScene()) && scenes_scenes_pb.Scene.toObject(includeInstance, f),
+    operatorId: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    time: +jspb.Message.getFieldWithDefault(msg, 4, 0.0),
     boundingBox: (f = msg.getBoundingBox()) && geometry_geometry_pb.BoundingBox2D.toObject(includeInstance, f),
-    resourceId: jspb.Message.getFieldWithDefault(msg, 5, "")
+    resourceId: jspb.Message.getFieldWithDefault(msg, 6, "")
   };
 
   if (includeInstance) {
@@ -106,19 +108,24 @@ proto.computations.Computation.deserializeBinaryFromReader = function(msg, reade
       msg.setId(value);
       break;
     case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOperatorKey(value);
+      var value = new scenes_scenes_pb.Scene;
+      reader.readMessage(value,scenes_scenes_pb.Scene.deserializeBinaryFromReader);
+      msg.setScene(value);
       break;
     case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setOperatorId(value);
+      break;
+    case 4:
       var value = /** @type {number} */ (reader.readDouble());
       msg.setTime(value);
       break;
-    case 4:
+    case 5:
       var value = new geometry_geometry_pb.BoundingBox2D;
       reader.readMessage(value,geometry_geometry_pb.BoundingBox2D.deserializeBinaryFromReader);
       msg.setBoundingBox(value);
       break;
-    case 5:
+    case 6:
       var value = /** @type {string} */ (reader.readString());
       msg.setResourceId(value);
       break;
@@ -167,24 +174,32 @@ proto.computations.Computation.prototype.serializeBinaryToWriter = function (wri
       f
     );
   }
-  f = this.getOperatorKey();
+  f = this.getScene();
+  if (f != null) {
+    writer.writeMessage(
+      2,
+      f,
+      scenes_scenes_pb.Scene.serializeBinaryToWriter
+    );
+  }
+  f = this.getOperatorId();
   if (f.length > 0) {
     writer.writeString(
-      2,
+      3,
       f
     );
   }
   f = this.getTime();
   if (f !== 0.0) {
     writer.writeDouble(
-      3,
+      4,
       f
     );
   }
   f = this.getBoundingBox();
   if (f != null) {
     writer.writeMessage(
-      4,
+      5,
       f,
       geometry_geometry_pb.BoundingBox2D.serializeBinaryToWriter
     );
@@ -192,7 +207,7 @@ proto.computations.Computation.prototype.serializeBinaryToWriter = function (wri
   f = this.getResourceId();
   if (f.length > 0) {
     writer.writeString(
-      5,
+      6,
       f
     );
   }
@@ -215,48 +230,78 @@ proto.computations.Computation.prototype.setId = function(value) {
 
 
 /**
- * optional string operator_key = 2;
- * @return {string}
+ * optional scenes.Scene scene = 2;
+ * @return {?proto.scenes.Scene}
  */
-proto.computations.Computation.prototype.getOperatorKey = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+proto.computations.Computation.prototype.getScene = function() {
+  return /** @type{?proto.scenes.Scene} */ (
+    jspb.Message.getWrapperField(this, scenes_scenes_pb.Scene, 2));
 };
 
 
-/** @param {string} value */
-proto.computations.Computation.prototype.setOperatorKey = function(value) {
-  jspb.Message.setField(this, 2, value);
+/** @param {?proto.scenes.Scene|undefined} value */
+proto.computations.Computation.prototype.setScene = function(value) {
+  jspb.Message.setWrapperField(this, 2, value);
+};
+
+
+proto.computations.Computation.prototype.clearScene = function() {
+  this.setScene(undefined);
 };
 
 
 /**
- * optional double time = 3;
- * @return {number}
+ * Returns whether this field is set.
+ * @return {!boolean}
  */
-proto.computations.Computation.prototype.getTime = function() {
-  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 3, 0.0));
+proto.computations.Computation.prototype.hasScene = function() {
+  return jspb.Message.getField(this, 2) != null;
 };
 
 
-/** @param {number} value */
-proto.computations.Computation.prototype.setTime = function(value) {
+/**
+ * optional string operator_id = 3;
+ * @return {string}
+ */
+proto.computations.Computation.prototype.getOperatorId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.computations.Computation.prototype.setOperatorId = function(value) {
   jspb.Message.setField(this, 3, value);
 };
 
 
 /**
- * optional geometry.BoundingBox2D bounding_box = 4;
+ * optional double time = 4;
+ * @return {number}
+ */
+proto.computations.Computation.prototype.getTime = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 4, 0.0));
+};
+
+
+/** @param {number} value */
+proto.computations.Computation.prototype.setTime = function(value) {
+  jspb.Message.setField(this, 4, value);
+};
+
+
+/**
+ * optional geometry.BoundingBox2D bounding_box = 5;
  * @return {?proto.geometry.BoundingBox2D}
  */
 proto.computations.Computation.prototype.getBoundingBox = function() {
   return /** @type{?proto.geometry.BoundingBox2D} */ (
-    jspb.Message.getWrapperField(this, geometry_geometry_pb.BoundingBox2D, 4));
+    jspb.Message.getWrapperField(this, geometry_geometry_pb.BoundingBox2D, 5));
 };
 
 
 /** @param {?proto.geometry.BoundingBox2D|undefined} value */
 proto.computations.Computation.prototype.setBoundingBox = function(value) {
-  jspb.Message.setWrapperField(this, 4, value);
+  jspb.Message.setWrapperField(this, 5, value);
 };
 
 
@@ -270,22 +315,22 @@ proto.computations.Computation.prototype.clearBoundingBox = function() {
  * @return {!boolean}
  */
 proto.computations.Computation.prototype.hasBoundingBox = function() {
-  return jspb.Message.getField(this, 4) != null;
+  return jspb.Message.getField(this, 5) != null;
 };
 
 
 /**
- * optional string resource_id = 5;
+ * optional string resource_id = 6;
  * @return {string}
  */
 proto.computations.Computation.prototype.getResourceId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
 };
 
 
 /** @param {string} value */
 proto.computations.Computation.prototype.setResourceId = function(value) {
-  jspb.Message.setField(this, 5, value);
+  jspb.Message.setField(this, 6, value);
 };
 
 

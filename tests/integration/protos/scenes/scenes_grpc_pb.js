@@ -5,6 +5,7 @@ var grpc = require('grpc');
 var scenes_scenes_pb = require('../scenes/scenes_pb.js');
 var google_api_annotations_pb = require('../google/api/annotations_pb.js');
 var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js');
+var operators_operators_pb = require('../operators/operators_pb.js');
 
 function serialize_google_protobuf_Empty(arg) {
   if (!(arg instanceof google_protobuf_empty_pb.Empty)) {
@@ -72,6 +73,17 @@ function deserialize_scenes_ListScenesResponse(buffer_arg) {
   return scenes_scenes_pb.ListScenesResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_scenes_RenameSceneRequest(arg) {
+  if (!(arg instanceof scenes_scenes_pb.RenameSceneRequest)) {
+    throw new Error('Expected argument of type scenes.RenameSceneRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_scenes_RenameSceneRequest(buffer_arg) {
+  return scenes_scenes_pb.RenameSceneRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_scenes_Scene(arg) {
   if (!(arg instanceof scenes_scenes_pb.Scene)) {
     throw new Error('Expected argument of type scenes.Scene');
@@ -81,17 +93,6 @@ function serialize_scenes_Scene(arg) {
 
 function deserialize_scenes_Scene(buffer_arg) {
   return scenes_scenes_pb.Scene.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_scenes_UpdateSceneRequest(arg) {
-  if (!(arg instanceof scenes_scenes_pb.UpdateSceneRequest)) {
-    throw new Error('Expected argument of type scenes.UpdateSceneRequest');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_scenes_UpdateSceneRequest(buffer_arg) {
-  return scenes_scenes_pb.UpdateSceneRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 
@@ -129,17 +130,6 @@ var ScenesService = exports.ScenesService = {
     responseSerialize: serialize_scenes_Scene,
     responseDeserialize: deserialize_scenes_Scene,
   },
-  update: {
-    path: '/scenes.Scenes/Update',
-    requestStream: false,
-    responseStream: false,
-    requestType: scenes_scenes_pb.UpdateSceneRequest,
-    responseType: scenes_scenes_pb.Scene,
-    requestSerialize: serialize_scenes_UpdateSceneRequest,
-    requestDeserialize: deserialize_scenes_UpdateSceneRequest,
-    responseSerialize: serialize_scenes_Scene,
-    responseDeserialize: deserialize_scenes_Scene,
-  },
   delete: {
     path: '/scenes.Scenes/Delete',
     requestStream: false,
@@ -150,6 +140,17 @@ var ScenesService = exports.ScenesService = {
     requestDeserialize: deserialize_scenes_DeleteSceneRequest,
     responseSerialize: serialize_google_protobuf_Empty,
     responseDeserialize: deserialize_google_protobuf_Empty,
+  },
+  rename: {
+    path: '/scenes.Scenes/Rename',
+    requestStream: false,
+    responseStream: false,
+    requestType: scenes_scenes_pb.RenameSceneRequest,
+    responseType: scenes_scenes_pb.Scene,
+    requestSerialize: serialize_scenes_RenameSceneRequest,
+    requestDeserialize: deserialize_scenes_RenameSceneRequest,
+    responseSerialize: serialize_scenes_Scene,
+    responseDeserialize: deserialize_scenes_Scene,
   },
 };
 
