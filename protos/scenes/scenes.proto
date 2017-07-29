@@ -5,6 +5,8 @@ package scenes;
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
+import "operators/operators.proto";
+
 
 service Scenes {
     rpc List (ListScenesRequest) returns (ListScenesResponse) {
@@ -23,15 +25,15 @@ service Scenes {
             body: "scene"
         };
     }
-    rpc Update (UpdateSceneRequest) returns (Scene) {
-        option (google.api.http) = {
-            put: "/v1/scenes/{id}"
-            body: "scene"
-        };
-    }
     rpc Delete (DeleteSceneRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/v1/scenes/{id}"
+        };
+    }
+    rpc Rename (RenameSceneRequest) returns (Scene) {
+        option (google.api.http) = {
+            post: "/v1/scenes/{id}/rename"
+            body: "scene"
         };
     }
 }
@@ -41,7 +43,8 @@ message Scene {
     string project_id = 2;
     int32 version = 3;
     string name = 4;
-    bytes operator_data = 5;
+    map<string, operators.Operator> operators = 5;
+    map<string, operators.Connection> connections = 6;
 }
 
 message ListScenesRequest {
@@ -62,11 +65,11 @@ message CreateSceneRequest {
     Scene scene = 1;
 }
 
-message UpdateSceneRequest {
-    string id = 1;
-    Scene scene = 2;
-}
-
 message DeleteSceneRequest {
     string id = 1;
+}
+
+message RenameSceneRequest {
+    string id = 1;
+    string name = 2;
 }

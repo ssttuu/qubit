@@ -16,6 +16,7 @@ import (
 
 	"github.com/stupschwartz/qubit/applications/api/services/web/image_sequences"
 	"github.com/stupschwartz/qubit/applications/api/services/web/images"
+	"github.com/stupschwartz/qubit/applications/api/services/web/operators"
 	"github.com/stupschwartz/qubit/applications/api/services/web/organizations"
 	"github.com/stupschwartz/qubit/applications/api/services/web/projects"
 	"github.com/stupschwartz/qubit/applications/api/services/web/scene_events"
@@ -89,6 +90,7 @@ func main() {
 	scene_events.Register(grpcServer, postgresClient)
 	scene_renders.Register(grpcServer, postgresClient, computationsClient)
 	scenes.Register(grpcServer, postgresClient, storageClient)
+	operators.Register(grpcServer, postgresClient, storageClient)
 	images.Register(grpcServer, postgresClient)
 	image_sequences.Register(grpcServer, postgresClient)
 	<-servingDone

@@ -3,19 +3,22 @@ package scene
 import (
 	"encoding/json"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	"github.com/stupschwartz/qubit/core/operator"
+	"github.com/stupschwartz/qubit/applications/lib/apiutils"
 	pb "github.com/stupschwartz/qubit/proto-gen/go/scenes"
 )
 
-const TableName = "scenes"
+const ScenesTableName = "scenes"
 
+// TODO: obviously
 type Scene struct {
-	Id           string `db:"id"`
-	Name         string `db:"name"`
-	OperatorData []byte `db:"operator_data"`
-	ProjectId    string `db:"project_id"`
-	Version      int32  `db:"version"`
+	Id          string        `db:"id"`
+	Name        string        `db:"name"`
+	Operators   OperatorMap   `db:"operators"`
+	Connections ConnectionMap `db:"connections"`
+	ProjectId   string        `db:"project_id"`
+	Version     int32         `db:"version"`
 }
 
 type Scenes []Scene
@@ -23,34 +26,36 @@ type Scenes []Scene
 // TODO: Return a pointer
 func NewFromProto(pbScene *pb.Scene) Scene {
 	return Scene{
-		Id:           pbScene.GetId(),
-		Name:         pbScene.GetName(),
-		OperatorData: pbScene.GetOperatorData(),
-		ProjectId:    pbScene.GetProjectId(),
-		Version:      pbScene.GetVersion(),
+		Id:        pbScene.GetId(),
+		Name:      pbScene.GetName(),
+		Operators: pbScene.GetOperators(),
+		ProjectId: pbScene.GetProjectId(),
+		Version:   pbScene.GetVersion(),
 	}
+}
+
+func (s *Scene) ApplyEvent(eventName string, eventData map[string]interface{}) {
+
 }
 
 func (s *Scene) GetCreateData() map[string]interface{} {
-	defaultOpData := operator.OperatorData{
-		RootOperatorIds: []string{},
-		OperatorMap:     map[string]operator.Operator{},
-	}
-	defaultOpDataJSON, err := json.Marshal(defaultOpData)
+	// TODO: Store as Proto instead of JSON?
+	defaultOpDataJSON, err := json.Marshal(s.Operators)
 	if err != nil {
-		panic(errors.Wrapf(err, "Failed to marshal defaultOpData: %v", defaultOpData))
+		// TODO: handle/return error
+		panic(errors.Wrap(err, "Failed to marshal operators"))
 	}
 	return map[string]interface{}{
-		"name":          s.Name,
-		"operator_data": defaultOpDataJSON,
-		"project_id":    s.ProjectId,
-		"version":       1,
+		"name":       s.Name,
+		"operators":  defaultOpDataJSON,
+		"project_id": s.ProjectId,
+		"version":    1,
 	}
 }
 
-func (s *Scene) GetOperators() (operator.OperatorData, error) {
-	var opData operator.OperatorData
-	err := json.Unmarshal(s.OperatorData, &opData)
+func (s *Scene) GetOperators() (OperatorMap, error) {
+	var opData OperatorMap
+	err := json.Unmarshal(s.Operators, &opData)
 	return opData, err
 }
 
@@ -60,22 +65,23 @@ func (s *Scene) GetUpdateData() map[string]interface{} {
 	}
 }
 
-func (s *Scene) SetOperators(opData operator.OperatorData) error {
+func (s *Scene) SetOperators(opData OperatorMap) error {
 	opsJSONData, err := json.Marshal(&opData)
 	if err != nil {
 		return err
 	}
-	s.OperatorData = opsJSONData
+	s.Operators = opsJSONData
 	return nil
 }
 
 func (s *Scene) ToProto() *pb.Scene {
 	return &pb.Scene{
-		Id:           s.Id,
-		Name:         s.Name,
-		OperatorData: s.OperatorData,
-		ProjectId:    s.ProjectId,
-		Version:      s.Version,
+		Id:          s.Id,
+		Name:        s.Name,
+		Operators:   s.Operators,
+		Connections: s.Connections,
+		ProjectId:   s.ProjectId,
+		Version:     s.Version,
 	}
 }
 
@@ -95,4 +101,71 @@ func (s *Scenes) ToProto() []*pb.Scene {
 		pbscenes = append(pbscenes, sceneProto)
 	}
 	return pbscenes
+}
+
+// DB
+
+func CreateScene(pgClient *sqlx.DB, scene *Scene) error {
+	err := apiutils.Create(&apiutils.CreateConfig{
+		DB:     pgClient,
+		Object: scene,
+		Table:  ScenesTableName,
+	})
+	if err != nil {
+		return errors.Wrapf(err, "Failed to create Scene: %v", scene)
+	}
+	return err
+}
+
+func GetScene(pgClient *sqlx.DB, sceneId string) (*Scene, error) {
+	var s Scene
+	err := apiutils.Get(&apiutils.GetConfig{
+		DB:    pgClient,
+		Id:    sceneId,
+		Out:   &s,
+		Table: ScenesTableName,
+	})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to get Scene by id: %v", sceneId)
+	}
+	return s, nil
+}
+
+func ListScene(pgClient *sqlx.DB) (Scenes, error) {
+	var sceneList Scenes
+	err := apiutils.List(&apiutils.ListConfig{
+		DB:    pgClient,
+		Out:   &sceneList,
+		Table: ScenesTableName,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to get Scenes")
+	}
+	return sceneList, nil
+}
+
+func UpdateScene(pgClient *sqlx.DB, scene *Scene) error {
+	err := apiutils.Update(&apiutils.UpdateConfig{
+		DB:        pgClient,
+		Id:        scene.Id,
+		NewObject: scene,
+		OldObject: &Scene{},
+		Table:     ScenesTableName,
+	})
+	if err != nil {
+		return errors.Wrapf(err, "Failed to update Scene: %v", scene)
+	}
+	return nil
+}
+
+func DeleteScene(pgClient *sqlx.DB, sceneId string) error {
+	err := apiutils.Delete(&apiutils.DeleteConfig{
+		DB:    pgClient,
+		Id:    sceneId,
+		Table: ScenesTableName,
+	})
+	if err != nil {
+		return errors.Wrapf(err, "Failed to delete Scene by id: %v", sceneId)
+	}
+	return err
 }

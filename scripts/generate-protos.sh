@@ -45,6 +45,7 @@ for f in $(find protos -type f -name "*.proto"); do
             scene_events/scene_events.proto=github.com/stupschwartz/qubit/proto-gen/go/scene_events
             scene_renders/scene_renders.proto=github.com/stupschwartz/qubit/proto-gen/go/scene_renders
             scenes/scenes.proto=github.com/stupschwartz/qubit/proto-gen/go/scenes
+            operators/operators.proto=github.com/stupschwartz/qubit/proto-gen/go/operators
         )
         module_string=
         for m in "${modules[@]}"; do

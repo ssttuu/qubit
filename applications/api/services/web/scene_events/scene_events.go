@@ -41,7 +41,7 @@ func (s *Server) Create(ctx context.Context, in *scene_events_pb.CreateSceneEven
 		ForClause:   "FOR UPDATE",
 		Id:          newObject.SceneId,
 		Out:         &sc,
-		Table:       scene.TableName,
+		Table:       scene.ScenesTableName,
 		Tx:          tx,
 		WhereClause: "WHERE scene_version=$1",
 	})
@@ -82,7 +82,7 @@ func (s *Server) Create(ctx context.Context, in *scene_events_pb.CreateSceneEven
 	}
 	err = pgutils.UpdateByID(&pgutils.UpdateConfig{
 		Id:    sc.Id,
-		Table: scene.TableName,
+		Table: scene.ScenesTableName,
 		Tx:    tx,
 		Updates: map[string]interface{}{
 			"operators": operatorJSONData,

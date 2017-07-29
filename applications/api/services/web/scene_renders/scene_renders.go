@@ -24,20 +24,21 @@ func Register(grpcServer *grpc.Server, postgresClient *sqlx.DB, computationsClie
 }
 
 func (s *Server) Create(ctx context.Context, in *scene_renders_pb.SceneRenderRequest) (*scene_renders_pb.SceneRenderStatus, error) {
-	// TODO: Denormalize scene/operator data
 	// TODO: Pass through to computations
 
+	// TODO: check for / create SceneSnapshot
 	var obj scene.Scene
 	err := apiutils.Get(&apiutils.GetConfig{
 		DB:    s.PostgresClient,
 		Id:    in.Render.GetSceneId(),
 		Out:   &obj,
-		Table: scene.TableName,
+		Table: scene.ScenesTableName,
 	})
 	if err != nil {
 		return nil, err
 	}
 
+	// TODO: return long running task data to client
 	s.ComputationsClient.CreateComputation(ctx, &computations_pb.CreateComputationRequest{
 		&computations_pb.Computation{
 			Scene:       obj.ToProto(),
